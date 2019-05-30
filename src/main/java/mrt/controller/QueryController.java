@@ -45,7 +45,7 @@ public class QueryController {
 	private Slack slack;
 
 	@PostMapping( "/query" )
-	public Map<?, ?> query( @RequestParam String text ) {
+	public Map<?, ?> query( String command, @RequestParam String text ) {
 		log.info( "Text: {}", text );
 
 		if ( STATIONS.isEmpty() ) {
@@ -72,6 +72,8 @@ public class QueryController {
 			row( table, 0 ).select( "th:lt(2)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
 
 			attach.setText( text = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
+
+			attach.setFooter( StringUtils.isEmpty( command ) ? StringUtils.EMPTY : String.format( "%s %s", command, text ) );
 
 			JsonObject object = new SlackMessage( StringUtils.EMPTY ).addAttachments( attach.setFallback( text ) ).prepare();
 
