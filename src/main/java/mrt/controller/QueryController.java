@@ -73,8 +73,6 @@ public class QueryController {
 
 			row( table, 0 ).select( "th:lt(3)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
 
-			attach.addFields( field( "注意事項", "不含候車時間" ) );
-
 			attach.setFooter( StringUtils.isEmpty( command ) ? text : String.format( "%s %s", command, text ) );
 
 			attach.setText( text = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
