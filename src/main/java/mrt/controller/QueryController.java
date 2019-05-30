@@ -2,10 +2,9 @@ package mrt.controller;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
@@ -92,11 +91,11 @@ public class QueryController {
 	}
 
 	private String find( String name ) {
-		List<String> stations = STATIONS.entrySet().stream().filter( i -> i.getKey().contains( name ) ).map( Entry::getValue ).collect( Collectors.toList() );
+		Optional<String> station = STATIONS.entrySet().stream().filter( i -> StringUtils.split( i.getKey() )[ 1 ].equals( name ) ).map( Entry::getValue ).findFirst();
 
-		Assert.isTrue( stations.size() == 1, "找到多個站名: " + name );
+		Assert.isTrue( station.isPresent(), "查無此站: " + name );
 
-		return stations.get( 0 );
+		return station.get();
 	}
 
 	private Element row( Element table, int index ) {
