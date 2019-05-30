@@ -86,15 +86,11 @@ public class QueryController {
 	}
 
 	private String find( String name ) {
-		Optional<String> station = STATIONS.entrySet().stream().filter( i -> check( i.getKey(), name ) ).map( Entry::getValue ).findFirst();
+		Optional<String> station = STATIONS.entrySet().stream().filter( i -> StringUtils.split( i.getKey() )[ 1 ].equals( name ) ).map( Entry::getValue ).findFirst();
 
 		Assert.isTrue( station.isPresent(), "查無此站: " + name );
 
 		return station.get();
-	}
-
-	private boolean check( String key, String name ) {
-		return StringUtils.split( key )[ 1 ].equals( StringUtils.remove( name, "站" ) );
 	}
 
 	private Element row( Element table, int index ) {
