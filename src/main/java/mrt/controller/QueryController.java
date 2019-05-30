@@ -71,7 +71,7 @@ public class QueryController {
 
 			SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( url ).setFooterIcon( ICON );
 
-			row( table, 0 ).select( "th:lt(2)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
+			row( table, 0 ).select( "th:lt(3)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
 
 			attach.setFooter( StringUtils.isEmpty( command ) ? text : String.format( "%s %s", command, text ) );
 
@@ -106,7 +106,7 @@ public class QueryController {
 	}
 
 	private SlackField field( String title, String value ) {
-		return new SlackField().setShorten( true ).setTitle( title ).setValue( value );
+		return new SlackField().setShorten( true ).setTitle( title.contains( "愛心" ) ? "優待票" : title ).setValue( value );
 	}
 
 	private Document get( String url ) throws IOException {
