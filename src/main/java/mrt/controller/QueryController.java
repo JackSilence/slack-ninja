@@ -39,6 +39,8 @@ public class QueryController {
 
 	private static final String URL = "https://web.metro.taipei/c/2stainfo.asp", TITLE = "捷運票價及乘車時間";
 
+	private static final String TITLE_LINK = "https://www.metro.taipei/cp.aspx?n=ECEADC266D7120A7";
+
 	private static final Gson GSON = new Gson();
 
 	private static final Map<String, String> STATIONS = new HashMap<>();
@@ -71,11 +73,9 @@ public class QueryController {
 
 			Element table = tables.first(), row = row( table, 1 );
 
-			SlackAttachment attach = new SlackAttachment();
+			SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( TITLE_LINK );
 
 			row( table, 0 ).select( "th:lt(2)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
-
-			attach.setTitle( TITLE ).setTitleLink( "https://www.metro.taipei/cp.aspx?n=ECEADC266D7120A7" );
 
 			attach.setText( text = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
 
