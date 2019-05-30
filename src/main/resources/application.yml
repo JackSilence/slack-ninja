@@ -1,0 +1,5 @@
+app:
+  name: MRT
+logging:
+  pattern:
+    console: "[%d][%t] %p %C{0}.%M:%L - %m%n"
