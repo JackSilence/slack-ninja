@@ -37,6 +37,8 @@ public class QueryController {
 
 	private static final String QUERY = "?s1elect=%s&s2elect=%s&action=query", TITLE = "捷運票價及乘車時間";
 
+	private static final String THUMB = "https://www-ws.gov.taipei/001/Upload/public/MMO/trtc/logo.gif";
+
 	private static final String ICON = "https://platform.slack-edge.com/img/default_application_icon.png";
 
 	private static final Gson GSON = new Gson();
@@ -69,11 +71,11 @@ public class QueryController {
 
 			Element table = tables.first(), row = row( table, 1 );
 
-			SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( url ).setFooterIcon( ICON );
+			SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( url ).setThumbUrl( THUMB ).setFooterIcon( ICON );
 
 			row( table, 0 ).select( "th:lt(2)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
 
-			attach.setFooter( StringUtils.isEmpty( command ) ? StringUtils.EMPTY : String.format( "%s %s", command, text ) );
+			attach.setFooter( StringUtils.isEmpty( command ) ? text : String.format( "%s %s", command, text ) );
 
 			attach.setText( text = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
 
