@@ -9,8 +9,6 @@ import java.util.Optional;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.fluent.Form;
-import org.apache.http.client.fluent.Request;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -27,7 +25,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import magic.service.Slack;
-import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
@@ -36,9 +33,9 @@ import net.gpedro.integrations.slack.SlackMessage;
 public class QueryController {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	private static final String URL = "https://web.metro.taipei/c/2stainfo.asp", TITLE = "捷運票價及乘車時間";
+	private static final String URL = "https://web.metro.taipei/c/2stainfo.asp";
 
-	private static final String TITLE_LINK = "https://www.metro.taipei/cp.aspx?n=ECEADC266D7120A7";
+	private static final String QUERY = "?s1elect=%s&s2elect=%s&action=query", TITLE = "捷運票價及乘車時間";
 
 	private static final Gson GSON = new Gson();
 
@@ -60,19 +57,17 @@ public class QueryController {
 
 			Assert.isTrue( params.length == 2, "起訖站皆須輸入" );
 
-			String start = find( params[ 0 ] ), end = find( params[ 1 ] );
+			String start = find( params[ 0 ] ), end = find( params[ 1 ] ), url;
 
 			Assert.isTrue( !start.equals( end ), "起訖站不得相同: " + text );
 
 			log.info( "Start: {}, end: {}", start, end );
 
-			Form form = Form.form().add( "s1elect", start ).add( "s2elect", end ).add( "action", "query" );
-
-			Elements tables = Jsoup.parse( Utils.getEntityAsString( Request.Post( URL ).bodyForm( form.build() ) ) ).select( "form table" );
+			Elements tables = get( url = URL.concat( String.format( QUERY, start, end ) ) ).select( "form table" );
 
 			Element table = tables.first(), row = row( table, 1 );
 
-			SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( TITLE_LINK );
+			SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( url );
 
 			row( table, 0 ).select( "th:lt(2)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
 
@@ -82,7 +77,7 @@ public class QueryController {
 
 			return GSON.fromJson( GSON.toJson( object ), Map.class );
 
-		} catch ( RuntimeException e ) {
+		} catch ( RuntimeException | IOException e ) {
 			log.error( "", e );
 
 			return slack.text( e.getMessage() );
@@ -110,12 +105,14 @@ public class QueryController {
 		return new SlackField().setShorten( true ).setTitle( title ).setValue( value );
 	}
 
+	private Document get( String url ) throws IOException {
+		return Jsoup.connect( url ).get();
+	}
+
 	@PostConstruct
 	private void init() {
 		try {
-			Document doc = Jsoup.connect( URL ).get();
-
-			doc.getElementById( "sstation" ).select( "option" ).forEach( i -> STATIONS.put( i.text(), i.val() ) );
+			get( URL ).getElementById( "sstation" ).select( "option" ).forEach( i -> STATIONS.put( i.text(), i.val() ) );
 
 		} catch ( IOException e ) {
 			log.error( "", e );
