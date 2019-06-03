@@ -38,7 +38,7 @@ public class TaskController {
 
 	@PostMapping
 	public Map<?, ?> task() {
-		Map<String, Object> attach = map( new SlackAttachment( StringUtils.EMPTY ).setText( "請選擇要執行的任務" ).setColor( "good" ).toJson() );
+		Map<String, Object> attach = map( new SlackAttachment( StringUtils.EMPTY ).setText( "請選擇要執行的任務" ).setCallbackId( "heroku_task" ).setColor( "good" ).toJson() );
 
 		attach.put( ACTIONS, Stream.of( Task.values() ).map( this::action ).collect( Collectors.toList() ) );
 
