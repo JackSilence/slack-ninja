@@ -41,11 +41,11 @@ public class TaskController {
 
 	@PostMapping
 	public Map<?, ?> task() {
-		SlackAttachment attach = new SlackAttachment( StringUtils.EMPTY ).setCallbackId( ID ).setColor( "good" );
+		SlackAttachment attach = new SlackAttachment( StringUtils.EMPTY ).setTitle( "任務清單" ).setCallbackId( ID );
 
 		Stream.of( Task.values() ).map( this::action ).forEach( i -> attach.addAction( i ) );
 
-		return map( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach ).prepare() );
+		return map( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach.setText( "點擊按鈕以選擇，並於確認後執行" ) ).prepare() );
 	}
 
 	@PostMapping( "/execute" )
@@ -56,7 +56,7 @@ public class TaskController {
 	}
 
 	private Action action( Task task ) { // "confirm": {} -> 會出現預設的確認視窗
-		return new Action( ID, task.desc, SlackActionType.BUTTON, task.name() ).setConfirm( new Confirm() );
+		return new Action( ID, task.desc, SlackActionType.BUTTON, task.name() ).setConfirm( new Confirm( "確認執行任務", task.desc, "是", "否" ) );
 	}
 
 	private Map<String, Object> map( JsonObject object ) {
