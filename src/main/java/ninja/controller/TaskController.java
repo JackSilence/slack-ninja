@@ -1,8 +1,6 @@
 package ninja.controller;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -12,23 +10,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cloudinary.utils.StringUtils;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import net.gpedro.integrations.slack.SlackAction;
 import net.gpedro.integrations.slack.SlackActionType;
 import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackMessage;
+import ninja.slack.Action;
+import ninja.slack.Confirm;
 
 @RestController
 @RequestMapping( "/task" )
 public class TaskController {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
-
-	private static final String ATTACHMENTS = "attachments", ACTIONS = "actions", CONFIRM = "confirm";
-
-	private static final String TITLE = "title", OK_TEXT = "ok_text", DISMISS_TEXT = "dismiss_text";
 
 	private static final Gson GSON = new Gson();
 
@@ -38,12 +33,11 @@ public class TaskController {
 
 	@PostMapping
 	public Map<?, ?> task() {
-		Map<String, Object> attach = map( new SlackAttachment( StringUtils.EMPTY ).setText( "請選擇要執行的任務" ).setColor( "good" ).toJson() );
+		SlackAttachment attach = new SlackAttachment( StringUtils.EMPTY ).setColor( "good" ).setCallbackId( "heroku_task" );
 
-		attach.put( ACTIONS, Stream.of( Task.values() ).map( this::action ).collect( Collectors.toList() ) );
-		attach.put( "callback_id", "heroku_task" );
+		Stream.of( Task.values() ).map( this::action ).forEach( i -> attach.addAction( i ) );
 
-		return ImmutableMap.of( ATTACHMENTS, Arrays.asList( attach ) );
+		return map( new SlackMessage().setText( "請選擇要執行的任務" ).addAttachments( attach ).prepare() );
 	}
 
 	@PostMapping( "/execute" )
@@ -53,12 +47,10 @@ public class TaskController {
 		return null;
 	}
 
-	private Map<String, Object> action( Task task ) {
-		Map<String, Object> action = map( new SlackAction( "task", task.name(), SlackActionType.BUTTON, task.name() ).toJson() );
+	private Action action( Task task ) {
+		Action action = new Action( "task", task.name(), SlackActionType.BUTTON, task.name() );
 
-		action.put( CONFIRM, ImmutableMap.of( TITLE, "確認執行", OK_TEXT, "是", DISMISS_TEXT, "否" ) );
-
-		return action;
+		return action.setConfirm( new Confirm( null, "lala", null, null ) );
 	}
 
 	private Map<String, Object> map( JsonObject object ) {
