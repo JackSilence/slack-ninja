@@ -50,7 +50,7 @@ public class TaskController {
 	private Action action( Task task ) {
 		Action action = new Action( "task", task.name(), SlackActionType.BUTTON, task.name() );
 
-		return action.setConfirm( new Confirm( null, null, null, null ) );
+		return action; // slack button會有預設的confirm視窗
 	}
 
 	private Map<String, Object> map( JsonObject object ) {
