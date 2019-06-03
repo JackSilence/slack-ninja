@@ -37,7 +37,7 @@ public class TaskController {
 
 		Stream.of( Task.values() ).map( this::action ).forEach( i -> attach.addAction( i ) );
 
-		return map( new SlackMessage("請選擇要執行的任務").addAttachments( attach ).prepare() );
+		return map( new SlackMessage( "請選擇要執行的任務" ).addAttachments( attach ).prepare() );
 	}
 
 	@PostMapping( "/execute" )
@@ -50,7 +50,8 @@ public class TaskController {
 	private Action action( Task task ) {
 		Action action = new Action( "task", task.name(), SlackActionType.BUTTON, task.name() );
 
-		return action; // slack button會有預設的confirm視窗
+		// slack action如果有confirm: {}則會出現預設的確認視窗
+		return action.setConfirm( new Confirm() );
 	}
 
 	private Map<String, Object> map( JsonObject object ) {

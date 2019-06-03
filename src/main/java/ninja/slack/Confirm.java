@@ -7,6 +7,9 @@ public class Confirm {
 
 	private String title, text, ok, dismiss;
 
+	public Confirm() {
+	}
+
 	public Confirm( String title, String text, String ok, String dismiss ) {
 		this.title = title;
 		this.text = text;
