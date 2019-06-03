@@ -25,19 +25,27 @@ import ninja.slack.Confirm;
 public class TaskController {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
+	private static final String ID = "heroku_task";
+
 	private static final Gson GSON = new Gson();
 
 	private enum Task {
-		SHOPEE, HEROKU, POINT, NBA;
+		SHOPEE( "百米家新商品通知" ), HEROKU( "Heroku Usage" ), POINT( "點數查詢" ), NBA( "NBA BOX" );
+
+		private String desc;
+
+		private Task( String desc ) {
+			this.desc = desc;
+		}
 	}
 
 	@PostMapping
 	public Map<?, ?> task() {
-		SlackAttachment attach = new SlackAttachment( StringUtils.EMPTY ).setColor( "good" ).setCallbackId( "heroku_task" );
+		SlackAttachment attach = new SlackAttachment( StringUtils.EMPTY ).setCallbackId( ID ).setColor( "good" );
 
 		Stream.of( Task.values() ).map( this::action ).forEach( i -> attach.addAction( i ) );
 
-		return map( new SlackMessage( "請選擇要執行的任務" ).addAttachments( attach ).prepare() );
+		return map( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach ).prepare() );
 	}
 
 	@PostMapping( "/execute" )
@@ -47,11 +55,8 @@ public class TaskController {
 		return null;
 	}
 
-	private Action action( Task task ) {
-		Action action = new Action( "task", task.name(), SlackActionType.BUTTON, task.name() );
-
-		// slack action如果有confirm: {}則會出現預設的確認視窗
-		return action.setConfirm( new Confirm() );
+	private Action action( Task task ) { // "confirm": {} -> 會出現預設的確認視窗
+		return new Action( ID, task.desc, SlackActionType.BUTTON, task.name() ).setConfirm( new Confirm() );
 	}
 
 	private Map<String, Object> map( JsonObject object ) {
