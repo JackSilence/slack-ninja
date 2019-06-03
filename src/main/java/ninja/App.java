@@ -1,4 +1,4 @@
-package mrt;
+package ninja;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

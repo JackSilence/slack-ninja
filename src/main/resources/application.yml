@@ -1,5 +1,5 @@
 app:
-  name: MRT
+  name: NINJA
 logging:
   pattern:
     console: "[%d][%t] %p %C{0}.%M:%L - %m%n"

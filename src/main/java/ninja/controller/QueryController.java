@@ -1,4 +1,4 @@
-package mrt.controller;
+package ninja.controller;
 
 import java.io.IOException;
 import java.util.HashMap;
