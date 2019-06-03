@@ -46,8 +46,8 @@ public class QueryController {
 	@Autowired
 	private Slack slack;
 
-	@PostMapping( "/query" )
-	public Map<?, ?> query( String command, @RequestParam String text ) {
+	@PostMapping( "/mrt" )
+	public Map<?, ?> mrt( String command, @RequestParam String text ) {
 		log.info( "Text: {}", text );
 
 		if ( STATIONS.isEmpty() ) {
