@@ -54,8 +54,8 @@ public class TaskController {
 	}
 
 	@PostMapping( "/execute" )
-	public Map<?, ?> execute( String payload ) {
-		log.info( payload );
+	public Map<?, ?> execute( String callback_id ) {
+		log.info( callback_id );
 
 		return slack.text( "OK" );
 	}
