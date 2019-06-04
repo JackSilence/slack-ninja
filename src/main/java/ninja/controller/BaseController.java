@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
+	protected static final String REQ_BODY = "req_body";
+
 	private static final String HEADER_TIMESTAMP = "X-Slack-Request-Timestamp", HEADER_SIGNATURE = "X-Slack-Signature";
 
 	private static final String VERSION = "v0", ALGORITHM = "HmacSHA256";
@@ -29,7 +32,7 @@ public abstract class BaseController {
 	private String secret;
 
 	@ModelAttribute
-	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, @RequestBody String body ) {
+	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, @RequestBody String body, HttpServletRequest request ) {
 		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
 
 		Assert.isTrue( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
@@ -37,6 +40,8 @@ public abstract class BaseController {
 		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
 
 		Assert.isTrue( signature.equals( digest ), String.join( "!=", signature, digest ) );
+
+		request.setAttribute( REQ_BODY, body );
 	}
 
 	private String digest( String content ) {
