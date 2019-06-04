@@ -4,8 +4,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.ImmutableMap;
-
 import ninja.slack.Callback;
 import ninja.util.Gson;
 
@@ -21,6 +19,6 @@ public class EventController extends BaseController {
 		}
 
 		log.info( "Body: {}", body );
-		return ImmutableMap.of( "text", "你剛剛說: " + callback.getEvent().getText() );
+		return "你剛剛說: " + callback.getEvent().getText();
 	}
 }
