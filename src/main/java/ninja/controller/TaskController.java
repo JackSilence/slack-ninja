@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.crypto.Mac;
@@ -80,7 +81,9 @@ public class TaskController {
 
 		Stream.of( Task.values() ).map( this::action ).forEach( i -> attach.addAction( i ) );
 
-		return Gson.map( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach ).prepare() );
+		attach.setText( Stream.of( Task.values() ).map( i -> "• " + i.desc ).collect( Collectors.joining( "\n" ) ) );
+
+		return Gson.map( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach.setTitle( "任務清單" ) ).prepare() );
 	}
 
 	@PostMapping( "/execute" )
@@ -105,7 +108,7 @@ public class TaskController {
 	}
 
 	private Action action( Task task ) { // "confirm": {} -> 會出現預設的確認視窗
-		return new Action( ID, task.desc, SlackActionType.BUTTON, task.name() ).setConfirm( new Confirm() );
+		return new Action( ID, task.name(), SlackActionType.BUTTON, task.name() ).setConfirm( new Confirm() );
 	}
 
 	private String digest( String content ) {
