@@ -21,13 +21,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import magic.service.Slack;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
+import ninja.util.Gson;
 
 @RestController
 public class QueryController {
@@ -39,15 +37,13 @@ public class QueryController {
 
 	private static final String ICON = "https://platform.slack-edge.com/img/default_application_icon.png";
 
-	private static final Gson GSON = new Gson();
-
 	private static final Map<String, String> STATIONS = new HashMap<>();
 
 	@Autowired
 	private Slack slack;
 
 	@PostMapping( "/mrt" )
-	public Map<?, ?> mrt( String command, @RequestParam String text ) {
+	public Map<String, ?> mrt( String command, @RequestParam String text ) {
 		log.info( "Text: {}", text );
 
 		if ( STATIONS.isEmpty() ) {
@@ -77,9 +73,7 @@ public class QueryController {
 
 			attach.setText( text = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
 
-			JsonObject object = new SlackMessage( StringUtils.EMPTY ).addAttachments( attach.setFallback( text ) ).prepare();
-
-			return GSON.fromJson( GSON.toJson( object ), Map.class );
+			return Gson.map( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach.setFallback( text ) ).prepare() );
 
 		} catch ( RuntimeException | IOException e ) {
 			log.error( "", e );
