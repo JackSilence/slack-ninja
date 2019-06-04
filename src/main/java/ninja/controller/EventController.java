@@ -35,8 +35,10 @@ public class EventController extends BaseController {
 
 		}
 
+		log.info( "Body: {}", body );
 		Type type = EnumUtils.getEnumIgnoreCase( Type.class, event.getType() );
-
+		log.info( text );
+		log.info( type.toString() );
 		if ( Type.APP_MENTION.equals( type ) && StringUtils.containsIgnoreCase( text, LIST_TASKS ) ) {
 			return controller.task();
 
