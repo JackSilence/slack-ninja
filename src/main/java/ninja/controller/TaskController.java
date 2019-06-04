@@ -64,17 +64,14 @@ public class TaskController {
 	}
 
 	@ModelAttribute
-	public void verify( @RequestHeader( "X-Slack-Request-Timestamp" ) String timestamp, @RequestHeader( "X-Slack-Signature" ) String signature, @RequestBody String body, String payload ) {
-		log.info( body );
-		log.info( payload );
-		log.info( signature );
+	public void verify( @RequestHeader( "X-Slack-Request-Timestamp" ) String timestamp, @RequestHeader( "X-Slack-Signature" ) String signature, @RequestBody String body ) {
 		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
 
-		Assert.isTrue( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, instant.toString() );
+		Assert.isTrue( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
 
 		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
 
-		Assert.isTrue( signature.equals( digest ), digest );
+		Assert.isTrue( signature.equals( digest ), String.join( "!=", signature, digest ) );
 	}
 
 	@PostMapping
