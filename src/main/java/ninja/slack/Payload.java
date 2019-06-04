@@ -7,10 +7,12 @@ import com.google.gson.annotations.SerializedName;
 import net.gpedro.integrations.slack.SlackAction;
 
 public class Payload {
-	private String type, token;
+	private String type;
 
 	@SerializedName( "callback_id" )
 	private String id;
+
+	private Channel channel;
 
 	private List<SlackAction> actions;
 
@@ -22,20 +24,20 @@ public class Payload {
 		this.type = type;
 	}
 
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken( String token ) {
-		this.token = token;
-	}
-
 	public String getId() {
 		return id;
 	}
 
 	public void setId( String id ) {
 		this.id = id;
+	}
+
+	public Channel getChannel() {
+		return channel;
+	}
+
+	public void setChannel( Channel channel ) {
+		this.channel = channel;
 	}
 
 	public List<SlackAction> getActions() {
