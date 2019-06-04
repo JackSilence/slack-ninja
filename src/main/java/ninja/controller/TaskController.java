@@ -1,28 +1,14 @@
 package ninja.controller;
 
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.client.fluent.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,18 +26,13 @@ import ninja.util.Gson;
 
 @RestController
 @RequestMapping( "/task" )
-public class TaskController {
-	private final Logger log = LoggerFactory.getLogger( this.getClass() );
-
-	private static final String ID = "heroku_task", VERSION = "v0", ALGORITHM = "HmacSHA256";
+public class TaskController extends BaseController {
+	private static final String ID = "heroku_task", TYPE = "interactive_message";
 
 	private static final String COMMAND_URL = "https://slack.com/api/chat.command?token=%s&channel=%s&command=/%s";
 
 	@Value( "${slack.legacy.token:}" )
 	private String token;
-
-	@Value( "${slack.signing.secret:}" )
-	private String secret;
 
 	private enum Task {
 		SHOPEE( "百米家新商品通知" ), HEROKU( "Heroku Usage" ), EPOINT( "點數查詢" ), NBA( "NBA BOX" );
@@ -61,17 +42,6 @@ public class TaskController {
 		private Task( String desc ) {
 			this.desc = desc;
 		}
-	}
-
-	@ModelAttribute
-	public void verify( @RequestHeader( "X-Slack-Request-Timestamp" ) String timestamp, @RequestHeader( "X-Slack-Signature" ) String signature, @RequestBody String body ) {
-		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
-
-		Assert.isTrue( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
-
-		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
-
-		Assert.isTrue( signature.equals( digest ), String.join( "!=", signature, digest ) );
 	}
 
 	@PostMapping
@@ -87,7 +57,7 @@ public class TaskController {
 	public void execute( String payload ) {
 		Payload message = Gson.payload( payload );
 
-		Assert.isTrue( ID.equals( message.getId() ), payload );
+		Assert.isTrue( TYPE.equals( message.getType() ) && ID.equals( message.getId() ), payload );
 
 		List<SlackAction> actions = message.getActions();
 
@@ -106,18 +76,5 @@ public class TaskController {
 
 	private Action action( Task task ) { // "confirm": {} -> 會出現預設的確認視窗
 		return new Action( ID, task.desc, SlackActionType.BUTTON, task.name() ).setConfirm( new Confirm() );
-	}
-
-	private String digest( String content ) {
-		try {
-			Mac mac = Mac.getInstance( ALGORITHM );
-
-			mac.init( new SecretKeySpec( secret.getBytes( StandardCharsets.UTF_8 ), ALGORITHM ) );
-
-			return String.join( "=", VERSION, Hex.encodeHexString( mac.doFinal( content.getBytes( StandardCharsets.UTF_8 ) ) ) );
-
-		} catch ( NoSuchAlgorithmException | InvalidKeyException e ) {
-			throw new RuntimeException( e );
-		}
 	}
 }
