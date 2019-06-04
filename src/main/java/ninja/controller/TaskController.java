@@ -72,7 +72,7 @@ public class TaskController {
 
 		Assert.isTrue( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, instant.toString() );
 
-		String digest = digest( String.join( ":", VERSION, timestamp, payload ) );
+		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
 
 		Assert.isTrue( signature.equals( digest ), digest );
 	}
