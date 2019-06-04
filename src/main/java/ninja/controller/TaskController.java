@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,7 +64,10 @@ public class TaskController {
 	}
 
 	@ModelAttribute
-	public void verify( @RequestHeader( "X-Slack-Request-Timestamp" ) String timestamp, @RequestHeader( "X-Slack-Signature" ) String signature, String payload ) {
+	public void verify( @RequestHeader( "X-Slack-Request-Timestamp" ) String timestamp, @RequestHeader( "X-Slack-Signature" ) String signature, @RequestBody String body, String payload ) {
+		log.info( body );
+		log.info( payload );
+		log.info( signature );
 		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
 
 		Assert.isTrue( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, instant.toString() );
