@@ -10,6 +10,8 @@ import ninja.util.Gson;
 public class EventController extends BaseController {
 	@PostMapping( "/event" )
 	public Object event( @RequestAttribute( REQ_BODY ) String body ) {
+		log.info( "Body: {}", body );
+
 		return Gson.map( body ).get( "challenge" );
 	}
 }
