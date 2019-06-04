@@ -5,14 +5,15 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cloudinary.utils.StringUtils;
-import com.google.common.collect.ImmutableMap;
 
+import magic.service.Slack;
 import net.gpedro.integrations.slack.SlackAction;
 import net.gpedro.integrations.slack.SlackActionType;
 import net.gpedro.integrations.slack.SlackAttachment;
@@ -27,16 +28,16 @@ import ninja.util.Gson;
 public class TaskController {
 	private static final String ID = "heroku_task", TYPE = "interactive_message";
 
-	private static final String URL = "%s.herokuapp.com/execute/%s";
+	@Autowired
+	private Slack slack;
 
 	private enum Task {
-		SHOPEE( "百米家新商品通知", "/shopee" ), HEROKU( "Heroku Usage", "" ), POINT( "點數查詢", "" ), NBA( "NBA BOX", "" );
+		SHOPEE( "百米家新商品通知" ), HEROKU( "Heroku Usage" ), EPOINT( "點數查詢" ), NBA( "NBA BOX" );
 
-		private String desc, command;
+		private String desc;
 
-		private Task( String desc, String command ) {
+		private Task( String desc ) {
 			this.desc = desc;
-			this.command = command;
 		}
 	}
 
@@ -50,7 +51,7 @@ public class TaskController {
 	}
 
 	@PostMapping( "/execute" )
-	public Map<String, String> execute( String payload ) {
+	public void execute( String payload ) {
 		Payload message = Gson.payload( payload );
 
 		Assert.isTrue( TYPE.equals( message.getType() ) && ID.equals( message.getId() ), payload );
@@ -63,7 +64,7 @@ public class TaskController {
 
 		Task task = Task.valueOf( action.getValue() );
 
-		return ImmutableMap.of( "text", task.command );
+		slack.call( new SlackMessage( "/" + task.name().toLowerCase() ) );
 	}
 
 	private Action action( Task task ) { // "confirm": {} -> 會出現預設的確認視窗
