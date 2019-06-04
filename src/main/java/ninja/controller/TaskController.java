@@ -55,7 +55,7 @@ public class TaskController extends BaseController {
 
 	@PostMapping( "/execute" )
 	public void execute( String payload ) {
-		Payload message = Gson.payload( payload );
+		Payload message = Gson.from( payload, Payload.class );
 
 		Assert.isTrue( TYPE.equals( message.getType() ) && ID.equals( message.getId() ), payload );
 
