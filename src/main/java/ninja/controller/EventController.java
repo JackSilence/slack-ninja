@@ -1,5 +1,8 @@
 package ninja.controller;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
@@ -11,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
 import magic.util.Utils;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.slack.Callback;
 import ninja.slack.Event;
 import ninja.util.Gson;
@@ -20,10 +22,14 @@ import ninja.util.Heroku;
 @RestController
 
 public class EventController extends BaseController {
-	private static final String CHALLENGE = "challenge", POST_URL = "https://slack.com/api/chat.postMessage";
+	private static final String CHALLENGE = "challenge", MENTION_KEYWORD = "查詢可用任務";
+
+	private static final String POST_URL = "https://slack.com/api/chat.postMessage";
+
+	private static final List<String> REJECT_SUB_TYPES = Arrays.asList( "bot_message", "message_deleted" );
 
 	private enum Type {
-		APP_MENTION;
+		APP_MENTION, MESSAGE;
 	}
 
 	@Value( "${slack.bot.token:}" )
@@ -43,20 +49,19 @@ public class EventController extends BaseController {
 
 		Event event = callback.getEvent();
 
+		if ( REJECT_SUB_TYPES.contains( event.getSubtype() ) ) {
+			return; // 不處理小心會變成無窮迴圈
+		}
+
 		log.info( "Body: {}", body );
 
-		if ( "bot_message".equals( event.getSubtype() ) || "message_deleted".equals( event.getSubtype() ) ) {
-			return;
+		Type type = EnumUtils.getEnumIgnoreCase( Type.class, event.getType() );
+
+		if ( Type.APP_MENTION.equals( type ) && StringUtils.contains( event.getText(), MENTION_KEYWORD ) ) {
+			Request request = Request.Post( POST_URL ).setHeader( "Authorization", "Bearer " + token );
+
+			log.info( Utils.getEntityAsString( request.bodyString( Gson.json( Heroku.task( event.getChannel() ) ), ContentType.APPLICATION_JSON ) ) );
+
 		}
-
-		SlackMessage message = new SlackMessage( event.toString() );
-
-		if ( Type.APP_MENTION.equals( EnumUtils.getEnumIgnoreCase( Type.class, event.getType() ) ) && StringUtils.contains( event.getText(), "任務清單" ) ) {
-			message = Heroku.task();
-		}
-
-		Request request = Request.Post( POST_URL ).setHeader( "Authorization", "Bearer " + token );
-
-		log.info( Utils.getEntityAsString( request.bodyString( Gson.json( message.setChannel( event.getChannel() ).prepare() ), ContentType.APPLICATION_JSON ) ) );
 	}
 }

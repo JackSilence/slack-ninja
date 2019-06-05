@@ -30,7 +30,7 @@ public class TaskController extends BaseController {
 
 	@PostMapping
 	public Map<String, Object> task() {
-		return Gson.map( Heroku.task().prepare() );
+		return Gson.map( Heroku.task() );
 	}
 
 	@PostMapping( "/execute" )
