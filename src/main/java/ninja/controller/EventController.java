@@ -43,7 +43,9 @@ public class EventController extends BaseController {
 
 		Event event = callback.getEvent();
 
-		if ( "bot_message".equals( event.getSubtype() ) ) {
+		log.info( "Body: {}", body );
+
+		if ( "bot_message".equals( event.getSubtype() ) || "message_deleted".equals( event.getSubtype() ) ) {
 			return;
 		}
 
