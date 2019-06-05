@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.JsonObject;
-
 import magic.util.Utils;
 import ninja.slack.Callback;
 import ninja.slack.Event;
@@ -62,11 +60,7 @@ public class EventController extends BaseController {
 		if ( Type.APP_MENTION.equals( type ) && StringUtils.contains( event.getText(), MENTION_KEYWORD ) ) {
 			Request request = Request.Post( POST_URL ).setHeader( "Authorization", "Bearer " + token );
 
-			JsonObject object = Heroku.task( "您可選擇任務並於確認後執行", event.getChannel() );
-
-			object.addProperty( "as_user", true );
-
-			String json = Gson.json( object );
+			String json = Gson.json( Heroku.task( "您可選擇任務並於確認後執行", event.getChannel() ) );
 
 			log.info( Utils.getEntityAsString( request.bodyString( json, ContentType.APPLICATION_JSON ) ) );
 		}
