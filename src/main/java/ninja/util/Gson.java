@@ -16,4 +16,8 @@ public class Gson {
 	public static <T> T from( String json, Class<T> clazz ) {
 		return GSON.fromJson( json, clazz );
 	}
+
+	public static String json( Object src ) {
+		return GSON.toJson( src );
+	}
 }
