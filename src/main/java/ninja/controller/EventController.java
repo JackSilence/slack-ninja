@@ -60,8 +60,9 @@ public class EventController extends BaseController {
 		if ( Type.APP_MENTION.equals( type ) && StringUtils.contains( event.getText(), MENTION_KEYWORD ) ) {
 			Request request = Request.Post( POST_URL ).setHeader( "Authorization", "Bearer " + token );
 
-			log.info( Utils.getEntityAsString( request.bodyString( Gson.json( Heroku.task( event.getChannel() ) ), ContentType.APPLICATION_JSON ) ) );
+			String json = Gson.json( Heroku.task( "您可選擇任務並於確認後執行", event.getChannel() ) );
 
+			log.info( Utils.getEntityAsString( request.bodyString( json, ContentType.APPLICATION_JSON ) ) );
 		}
 	}
 }
