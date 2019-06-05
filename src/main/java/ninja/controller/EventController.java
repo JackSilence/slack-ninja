@@ -43,6 +43,10 @@ public class EventController extends BaseController {
 
 		Event event = callback.getEvent();
 
+		if ( "bot_message".equals( event.getSubtype() ) ) {
+			return;
+		}
+
 		SlackMessage message = new SlackMessage( event.toString() );
 
 		if ( Type.APP_MENTION.equals( EnumUtils.getEnumIgnoreCase( Type.class, event.getType() ) ) && StringUtils.contains( event.getText(), "任務清單" ) ) {
@@ -51,6 +55,6 @@ public class EventController extends BaseController {
 
 		Request request = Request.Post( POST_URL ).setHeader( "Authorization", "Bearer " + token );
 
-		log.info( Utils.getEntityAsString( request.bodyString( Gson.json( message.setChannel( event.getChannel() ) ), ContentType.APPLICATION_JSON ) ) );
+		log.info( Utils.getEntityAsString( request.bodyString( Gson.json( message.setChannel( event.getChannel() ).prepare() ), ContentType.APPLICATION_JSON ) ) );
 	}
 }
