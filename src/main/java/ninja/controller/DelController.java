@@ -2,13 +2,16 @@ package ninja.controller;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ninja.slack.Event;
 import ninja.slack.History;
 import ninja.util.Gson;
 
@@ -22,24 +25,22 @@ public class DelController extends BaseController {
 	private String token;
 
 	@PostMapping( value = "/delete" )
-	public void delete( @RequestParam( "channel_id" ) String channel, @RequestParam String text ) {
+	public String delete( @RequestParam( "channel_id" ) String channel, @RequestParam String text ) {
 		if ( text.isEmpty() ) {
 			text = LocalDate.now().toString();
 		}
 
-		try {
-			LocalDate date = LocalDate.parse( text );
+		LocalDate date = LocalDate.parse( text );
 
-			long start = epochSecond( date ), end = epochSecond( date.plusDays( 1 ) );
+		long start = epochSecond( date ), end = epochSecond( date.plusDays( 1 ) );
 
-			History history = Gson.from( get( HISTORY_METHOD, token + "a", channel, String.format( QUERY, start, end ) ), History.class );
+		History history = Gson.from( get( HISTORY_METHOD, token, channel, String.format( QUERY, start, end ) ), History.class );
 
-			log.info( history.getMessages().toString() );
+		List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
 
-		} catch ( DateTimeParseException e ) {
-			throw new RuntimeException( e );
+		message.forEach( i -> post( DEL_METHOD, token, message ) );
 
-		}
+		return String.format( "已刪除%s的%d則訊息", text, message.size() );
 	}
 
 	private long epochSecond( LocalDate date ) {
