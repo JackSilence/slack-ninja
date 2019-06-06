@@ -33,7 +33,7 @@ public class DelController extends BaseController {
 		LocalDate date = LocalDate.parse( text );
 
 		long start = epochSecond( date ), end = epochSecond( date.plusDays( 1 ) );
-
+log.info( channel );
 		History history = Gson.from( get( HISTORY_METHOD, token, channel, String.format( QUERY, start, end ) ), History.class );
 
 		List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
