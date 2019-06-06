@@ -11,7 +11,6 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -50,14 +49,8 @@ public abstract class BaseController {
 		request.setAttribute( REQ_BODY, body );
 	}
 
-	protected void get( String method, String token, String channel ) {
-		get( method, token, channel, StringUtils.EMPTY );
-	}
-
-	protected void get( String method, String token, String channel, String query ) {
-		String x;
-		log.info( Utils.getEntityAsString( Request.Get( x = uri( method ) + String.format( QUERY, token, channel ) + query ) ) );
-		log.info( x );
+	protected String get( String method, String token, String channel, String query ) {
+		return Utils.getEntityAsString( Request.Get( uri( method ) + String.format( QUERY, token, channel ) + query ) );
 	}
 
 	protected void post( String method, String token, Object src ) {

@@ -46,6 +46,6 @@ public class TaskController extends BaseController {
 		Task task = Task.valueOf( action.getValue() );
 
 		// 使用legacy token執行command, 只有對應的帳號才會看到return message
-		get( METHOD, token, message.getChannel().getId(), QUERY + task.name().toLowerCase() );
+		log.info( get( METHOD, token, message.getChannel().getId(), QUERY + task.name().toLowerCase() ) );
 	}
 }
