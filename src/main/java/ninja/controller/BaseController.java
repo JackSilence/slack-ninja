@@ -11,6 +11,9 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,14 +22,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import magic.util.Utils;
+import ninja.util.Gson;
+
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	protected static final String REQ_BODY = "req_body";
+	protected static final String REQ_BODY = "req_body", VERSION = "v0", ALGORITHM = "HmacSHA256";
 
 	private static final String HEADER_TIMESTAMP = "X-Slack-Request-Timestamp", HEADER_SIGNATURE = "X-Slack-Signature";
 
-	private static final String VERSION = "v0", ALGORITHM = "HmacSHA256";
+	private static final String API_URL = "https://slack.com/api/", QUERY = "?token=%s&channel=%s";
 
 	@Value( "${slack.signing.secret:}" )
 	private String secret;
@@ -44,6 +50,22 @@ public abstract class BaseController {
 		request.setAttribute( REQ_BODY, body );
 	}
 
+	protected void get( String method, String token, String channel ) {
+		get( method, token, channel, StringUtils.EMPTY );
+	}
+
+	protected void get( String method, String token, String channel, String query ) {
+		String x;
+		log.info( Utils.getEntityAsString( Request.Get( x = uri( method ) + String.format( QUERY, token, channel ) + query ) ) );
+		log.info( x );
+	}
+
+	protected void post( String method, String token, Object src ) {
+		Request request = Request.Post( uri( method ) ).setHeader( "Authorization", "Bearer " + token );
+
+		log.info( Utils.getEntityAsString( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) ) );
+	}
+
 	private String digest( String content ) {
 		try {
 			Mac mac = Mac.getInstance( ALGORITHM );
@@ -56,5 +78,9 @@ public abstract class BaseController {
 			throw new RuntimeException( e );
 
 		}
+	}
+
+	private String uri( String method ) {
+		return API_URL + method;
 	}
 }

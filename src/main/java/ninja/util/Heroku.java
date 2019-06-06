@@ -2,7 +2,8 @@ package ninja.util;
 
 import java.util.stream.Stream;
 
-import com.cloudinary.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.gson.JsonObject;
 
 import net.gpedro.integrations.slack.SlackActionType;

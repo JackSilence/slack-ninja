@@ -5,15 +5,12 @@ import java.util.List;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
-import magic.util.Utils;
 import ninja.slack.Callback;
 import ninja.slack.Event;
 import ninja.util.Gson;
@@ -22,9 +19,7 @@ import ninja.util.Heroku;
 @RestController
 
 public class EventController extends BaseController {
-	private static final String CHALLENGE = "challenge", MENTION_KEYWORD = "查詢可用任務";
-
-	private static final String POST_URL = "https://slack.com/api/chat.postMessage";
+	private static final String CHALLENGE = "challenge", MENTION_KEYWORD = "查詢可用任務", METHOD = "chat.postMessage";
 
 	private static final List<String> REJECT_SUB_TYPES = Arrays.asList( "bot_message", "message_deleted" );
 
@@ -58,11 +53,7 @@ public class EventController extends BaseController {
 		Type type = EnumUtils.getEnumIgnoreCase( Type.class, event.getType() );
 
 		if ( Type.APP_MENTION.equals( type ) && StringUtils.contains( event.getText(), MENTION_KEYWORD ) ) {
-			Request request = Request.Post( POST_URL ).setHeader( "Authorization", "Bearer " + token );
-
-			String json = Gson.json( Heroku.task( "您可選擇任務並於確認後執行", event.getChannel() ) );
-
-			log.info( Utils.getEntityAsString( request.bodyString( json, ContentType.APPLICATION_JSON ) ) );
+			post( METHOD, challenge, Heroku.task( "您可選擇任務並於確認後執行", event.getChannel() ) );
 		}
 	}
 }
