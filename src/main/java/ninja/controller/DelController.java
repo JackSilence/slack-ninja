@@ -34,7 +34,7 @@ public class DelController extends BaseController {
 
 			History history = Gson.from( get( HISTORY_METHOD, token + "a", channel, String.format( QUERY, start, end ) ), History.class );
 
-			log.info( history.toString() );
+			log.info( history.getMessages().toString() );
 
 		} catch ( DateTimeParseException e ) {
 			throw new RuntimeException( e );
