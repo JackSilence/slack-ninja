@@ -3,15 +3,17 @@
 	"blocks": [
 		{
 			"type": "section",
-			"block_id": "delete_task",
+			"block_id": "heroku_task",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Pick a date to delete messages"
+				"text": "*_要刪除那一天的訊息_*"
 			},
 			"accessory": {
 				"type": "datepicker",
-				"action_id": "delete_task",
-				"initial_date": "%s",
+				"action_id": "heroku_task",
+				"confirm": {
+					
+				},
 				"placeholder": {
 					"type": "plain_text",
 					"text": "請選擇日期"
