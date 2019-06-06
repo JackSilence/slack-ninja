@@ -4,6 +4,10 @@
 		{
 			"type": "section",
 			"block_id": "delete_task",
+			"text": {
+				"type": "mrkdwn",
+				"text": ""
+			},
 			"accessory": {
 				"type": "datepicker",
 				"action_id": "delete_task",
