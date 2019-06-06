@@ -11,9 +11,6 @@
 			"accessory": {
 				"type": "datepicker",
 				"action_id": "heroku_task",
-				"confirm": {
-					
-				},
 				"placeholder": {
 					"type": "plain_text",
 					"text": "請選擇日期"
