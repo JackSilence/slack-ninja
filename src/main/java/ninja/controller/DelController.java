@@ -30,21 +30,27 @@ public class DelController extends BaseController {
 			text = LocalDate.now().toString();
 		}
 
-		LocalDate date = LocalDate.parse( text );
+		try {
+			LocalDate date = LocalDate.parse( text );
 
-		long start = epochSecond( date ), end = epochSecond( date.plusDays( 1 ) );
+			long start = epochSecond( date ), end = epochSecond( date.plusDays( 1 ) );
 
-		History history = Gson.from( get( HISTORY_METHOD, token, channel, String.format( QUERY, start, end ) ), History.class );
+			History history = Gson.from( get( HISTORY_METHOD, token, channel, String.format( QUERY, start, end ) ), History.class );
 
-		List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
+			List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
 
-		message.forEach( i -> {
-			i.setChannel( channel );
+			message.forEach( i -> {
+				i.setChannel( channel );
 
-			post( DEL_METHOD, token, i );
-		} );
+				post( DEL_METHOD, token, i );
+			} );
 
-		return String.format( "已刪除%s的%d則訊息", text, message.size() );
+			return String.format( "已刪除%s的%d則訊息", text, message.size() );
+
+		} catch ( RuntimeException e ) {
+			return e.getMessage();
+
+		}
 	}
 
 	private long epochSecond( LocalDate date ) {
