@@ -38,7 +38,7 @@ public class DelController extends BaseController {
 
 		List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
 
-		message.forEach( i -> post( DEL_METHOD, token, message ) );
+		message.forEach( i -> post( DEL_METHOD, token, i ) );
 
 		return String.format( "已刪除%s的%d則訊息", text, message.size() );
 	}
