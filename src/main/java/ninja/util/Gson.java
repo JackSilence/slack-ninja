@@ -9,7 +9,11 @@ public class Gson {
 	private static final com.google.gson.Gson GSON = new com.google.gson.Gson();
 
 	public static Map<String, Object> map( JsonObject object ) {
-		return GSON.fromJson( json( object ), new TypeToken<Map<String, Object>>() {
+		return map( json( object ) );
+	}
+
+	public static Map<String, Object> map( String json ) {
+		return GSON.fromJson( json, new TypeToken<Map<String, Object>>() {
 		}.getType() );
 	}
 

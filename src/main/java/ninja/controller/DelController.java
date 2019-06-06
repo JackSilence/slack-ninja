@@ -3,11 +3,14 @@ package ninja.controller;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import ninja.util.Gson;
 
 @RestController
 public class DelController extends BaseController {
@@ -19,7 +22,7 @@ public class DelController extends BaseController {
 	private String token;
 
 	@PostMapping( value = "/delete" )
-	public void delete( String channel, @RequestParam String text ) {
+	public void delete( @RequestParam( "channel_id" ) String channel, @RequestParam String text ) {
 		if ( text.isEmpty() ) {
 			text = LocalDate.now().toString();
 		}
@@ -29,7 +32,9 @@ public class DelController extends BaseController {
 
 			long start = epochSecond( date ), end = epochSecond( date.plusDays( 1 ) );
 
-			log.info( get( HISTORY_METHOD, token, channel, String.format( QUERY, start, end ) ) );
+			Map<String, Object> history = Gson.map( get( HISTORY_METHOD, token, channel, String.format( QUERY, start, end ) ) );
+
+			log.info( history.toString() );
 
 		} catch ( DateTimeParseException e ) {
 			throw new RuntimeException( e );
