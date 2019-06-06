@@ -1,13 +1,9 @@
 {
-	"text": "",
+	"text": "要刪除那一天的訊息",
 	"blocks": [
 		{
 			"type": "section",
 			"block_id": "delete_task",
-			"text": {
-				"type": "mrkdwn",
-				"text": "要刪除那一天的訊息？"
-			},
 			"accessory": {
 				"type": "datepicker",
 				"action_id": "delete_task",
