@@ -37,6 +37,8 @@ public class TaskController extends BaseController {
 	public void execute( String payload ) {
 		Payload message = Gson.from( payload, Payload.class );
 
+		log.info( "payload: {}", payload );
+
 		Assert.isTrue( TYPE.equals( message.getType() ) && Heroku.TASK_ID.equals( message.getId() ), payload );
 
 		List<SlackAction> actions = message.getActions();
