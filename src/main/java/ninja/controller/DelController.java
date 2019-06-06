@@ -49,7 +49,7 @@ public class DelController extends BaseController {
 				log.info( response );
 			}
 
-			return String.format( "已刪除%s的%d(%d)則訊息", text, message.size(), success );
+			return String.format( "%s有%d則訊息，已刪除%d則", text, message.size(), success );
 
 		} catch ( RuntimeException e ) {
 			return e.getMessage();
