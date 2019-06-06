@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class Event {
-	private String type, subtype, text, channel;
+	private String type, subtype, text, channel, ts;
 
 	public String getType() {
 		return type;
@@ -36,6 +36,14 @@ public class Event {
 
 	public void setChannel( String channel ) {
 		this.channel = channel;
+	}
+
+	public String getTs() {
+		return ts;
+	}
+
+	public void setTs( String ts ) {
+		this.ts = ts;
 	}
 
 	@Override

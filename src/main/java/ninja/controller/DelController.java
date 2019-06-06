@@ -3,13 +3,13 @@ package ninja.controller;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ninja.slack.History;
 import ninja.util.Gson;
 
 @RestController
@@ -32,7 +32,7 @@ public class DelController extends BaseController {
 
 			long start = epochSecond( date ), end = epochSecond( date.plusDays( 1 ) );
 
-			Map<String, Object> history = Gson.map( get( HISTORY_METHOD, token, channel, String.format( QUERY, start, end ) ) );
+			History history = Gson.from( get( HISTORY_METHOD, token + "a", channel, String.format( QUERY, start, end ) ), History.class );
 
 			log.info( history.toString() );
 
