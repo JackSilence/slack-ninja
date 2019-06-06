@@ -33,19 +33,23 @@ public class DelController extends BaseController {
 		try {
 			LocalDate date = LocalDate.parse( text );
 
-			long start = epochSecond( date ), end = epochSecond( date.plusDays( 1 ) );
+			long start = epochSecond( date ), end = epochSecond( date.plusDays( 1 ) ), success = 0;
 
 			History history = Gson.from( get( HISTORY_METHOD, token, channel, String.format( QUERY, start, end ) ), History.class );
 
 			List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
 
-			message.forEach( i -> {
+			for ( Event i : message ) {
 				i.setChannel( channel );
 
-				post( DEL_METHOD, token, i );
-			} );
+				String response = post( DEL_METHOD, token, i );
 
-			return String.format( "已刪除%s的%d則訊息", text, message.size() );
+				success += response.contains( "\"ok\":true" ) ? 1 : 0;
+
+				log.info( response );
+			}
+
+			return String.format( "已刪除%s的%d(%d)則訊息", text, message.size(), success );
 
 		} catch ( RuntimeException e ) {
 			return e.getMessage();

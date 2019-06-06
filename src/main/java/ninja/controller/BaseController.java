@@ -50,13 +50,13 @@ public abstract class BaseController {
 	}
 
 	protected String get( String method, String token, String channel, String query ) {
-		return Utils.getEntityAsString( Request.Get( uri( method ) + String.format( QUERY, token, channel ) + query ) );
+		return call( Request.Get( uri( method ) + String.format( QUERY, token, channel ) + query ) );
 	}
 
-	protected void post( String method, String token, Object src ) {
+	protected String post( String method, String token, Object src ) {
 		Request request = Request.Post( uri( method ) ).setHeader( "Authorization", "Bearer " + token );
 
-		log.info( Utils.getEntityAsString( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) ) );
+		return call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
 	}
 
 	private String digest( String content ) {
@@ -75,5 +75,9 @@ public abstract class BaseController {
 
 	private String uri( String method ) {
 		return API_URL + method;
+	}
+
+	private String call( Request request ) {
+		return Utils.getEntityAsString( request );
 	}
 }

@@ -53,7 +53,7 @@ public class EventController extends BaseController {
 		Type type = EnumUtils.getEnumIgnoreCase( Type.class, event.getType() );
 
 		if ( Type.APP_MENTION.equals( type ) && StringUtils.contains( event.getText(), MENTION_KEYWORD ) ) {
-			post( METHOD, token, Heroku.task( "您可選擇任務並於確認後執行", event.getChannel() ) );
+			log.info( post( METHOD, token, Heroku.task( "您可選擇任務並於確認後執行", event.getChannel() ) ) );
 		}
 	}
 }
