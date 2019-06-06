@@ -28,7 +28,7 @@ import net.gpedro.integrations.slack.SlackMessage;
 import ninja.util.Gson;
 
 @RestController
-public class QueryController {
+public class MetroController {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
 	private static final String URL = "https://web.metro.taipei/c/2stainfo.asp";
