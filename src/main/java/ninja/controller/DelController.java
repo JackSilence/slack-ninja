@@ -11,7 +11,7 @@ import magic.util.Utils;
 public class DelController {
 	private static final String TEMPLATE = "/template/datepicker.json";
 
-	@PostMapping( value = "/delete", produces = "application/json" )
+	@PostMapping( value = "/delete" )
 	public String delete() {
 		return String.format( Utils.getResourceAsString( TEMPLATE ), LocalDate.now() );
 	}
