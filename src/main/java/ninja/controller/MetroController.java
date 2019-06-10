@@ -57,11 +57,11 @@ public class MetroController {
 
 			Elements tables = get( url = URL.concat( String.format( QUERY, start, end ) ) ).select( "form table" );
 
-			Element table = tables.first(), row = row( table, 1 );
+			Element table = tables.first(), row = row( table, 2 );
 
 			SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( url ).setFooterIcon( ICON );
 
-			row( table, 0 ).select( "th:lt(3)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
+			row( table, 1 ).select( "td:lt(3)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
 
 			attach.setFooter( StringUtils.isEmpty( command ) ? text : String.format( "%s %s", command, text ) );
 
