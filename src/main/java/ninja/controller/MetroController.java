@@ -28,9 +28,13 @@ import net.gpedro.integrations.slack.SlackMessage;
 public class MetroController {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	private static final String URL = "https://m.metro.taipei/pda_ticket_price_time.asp";
+	private static final String QUERY_URL = "https://m.metro.taipei/pda_ticket_price_time.asp";
 
-	private static final String QUERY = "?s1elect=%s&s2elect=%s&action=query", TITLE = "捷運票價及乘車時間";
+	private static final String QUERY = "?s1elect=%s&s2elect=%s&action=query", QUERY_TITLE = "捷運票價及乘車時間";
+
+	private static final String MAP_URL = "https://m.metro.taipei/roadmap.asp", MAP_TITLE = "捷運路線圖暨車站資訊";
+
+	private static final String MAP_IMG = "https://m.metro.taipei/img/routemap.jpg";
 
 	private static final String ICON = "https://platform.slack-edge.com/img/default_application_icon.png";
 
@@ -39,6 +43,14 @@ public class MetroController {
 	@PostMapping( "/mrt" )
 	public String mrt( String command, @RequestParam String text ) {
 		log.info( "Text: {}", text );
+
+		SlackAttachment attach = new SlackAttachment( StringUtils.EMPTY ).setFooterIcon( ICON );
+
+		attach.setFooter( StringUtils.isEmpty( command ) ? text : String.format( "%s %s", command, text ) );
+
+		if ( StringUtils.isEmpty( text ) ) {
+			return message( attach.setImageUrl( MAP_IMG ), MAP_TITLE, MAP_URL );
+		}
 
 		if ( STATIONS.isEmpty() ) {
 			init();
@@ -55,19 +67,15 @@ public class MetroController {
 
 			log.info( "Start: {}, end: {}", start, end );
 
-			Elements tables = get( url = URL.concat( String.format( QUERY, start, end ) ) ).select( "form table" );
+			Elements tables = get( url = QUERY_URL.concat( String.format( QUERY, start, end ) ) ).select( "form table" );
 
 			Element table = tables.first(), row = row( table, 2 );
 
-			SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( url ).setFooterIcon( ICON );
-
 			row( table, 1 ).select( "td:lt(3)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
-
-			attach.setFooter( StringUtils.isEmpty( command ) ? text : String.format( "%s %s", command, text ) );
 
 			attach.setText( text = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
 
-			return new SlackMessage( StringUtils.EMPTY ).addAttachments( attach.setFallback( text ) ).prepare().toString();
+			return message( attach, QUERY_TITLE, url );
 
 		} catch ( RuntimeException | IOException e ) {
 			log.error( "", e );
@@ -75,6 +83,10 @@ public class MetroController {
 			return e.getMessage();
 
 		}
+	}
+
+	private String message( SlackAttachment attach, String title, String link ) {
+		return new SlackMessage( StringUtils.EMPTY ).addAttachments( attach.setTitle( title ).setTitleLink( link ) ).prepare().toString();
 	}
 
 	private String find( String name ) {
@@ -104,7 +116,7 @@ public class MetroController {
 	@PostConstruct
 	private void init() {
 		try {
-			get( URL ).getElementById( "sstation" ).select( "option" ).forEach( i -> STATIONS.put( i.text(), i.val() ) );
+			get( QUERY_URL ).getElementById( "sstation" ).select( "option" ).forEach( i -> STATIONS.put( i.text(), i.val() ) );
 
 		} catch ( IOException e ) {
 			log.error( "", e );
