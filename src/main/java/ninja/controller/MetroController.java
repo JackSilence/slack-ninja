@@ -28,7 +28,7 @@ import net.gpedro.integrations.slack.SlackMessage;
 public class MetroController {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	private static final String URL = "https://web.metro.taipei/c/2stainfo.asp";
+	private static final String URL = "https://m.metro.taipei/pda_ticket_price_time.asp";
 
 	private static final String QUERY = "?s1elect=%s&s2elect=%s&action=query", TITLE = "捷運票價及乘車時間";
 
