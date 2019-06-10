@@ -17,5 +17,5 @@ repositories {
 }
 
 dependencies {
-	compile('com.github.JackSilence:magic:5c4233fc90')
+	compile('com.github.JackSilence:magic:b6b8a542e2')
 }

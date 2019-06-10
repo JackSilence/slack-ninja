@@ -15,17 +15,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import magic.service.Slack;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
-import ninja.util.Gson;
 
 @RestController
 public class MetroController {
@@ -39,11 +36,8 @@ public class MetroController {
 
 	private static final Map<String, String> STATIONS = new HashMap<>();
 
-	@Autowired
-	private Slack slack;
-
 	@PostMapping( "/mrt" )
-	public Map<String, ?> mrt( String command, @RequestParam String text ) {
+	public String mrt( String command, @RequestParam String text ) {
 		log.info( "Text: {}", text );
 
 		if ( STATIONS.isEmpty() ) {
@@ -73,12 +67,12 @@ public class MetroController {
 
 			attach.setText( text = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
 
-			return Gson.map( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach.setFallback( text ) ).prepare() );
+			return new SlackMessage( StringUtils.EMPTY ).addAttachments( attach.setFallback( text ) ).prepare().toString();
 
 		} catch ( RuntimeException | IOException e ) {
 			log.error( "", e );
 
-			return slack.text( e.getMessage() );
+			return e.getMessage();
 
 		}
 	}
