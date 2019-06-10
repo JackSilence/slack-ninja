@@ -1,7 +1,6 @@
 package ninja.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,8 +24,8 @@ public class TaskController extends BaseController {
 	private String token;
 
 	@PostMapping
-	public Map<String, Object> task() {
-		return Gson.map( Heroku.task() );
+	public String task() {
+		return Heroku.task().toString();
 	}
 
 	@PostMapping( "/execute" )
