@@ -38,7 +38,7 @@ public class DelController extends BaseController {
 
 			LocalDate date = days == null ? LocalDate.parse( text ) : LocalDate.now().minusDays( days );
 
-			String title = date.toString(), query = String.format( QUERY, epochSecond( date ), date.plusDays( 1 ) );
+			String title = date.toString(), query = String.format( QUERY, epochSecond( date ), epochSecond( date.plusDays( 1 ) ) );
 
 			History history = Gson.from( get( HISTORY_METHOD, token, channel, query ), History.class );
 

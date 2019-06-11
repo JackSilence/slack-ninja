@@ -46,7 +46,7 @@ public class MetroController extends BaseController {
 
 			Assert.isTrue( params.length == 2, "起訖站皆須輸入" );
 
-			String start = find( params[ 0 ] ), end = find( params[ 1 ] ), url;
+			String start = find( params[ 0 ] ), end = find( params[ 1 ] ), url, txt;
 
 			Assert.isTrue( !start.equals( end ), "起訖站不得相同: " + text );
 
@@ -60,9 +60,9 @@ public class MetroController extends BaseController {
 
 			row( table, 1 ).select( "td:lt(3)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
 
-			attach.setText( text = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
+			attach.setText( txt = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
 
-			return message( attach.setFallback( text ), command, text );
+			return message( attach.setFallback( txt ), command, text );
 
 		} catch ( RuntimeException | IOException e ) {
 			log.error( "", e );
