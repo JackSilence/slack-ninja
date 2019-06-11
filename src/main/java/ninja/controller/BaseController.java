@@ -11,6 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import magic.util.Utils;
+import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.util.Gson;
 
 public abstract class BaseController {
@@ -32,6 +35,8 @@ public abstract class BaseController {
 	private static final String HEADER_TIMESTAMP = "X-Slack-Request-Timestamp", HEADER_SIGNATURE = "X-Slack-Signature";
 
 	private static final String API_URL = "https://slack.com/api/", QUERY = "?token=%s&channel=%s";
+
+	private static final String ICON = "https://platform.slack-edge.com/img/default_application_icon.png";
 
 	@Value( "${slack.signing.secret:}" )
 	private String secret;
@@ -47,6 +52,10 @@ public abstract class BaseController {
 		Assert.isTrue( signature.equals( digest ), String.join( "!=", signature, digest ) );
 
 		request.setAttribute( REQ_BODY, body );
+	}
+
+	protected String message( SlackAttachment attach, String command, String text ) {
+		return new SlackMessage( StringUtils.EMPTY ).addAttachments( footer( attach, command, text ) ).prepare().toString();
 	}
 
 	protected String get( String method, String token, String channel, String query ) {
@@ -79,5 +88,9 @@ public abstract class BaseController {
 
 	private String call( Request request ) {
 		return Utils.getEntityAsString( request );
+	}
+
+	private SlackAttachment footer( SlackAttachment attach, String command, String text ) {
+		return attach.setFooter( String.format( "%s %s", command, text ) ).setFooterIcon( ICON );
 	}
 }

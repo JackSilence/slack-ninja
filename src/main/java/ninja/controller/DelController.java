@@ -4,13 +4,18 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.ImmutableMap;
+
+import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.slack.Event;
 import ninja.slack.History;
 import ninja.util.Gson;
@@ -19,23 +24,23 @@ import ninja.util.Gson;
 public class DelController extends BaseController {
 	private static final String HISTORY_METHOD = "channels.history", DEL_METHOD = "chat.delete";
 
-	private static final String QUERY = "&oldest=%s&latest=%s";
+	private static final String QUERY = "&oldest=%s&latest=%s", TEXT = "總共有%d則訊息\n已刪除%s則訊息";
+
+	private static final Map<String, Long> DAYS_AGO = ImmutableMap.of( StringUtils.EMPTY, 0L, "今天", 0L, "昨天", 1L, "前天", 2L );
 
 	@Value( "${slack.user.token:}" )
 	private String token;
 
 	@PostMapping( value = "/delete" )
-	public String delete( @RequestParam( "channel_id" ) String channel, @RequestParam String text ) {
-		if ( text.isEmpty() ) {
-			text = LocalDate.now().toString();
-		}
-
+	public String delete( @RequestParam( "channel_id" ) String channel, @RequestParam String command, @RequestParam String text ) {
 		try {
-			LocalDate date = LocalDate.parse( text );
+			Long days = DAYS_AGO.get( text ), success = 0L;
 
-			long start = epochSecond( date ), end = epochSecond( date.plusDays( 1 ) ), success = 0;
+			LocalDate date = days == null ? LocalDate.parse( text ) : LocalDate.now().minusDays( days );
 
-			History history = Gson.from( get( HISTORY_METHOD, token, channel, String.format( QUERY, start, end ) ), History.class );
+			String title = date.toString(), query = String.format( QUERY, epochSecond( date ), date.plusDays( 1 ) );
+
+			History history = Gson.from( get( HISTORY_METHOD, token, channel, query ), History.class );
 
 			List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
 
@@ -49,7 +54,7 @@ public class DelController extends BaseController {
 				log.info( response );
 			}
 
-			return String.format( "%s有%d則訊息，已刪除%d則", text, message.size(), success );
+			return message( new SlackAttachment( title ).setTitle( title ).setText( String.format( TEXT, message.size(), success ) ), command, text );
 
 		} catch ( RuntimeException e ) {
 			return e.getMessage();

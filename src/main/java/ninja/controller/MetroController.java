@@ -22,22 +22,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
-import net.gpedro.integrations.slack.SlackMessage;
 
 @RestController
-public class MetroController {
+public class MetroController extends BaseController {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
 	private static final String URL = "https://m.metro.taipei/pda_ticket_price_time.asp";
 
 	private static final String QUERY = "?s1elect=%s&s2elect=%s&action=query", TITLE = "捷運票價及乘車時間";
 
-	private static final String ICON = "https://platform.slack-edge.com/img/default_application_icon.png";
-
 	private static final Map<String, String> STATIONS = new HashMap<>();
 
 	@PostMapping( "/mrt" )
-	public String mrt( String command, @RequestParam String text ) {
+	public String mrt( @RequestParam String command, @RequestParam String text ) {
 		log.info( "Text: {}", text );
 
 		if ( STATIONS.isEmpty() ) {
@@ -59,15 +56,13 @@ public class MetroController {
 
 			Element table = tables.first(), row = row( table, 2 );
 
-			SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( url ).setFooterIcon( ICON );
+			SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( url );
 
 			row( table, 1 ).select( "td:lt(3)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
 
-			attach.setFooter( StringUtils.isEmpty( command ) ? text : String.format( "%s %s", command, text ) );
-
 			attach.setText( text = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
 
-			return new SlackMessage( StringUtils.EMPTY ).addAttachments( attach.setFallback( text ) ).prepare().toString();
+			return message( attach.setFallback( text ), command, text );
 
 		} catch ( RuntimeException | IOException e ) {
 			log.error( "", e );
