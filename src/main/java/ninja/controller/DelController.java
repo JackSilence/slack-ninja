@@ -24,7 +24,7 @@ import ninja.util.Gson;
 public class DelController extends BaseController {
 	private static final String HISTORY_METHOD = "channels.history", DEL_METHOD = "chat.delete";
 
-	private static final String QUERY = "&oldest=%s&latest=%s", TEXT = "總共有%d則訊息\n已刪除%s則訊息";
+	private static final String QUERY = "&oldest=%s&latest=%s", TEXT = "總共有 %d 則訊息\n已刪除 %s 則訊息";
 
 	private static final Map<String, Long> DAYS_AGO = ImmutableMap.of( StringUtils.EMPTY, 0L, "今天", 0L, "昨天", 1L, "前天", 2L );
 
