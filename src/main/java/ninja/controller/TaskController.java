@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAction;
-import net.gpedro.integrations.slack.SlackApi;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Task;
 import ninja.slack.Payload;
 import ninja.util.Gson;
@@ -48,7 +46,5 @@ public class TaskController extends BaseController {
 
 		// 使用legacy token執行command, 只有對應的帳號才會看到return message
 		log.info( get( METHOD, token, message.getChannel().getId(), QUERY + task.name().toLowerCase() ) );
-
-		new SlackApi( message.getUrl() ).call( new SlackMessage( "手動執行: " + task ) );
 	}
 }
