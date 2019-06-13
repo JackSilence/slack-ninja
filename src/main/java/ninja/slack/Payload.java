@@ -12,6 +12,9 @@ public class Payload {
 	@SerializedName( "callback_id" )
 	private String id;
 
+	@SerializedName( "response_url" )
+	private String url;
+
 	private Channel channel;
 
 	private List<SlackAction> actions;
@@ -30,6 +33,14 @@ public class Payload {
 
 	public void setId( String id ) {
 		this.id = id;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl( String url ) {
+		this.url = url;
 	}
 
 	public Channel getChannel() {
