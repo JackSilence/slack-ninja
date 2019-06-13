@@ -29,7 +29,7 @@ public class TaskController extends BaseController {
 	}
 
 	@PostMapping( "/execute" )
-	public void execute( String payload ) {
+	public String execute( String payload ) {
 		log.info( "payload: {}", payload );
 		Payload message = Gson.from( payload, Payload.class );
 
@@ -47,5 +47,7 @@ public class TaskController extends BaseController {
 
 		// 使用legacy token執行command, 只有對應的帳號才會看到return message
 		log.info( get( METHOD, token, message.getChannel().getId(), QUERY + task.name().toLowerCase() ) );
+		
+		return "OK";
 	}
 }
