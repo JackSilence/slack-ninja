@@ -17,6 +17,8 @@ public class Payload {
 
 	private Channel channel;
 
+	private User user;
+
 	private List<SlackAction> actions;
 
 	public String getType() {
@@ -49,6 +51,14 @@ public class Payload {
 
 	public void setChannel( Channel channel ) {
 		this.channel = channel;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser( User user ) {
+		this.user = user;
 	}
 
 	public List<SlackAction> getActions() {
