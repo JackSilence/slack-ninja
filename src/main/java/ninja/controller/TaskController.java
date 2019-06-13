@@ -30,6 +30,7 @@ public class TaskController extends BaseController {
 
 	@PostMapping( "/execute" )
 	public void execute( String payload ) {
+		log.info( "payload: {}", payload );
 		Payload message = Gson.from( payload, Payload.class );
 
 		Assert.isTrue( TYPE.equals( message.getType() ) && Heroku.TASK_ID.equals( message.getId() ), payload );
