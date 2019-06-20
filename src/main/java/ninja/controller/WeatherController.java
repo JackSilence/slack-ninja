@@ -101,7 +101,7 @@ public class WeatherController extends BaseController {
 
 				String wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
 
-				SlackAttachment attach = Slack.attachment().setTitle( start = string( j, "startTime" ) ).setAuthorName( start ).setAuthorIcon( image.get( start ) ).setThumbUrl( image.get( start ) );
+				SlackAttachment attach = Slack.attachment().setAuthorName( start = string( j, "startTime" ) ).setAuthorIcon( image.get( start ) );
 
 				attach.addFields( field( data[ 2 ], 2 ) ).addFields( super.field( "舒適度", data[ 3 ] ) );
 
