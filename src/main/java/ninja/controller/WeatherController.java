@@ -41,9 +41,7 @@ public class WeatherController extends BaseController {
 		log.info( "Start: {}, end: {}", start, end );
 
 		try {
-			Request request = Request.Get( URL + String.format( QUERY, key, district ) );
-
-			Map<?, ?> result = Gson.from( Utils.getEntityAsString( request ), Map.class );
+			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( URL + String.format( QUERY, key, district, start, end ) ) ), Map.class );
 
 			Assert.notEmpty( result, "查無此區域: " + text );
 
