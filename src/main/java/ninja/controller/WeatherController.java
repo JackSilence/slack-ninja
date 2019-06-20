@@ -58,7 +58,7 @@ public class WeatherController extends BaseController {
 
 		Integer hour = time.getHour() / 3 * 3, town;
 
-		String start = time( time = time.with( LocalTime.of( hour, 0 ) ) ), end = time( time.plusHours( 12 ) );
+		String start = time( time = time.with( LocalTime.of( hour, 0 ) ) ), end = time( time.plusHours( 6 ) );
 
 		log.info( "Start: {}, end: {}", start, end );
 
