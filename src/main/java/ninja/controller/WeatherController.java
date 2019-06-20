@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,7 +86,9 @@ public class WeatherController extends BaseController {
 
 					String weather = data[ 0 ], color = weather.contains( "晴" ) ? "good" : weather.contains( "雨" ) ? "danger" : "warning";
 
-					message.addAttachments( attach.setText( weather + DELIMITER + data[ 4 ] ).setColor( color ) );
+					String wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE );
+
+					message.addAttachments( attach.setText( weather + DELIMITER + wind ).setColor( color ) );
 				} );
 			} );
 
