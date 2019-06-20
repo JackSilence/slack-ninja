@@ -27,7 +27,7 @@ import ninja.util.Slack;
 public class WeatherController extends BaseController {
 	private static final String API_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-061";
 
-	private static final String WEB_URL = "https://www.cwb.gov.tw/m/f/town368/%d.php";
+	private static final String WEB_URL = "https://www.cwb.gov.tw/m/f/town368/%d.php", TITLE = "台北市%s天氣預報";
 
 	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s", DELIMITER = "。";
 
@@ -64,13 +64,13 @@ public class WeatherController extends BaseController {
 		log.info( "Start: {}, end: {}", start, end );
 
 		try {
-			Assert.notNull( town = DISTRICTS.get( district ), "查無此區域: " + text );
+			Assert.notNull( town = DISTRICTS.get( district ), "查無此行政區: " + text );
 
 			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( API_URL + String.format( QUERY, key, district, start, end ) ) ), Map.class );
 
-			SlackAttachment attachment = Slack.attachment().setTitle( district + "天氣預報" ).setTitleLink( String.format( WEB_URL, town ) );
+			SlackAttachment attachment = Slack.attachment().setTitle( String.format( TITLE, district ) ).setTitleLink( String.format( WEB_URL, town ) );
 
-			SlackMessage message = Slack.message( attachment.setColor( "#3AA3E3" ), command, text );
+			SlackMessage message = Slack.message( attachment, command, text );
 
 			List<?> elements = list( first( first( map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
