@@ -60,7 +60,9 @@ public class WeatherController extends BaseController {
 
 					attach.addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
 
-					message.addAttachments( attach.setText( data[ 0 ] + DELIMITER + data[ 4 ] ) );
+					String weather = data[ 0 ], color = weather.contains( "晴" ) ? "good" : weather.contains( "雨" ) ? "danger" : "warning";
+
+					message.addAttachments( attach.setText( weather + DELIMITER + data[ 4 ] ).setColor( color ) );
 				} );
 			} );
 
