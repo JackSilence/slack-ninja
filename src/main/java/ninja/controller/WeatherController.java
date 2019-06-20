@@ -56,13 +56,11 @@ public class WeatherController extends BaseController {
 
 					String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
 
-					attach.setText( data[ 0 ] + DELIMITER + data[ 4 ].replace( StringUtils.SPACE, "，" ) + DELIMITER );
-
 					attach.addFields( field( data[ 2 ], 2 ) ).addFields( super.field( "舒適度", data[ 3 ] ) );
 
 					attach.addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
 
-					message.addAttachments( attach );
+					message.addAttachments( attach.setText( data[ 0 ] + DELIMITER + data[ 4 ] ) );
 				} );
 			} );
 
@@ -97,7 +95,7 @@ public class WeatherController extends BaseController {
 	}
 
 	private String time( ZonedDateTime time ) {
-		return time + ":00";
+		return time.toLocalDateTime() + ":00";
 	}
 
 	private SlackField field( String data, int index ) {
