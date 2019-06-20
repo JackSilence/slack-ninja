@@ -1,9 +1,10 @@
 package ninja.controller;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +23,7 @@ import ninja.util.Gson;
 public class WeatherController extends BaseController {
 	private static final String URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-061";
 
-	private static final String QUERY = "?Authorization=%s&locationName=%s", DELIMITER = "。";
+	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s", DELIMITER = "。";
 
 	@Value( "${cwb.api.key:}" )
 	private String key;
@@ -31,8 +32,18 @@ public class WeatherController extends BaseController {
 	public String weather( @RequestParam String command, @RequestParam String text ) {
 		String district = StringUtils.appendIfMissing( StringUtils.defaultIfEmpty( text, "內湖區" ), "區" );
 
+		LocalDateTime time = LocalDateTime.now();
+
+		int hour = time.getHour() / 3 * 3;
+
+		String start = time( time = time.with( LocalTime.of( hour, 0 ) ) ), end = time( time.plusHours( 12 ) );
+
+		log.info( "Start: {}, end: {}", start, end );
+
 		try {
-			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( URL + String.format( QUERY, key, district ) ) ), Map.class );
+			Request request = Request.Get( URL + String.format( QUERY, key, district ) );
+
+			Map<?, ?> result = Gson.from( Utils.getEntityAsString( request ), Map.class );
 
 			Assert.notEmpty( result, "查無此區域: " + text );
 
@@ -45,7 +56,7 @@ public class WeatherController extends BaseController {
 					SlackAttachment attach = new SlackAttachment( StringUtils.EMPTY ).setTitle( string( j, "startTime" ) );
 
 					String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
-					log.info( ArrayUtils.toString( data ) );
+
 					attach.setText( data[ 0 ] + DELIMITER + data[ 4 ].replace( StringUtils.SPACE, "，" ) + DELIMITER );
 
 					attach.addFields( field( data[ 2 ], 2 ) ).addFields( super.field( "舒適度", data[ 3 ] ) );
@@ -84,6 +95,10 @@ public class WeatherController extends BaseController {
 
 	private String string( Map<?, ?> map, String key ) {
 		return ( String ) map.get( key );
+	}
+
+	private String time( LocalDateTime time ) {
+		return time + ":00";
 	}
 
 	private SlackField field( String data, int index ) {
