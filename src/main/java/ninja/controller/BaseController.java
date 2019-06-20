@@ -36,8 +36,6 @@ public abstract class BaseController {
 
 	private static final String API_URL = "https://slack.com/api/", QUERY = "?token=%s&channel=%s";
 
-	private static final String ICON = "https://platform.slack-edge.com/img/default_application_icon.png";
-
 	@Value( "${slack.signing.secret:}" )
 	private String secret;
 
@@ -55,7 +53,7 @@ public abstract class BaseController {
 	}
 
 	protected String message( SlackAttachment attach, String command, String text ) {
-		return Slack.message().addAttachments( footer( attach, command, text ) ).prepare().toString();
+		return Slack.message( attach, command, text ).prepare().toString();
 	}
 
 	protected String get( String method, String token, String channel, String query ) {
@@ -66,10 +64,6 @@ public abstract class BaseController {
 		Request request = Request.Post( uri( method ) ).setHeader( "Authorization", "Bearer " + token );
 
 		return call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
-	}
-
-	protected SlackAttachment footer( SlackAttachment attach, String command, String text ) {
-		return attach.setFooter( String.format( "%s %s", command, text ) ).setFooterIcon( ICON );
 	}
 
 	protected SlackField field( String title, String value ) {

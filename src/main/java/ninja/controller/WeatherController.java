@@ -67,7 +67,9 @@ public class WeatherController extends BaseController {
 
 			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( API_URL + String.format( QUERY, key, district, start, end ) ) ), Map.class );
 
-			SlackMessage message = Slack.message();
+			SlackAttachment attachment = Slack.attachment().setTitle( district + "天氣預報" ).setTitleLink( String.format( WEB_URL, town ) );
+
+			SlackMessage message = Slack.message( attachment.setColor( "#3AA3E3" ), command, text );
 
 			List<?> elements = list( first( first( map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
@@ -87,9 +89,7 @@ public class WeatherController extends BaseController {
 				} );
 			} );
 
-			SlackAttachment attach = Slack.attachment().setTitle( district + "天氣預報" ).setTitleLink( String.format( WEB_URL, town ) );
-
-			return message.addAttachments( footer( attach, command, text ).setColor( "#3AA3E3" ) ).prepare().toString();
+			return message.prepare().toString();
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
