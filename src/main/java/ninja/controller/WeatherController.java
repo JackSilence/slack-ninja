@@ -3,6 +3,7 @@ package ninja.controller;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,12 +20,32 @@ import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.util.Gson;
+import ninja.util.Slack;
 
 @RestController
 public class WeatherController extends BaseController {
-	private static final String URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-061";
+	private static final String API_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-061";
+
+	private static final String WEB_URL = "https://www.cwb.gov.tw/m/f/town368/%d.php";
 
 	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s", DELIMITER = "。";
+
+	private static final Map<String, Integer> DISTRICTS = new HashMap<>();
+
+	static {
+		DISTRICTS.put( "中正區", 6300500 );
+		DISTRICTS.put( "大同區", 6300600 );
+		DISTRICTS.put( "中山區", 6300400 );
+		DISTRICTS.put( "松山區", 6300100 );
+		DISTRICTS.put( "大安區", 6300300 );
+		DISTRICTS.put( "萬華區", 6300700 );
+		DISTRICTS.put( "信義區", 6300200 );
+		DISTRICTS.put( "士林區", 6301100 );
+		DISTRICTS.put( "北投區", 6301200 );
+		DISTRICTS.put( "內湖區", 6301000 );
+		DISTRICTS.put( "南港區", 6300900 );
+		DISTRICTS.put( "文山區", 6300800 );
+	}
 
 	@Value( "${cwb.api.key:}" )
 	private String key;
@@ -35,24 +56,24 @@ public class WeatherController extends BaseController {
 
 		ZonedDateTime time = ZonedDateTime.now( ZoneId.of( "Asia/Taipei" ) );
 
-		int hour = time.getHour() / 3 * 3;
+		Integer hour = time.getHour() / 3 * 3, town;
 
 		String start = time( time = time.with( LocalTime.of( hour, 0 ) ) ), end = time( time.plusHours( 12 ) );
 
 		log.info( "Start: {}, end: {}", start, end );
 
 		try {
-			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( URL + String.format( QUERY, key, district, start, end ) ) ), Map.class );
+			Assert.notNull( town = DISTRICTS.get( district ), "查無此區域: " + text );
 
-			Assert.notEmpty( result, "查無此區域: " + text );
+			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( API_URL + String.format( QUERY, key, district, start, end ) ) ), Map.class );
 
-			SlackMessage message = new SlackMessage( "天氣預報綜合描述" );
+			SlackMessage message = Slack.message( Slack.attachment().setTitle( district + "天氣預報" ).setTitleLink( String.format( WEB_URL, town ) ), command, text );
 
 			List<?> elements = list( first( first( map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
 			elements.stream().map( this::map ).filter( i -> "WeatherDescription".equals( i.get( "elementName" ) ) ).forEach( i -> {
 				list( i, "time" ).stream().map( this::map ).forEach( j -> {
-					SlackAttachment attach = new SlackAttachment( StringUtils.EMPTY ).setTitle( string( j, "startTime" ) );
+					SlackAttachment attach = Slack.attachment().setTitle( string( j, "startTime" ) );
 
 					String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
 

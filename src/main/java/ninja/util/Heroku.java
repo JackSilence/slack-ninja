@@ -21,7 +21,7 @@ public class Heroku {
 	}
 
 	public static JsonObject task( String text, String channel ) {
-		SlackAttachment attach = new SlackAttachment( StringUtils.EMPTY ).setCallbackId( TASK_ID ).setColor( "#3AA3E3" );
+		SlackAttachment attach = Slack.attachment().setCallbackId( TASK_ID ).setColor( "#3AA3E3" );
 
 		Stream.of( Task.values() ).map( Heroku::action ).forEach( i -> attach.addAction( i ) );
 
