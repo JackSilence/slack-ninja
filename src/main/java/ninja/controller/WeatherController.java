@@ -3,6 +3,7 @@ package ninja.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +45,7 @@ public class WeatherController extends BaseController {
 					SlackAttachment attach = new SlackAttachment( StringUtils.EMPTY ).setTitle( string( j, "startTime" ) );
 
 					String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
-
+					log.info( ArrayUtils.toString( data ) );
 					attach.setText( data[ 0 ] + DELIMITER + data[ 4 ].replace( StringUtils.SPACE, "，" ) + DELIMITER );
 
 					attach.addFields( field( data[ 2 ], 2 ) ).addFields( super.field( "舒適度", data[ 3 ] ) );
