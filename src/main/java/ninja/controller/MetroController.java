@@ -13,8 +13,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,8 +23,6 @@ import net.gpedro.integrations.slack.SlackField;
 
 @RestController
 public class MetroController extends BaseController {
-	private final Logger log = LoggerFactory.getLogger( this.getClass() );
-
 	private static final String URL = "https://m.metro.taipei/pda_ticket_price_time.asp";
 
 	private static final String QUERY = "?s1elect=%s&s2elect=%s&action=query", TITLE = "捷運票價及乘車時間";
