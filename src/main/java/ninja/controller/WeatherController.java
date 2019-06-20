@@ -27,7 +27,7 @@ import ninja.util.Slack;
 public class WeatherController extends BaseController {
 	private static final String API_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-061";
 
-	private static final String WEB_URL = "https://www.cwb.gov.tw/m/f/town368/%d.php", TITLE = "台北市%s天氣預報";
+	private static final String WEB_URL = "https://www.cwb.gov.tw/V8/C/W/Town/Town.html?TID=", TITLE = "台北市%s天氣預報";
 
 	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s", DELIMITER = "。";
 
@@ -68,7 +68,7 @@ public class WeatherController extends BaseController {
 
 			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( API_URL + String.format( QUERY, key, district, start, end ) ) ), Map.class );
 
-			SlackAttachment attachment = Slack.attachment().setTitle( String.format( TITLE, district ) ).setTitleLink( String.format( WEB_URL, town ) );
+			SlackAttachment attachment = Slack.attachment().setTitle( String.format( TITLE, district ) ).setTitleLink( WEB_URL + town );
 
 			SlackMessage message = Slack.message( attachment, command, text );
 
