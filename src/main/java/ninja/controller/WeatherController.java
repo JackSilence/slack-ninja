@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +24,7 @@ public class WeatherController extends BaseController {
 	private String key;
 
 	@SuppressWarnings( "unchecked" )
-	@GetMapping( "/weather" )
+	@PostMapping( "/weather" )
 	public String weather( @RequestParam String command, @RequestParam String text ) {
 		String district = StringUtils.appendIfMissing( StringUtils.defaultIfEmpty( text, "內湖區" ), "區" );
 
