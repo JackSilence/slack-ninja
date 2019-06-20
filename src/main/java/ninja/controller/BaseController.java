@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.util.Gson;
 
@@ -66,6 +67,10 @@ public abstract class BaseController {
 		Request request = Request.Post( uri( method ) ).setHeader( "Authorization", "Bearer " + token );
 
 		return call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
+	}
+
+	protected SlackField field( String title, String value ) {
+		return new SlackField().setShorten( true ).setTitle( title ).setValue( value );
 	}
 
 	private String digest( String content ) {

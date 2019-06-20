@@ -68,6 +68,11 @@ public class MetroController extends BaseController {
 		}
 	}
 
+	@Override
+	protected SlackField field( String title, String value ) {
+		return super.field( title.contains( "愛心" ) ? "優待票" : title, value );
+	}
+
 	private String find( String name ) {
 		Optional<String> station = STATIONS.entrySet().stream().filter( i -> check( i.getKey(), name ) ).map( Entry::getValue ).findFirst();
 
@@ -82,10 +87,6 @@ public class MetroController extends BaseController {
 
 	private Element row( Element table, int index ) {
 		return table.select( String.format( "tr:eq(%d)", index ) ).first();
-	}
-
-	private SlackField field( String title, String value ) {
-		return new SlackField().setShorten( true ).setTitle( title.contains( "愛心" ) ? "優待票" : title ).setValue( value );
 	}
 
 	private Document get( String url ) throws IOException {
