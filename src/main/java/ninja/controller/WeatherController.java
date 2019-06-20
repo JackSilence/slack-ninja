@@ -1,11 +1,14 @@
 package ninja.controller;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +18,8 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.common.collect.Range;
 
 import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
@@ -27,9 +32,11 @@ import ninja.util.Slack;
 public class WeatherController extends BaseController {
 	private static final String API_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-061";
 
-	private static final String WEB_URL = "https://www.cwb.gov.tw/V8/C/W/Town/Town.html?TID=", TITLE = "台北市%s天氣預報";
+	private static final String WEB_URL = "https://www.cwb.gov.tw/V8/C/W/Town/Town.html?TID=", TITLE = "台北市%s天氣預報", DELIMITER = "。";
 
-	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s", DELIMITER = "。";
+	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s&elementName=Wx,WeatherDescription";
+
+	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
 
 	private static final Map<String, Integer> DISTRICTS = new HashMap<>();
 
@@ -51,6 +58,9 @@ public class WeatherController extends BaseController {
 	@Value( "${cwb.api.key:}" )
 	private String key;
 
+	@Value( "${cwb.icon.url:}" )
+	private String url;
+
 	@PostMapping( "/weather" )
 	public String weather( @RequestParam String command, @RequestParam String text ) {
 		String district = StringUtils.appendIfMissing( StringUtils.defaultIfEmpty( text, "內湖區" ), "區" );
@@ -59,14 +69,14 @@ public class WeatherController extends BaseController {
 
 		Integer hour = time.getHour() / 3 * 3, town;
 
-		String start = time( time = time.with( LocalTime.of( hour, 0 ) ) ), end = time( time.plusHours( 6 ) );
+		String from = time( time = time.with( LocalTime.of( hour, 0 ) ) ), to = time( time.plusHours( 6 ) );
 
-		log.info( "Start: {}, end: {}", start, end );
+		log.info( "From: {}, to: {}", from, to );
 
 		try {
 			Assert.notNull( town = DISTRICTS.get( district ), "查無此行政區: " + text );
 
-			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( API_URL + String.format( QUERY, key, district, start, end ) ) ), Map.class );
+			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( API_URL + String.format( QUERY, key, district, from, to ) ) ), Map.class );
 
 			SlackAttachment attachment = Slack.attachment().setTitle( String.format( TITLE, district ) ).setTitleLink( WEB_URL + town );
 
@@ -74,22 +84,30 @@ public class WeatherController extends BaseController {
 
 			List<?> elements = list( first( first( map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
-			elements.stream().map( this::map ).filter( i -> "WeatherDescription".equals( i.get( "elementName" ) ) ).forEach( i -> {
-				list( i, "time" ).stream().map( this::map ).forEach( j -> {
-					SlackAttachment attach = Slack.attachment().setTitle( string( j, "startTime" ) );
+			Map<String, String> image = new HashMap<>();
 
-					String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
+			each( elements, "Wx", j -> {
+				String start = string( j, "startTime" ), when;
 
-					attach.addFields( field( data[ 2 ], 2 ) ).addFields( super.field( "舒適度", data[ 3 ] ) );
+				when = Range.closedOpen( 6, 18 ).contains( LocalDateTime.parse( start, DATE_TIME_FORMATTER ).getHour() ) ? "day" : "night";
 
-					attach.addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
+				image.put( start, String.format( url, when, string( map( list( j, "elementValue" ).get( 1 ) ), "value" ) ) );
+			} );
 
-					String weather = data[ 0 ], color = weather.contains( "晴" ) ? "good" : weather.contains( "雨" ) ? "danger" : "warning";
+			each( elements, "WeatherDescription", j -> {
+				String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
 
-					String wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE );
+				String weather = data[ 0 ], color = weather.contains( "晴" ) ? "good" : weather.contains( "雨" ) ? "danger" : "warning";
 
-					message.addAttachments( attach.setText( weather + DELIMITER + wind ).setColor( color ) );
-				} );
+				String wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
+
+				SlackAttachment attach = Slack.attachment().setTitle( start = string( j, "startTime" ) ).setThumbUrl( image.get( start ) );
+
+				attach.addFields( field( data[ 2 ], 2 ) ).addFields( super.field( "舒適度", data[ 3 ] ) );
+
+				attach.addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
+
+				message.addAttachments( attach.setText( weather + DELIMITER + wind ).setColor( color ) );
 			} );
 
 			return message.prepare().toString();
@@ -100,6 +118,12 @@ public class WeatherController extends BaseController {
 			return e.getMessage();
 
 		}
+	}
+
+	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {
+		elements.stream().map( this::map ).filter( i -> name.equals( i.get( "elementName" ) ) ).forEach( i -> {
+			list( i, "time" ).stream().map( this::map ).forEach( action );
+		} );
 	}
 
 	private Map<?, ?> map( Map<?, ?> map, String key ) {
