@@ -1,7 +1,8 @@
 package ninja.controller;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class WeatherController extends BaseController {
 	public String weather( @RequestParam String command, @RequestParam String text ) {
 		String district = StringUtils.appendIfMissing( StringUtils.defaultIfEmpty( text, "內湖區" ), "區" );
 
-		LocalDateTime time = LocalDateTime.now();
+		ZonedDateTime time = ZonedDateTime.now( ZoneId.of( "Asia/Taipei" ) );
 
 		int hour = time.getHour() / 3 * 3;
 
@@ -95,7 +96,7 @@ public class WeatherController extends BaseController {
 		return ( String ) map.get( key );
 	}
 
-	private String time( LocalDateTime time ) {
+	private String time( ZonedDateTime time ) {
 		return time + ":00";
 	}
 
