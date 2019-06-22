@@ -103,7 +103,7 @@ public class WeatherController extends BaseController {
 
 				String period = hr == 12 ? "中午" : hr >= 0 && hr < 6 ? "凌晨" : hr >= 6 && hr < 12 ? "早上" : hr >= 13 && hr < 18 ? "下午" : "晚上";
 
-				String title = start.substring( 0, 11 ) + period + StringUtils.SPACE + ( hr > 12 ? hr - 12 : hr ) + " 時";
+				String title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點";
 
 				SlackAttachment attach = Slack.attachment().setAuthorName( title ).setAuthorIcon( image.get( start ) );
 
