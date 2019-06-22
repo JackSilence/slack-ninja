@@ -87,9 +87,7 @@ public class WeatherController extends BaseController {
 			Map<String, String> image = new HashMap<>();
 
 			each( elements, "Wx", j -> {
-				String start = string( j, "startTime" ), when;
-
-				when = Range.closedOpen( 6, 18 ).contains( LocalDateTime.parse( start, DATE_TIME_FORMATTER ).getHour() ) ? "day" : "night";
+				String start = string( j, "startTime" ), when = Range.closedOpen( 6, 18 ).contains( hour( start ) ) ? "day" : "night";
 
 				image.put( start, String.format( url, when, string( map( list( j, "elementValue" ).get( 1 ) ), "value" ) ) );
 			} );
@@ -101,7 +99,13 @@ public class WeatherController extends BaseController {
 
 				String wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
 
-				SlackAttachment attach = Slack.attachment().setAuthorName( start = string( j, "startTime" ) ).setAuthorIcon( image.get( start ) );
+				int hr = hour( start = string( j, "startTime" ) );
+
+				String period = hr == 12 ? "中午" : hr >= 0 && hr < 6 ? "凌晨" : hr >= 6 && hr < 12 ? "早上" : hr >= 13 && hr < 18 ? "下午" : "晚上";
+
+				String title = start.substring( 0, 11 ) + period + StringUtils.SPACE + ( hr > 12 ? hr - 12 : hr ) + " 時";
+
+				SlackAttachment attach = Slack.attachment().setAuthorName( title ).setAuthorIcon( image.get( start ) );
 
 				attach.addFields( field( data[ 2 ], 2 ) ).addFields( super.field( "舒適度", data[ 3 ] ) );
 
@@ -148,6 +152,10 @@ public class WeatherController extends BaseController {
 
 	private String time( ZonedDateTime time ) {
 		return time.toLocalDateTime() + ":00";
+	}
+
+	private int hour( String time ) {
+		return LocalDateTime.parse( time, DATE_TIME_FORMATTER ).getHour();
 	}
 
 	private SlackField field( String data, int index ) {
