@@ -34,7 +34,7 @@ public class WeatherController extends BaseController {
 
 	private static final String WEB_URL = "https://www.cwb.gov.tw/V8/C/W/Town/Town.html?TID=", TITLE = "台北市%s天氣預報", DELIMITER = "。";
 
-	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s&elementName=Wx,WeatherDescription";
+	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s&elementName=Wx,AT,WeatherDescription";
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
 
@@ -84,13 +84,15 @@ public class WeatherController extends BaseController {
 
 			List<?> elements = list( first( first( map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
-			Map<String, String> image = new HashMap<>();
+			Map<String, String> image = new HashMap<>(), at = new HashMap<>();
 
 			each( elements, "Wx", j -> {
 				String start = string( j, "startTime" ), when = Range.closedOpen( 6, 18 ).contains( hour( start ) ) ? "day" : "night";
 
 				image.put( start, String.format( url, when, string( map( list( j, "elementValue" ).get( 1 ) ), "value" ) ) );
 			} );
+
+			each( elements, "At", j -> at.put( string( j, "dateTime" ), string( first( j, "elementValue" ), "value" ) ) );
 
 			each( elements, "WeatherDescription", j -> {
 				String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
@@ -107,9 +109,9 @@ public class WeatherController extends BaseController {
 
 				SlackAttachment attach = Slack.attachment().setAuthorName( title ).setAuthorIcon( image.get( start ) );
 
-				attach.addFields( field( data[ 2 ], 2 ) ).addFields( super.field( "舒適度", data[ 3 ] ) );
+				attach.addFields( super.field( "溫度 / 體感", data[ 2 ].substring( 4 ) + " / " + at.get( start ) + "度" ) );
 
-				attach.addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
+				attach.addFields( super.field( "舒適度", data[ 3 ] ) ).addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
 
 				message.addAttachments( attach.setText( weather + DELIMITER + wind ).setColor( color ) );
 			} );
