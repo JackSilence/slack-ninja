@@ -109,7 +109,7 @@ public class WeatherController extends BaseController {
 
 				SlackAttachment attach = Slack.attachment().setAuthorName( title ).setAuthorIcon( image.get( start ) );
 
-				attach.addFields( super.field( "溫度, 體感", data[ 2 ].substring( 4, 6 ) + ", " + at.get( start ) + "˚C" ) );
+				attach.addFields( super.field( "溫度/體感", data[ 2 ].substring( 4, 6 ) + "˚C/" + at.get( start ) + "˚C" ) );
 
 				attach.addFields( super.field( "舒適度", data[ 3 ] ) ).addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
 
