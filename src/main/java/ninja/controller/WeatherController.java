@@ -92,7 +92,7 @@ public class WeatherController extends BaseController {
 				image.put( start, String.format( url, when, string( map( list( j, "elementValue" ).get( 1 ) ), "value" ) ) );
 			} );
 
-			each( elements, "At", j -> at.put( string( j, "dateTime" ), string( first( j, "elementValue" ), "value" ) ) );
+			each( elements, "At", j -> at.put( string( j, "dataTime" ), string( first( j, "elementValue" ), "value" ) ) );
 
 			each( elements, "WeatherDescription", j -> {
 				String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
