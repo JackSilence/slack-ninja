@@ -68,7 +68,7 @@ public class WeatherController extends BaseController {
 
 		ZonedDateTime time = ZonedDateTime.now( ZoneId.of( "Asia/Taipei" ) );
 
-		Integer hour = time.getHour(), town, plus = Arrays.asList( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6;
+		Integer hour = time.getHour(), plus = Arrays.asList( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6, town;
 
 		// 氣象局於5, 11, 17, 23時左右會刷新資料, 但詳細時間不確定; 所以在這些時間多往後抓一個區間再sublist
 		String from = time( time = time.with( LocalTime.of( hour / 3 * 3, 0 ) ) ), to = time( time.plusHours( plus ) );
@@ -111,7 +111,7 @@ public class WeatherController extends BaseController {
 
 				SlackAttachment attach = Slack.attachment().setAuthorName( title ).setAuthorIcon( image.get( start ) );
 
-				attach.addFields( super.field( "溫度／體感", data[ 2 ].substring( 4, 6 ) + "／" + at.get( start ) + "˚C" ) );
+				attach.addFields( super.field( "溫度 / 體感", data[ 2 ].substring( 4, 6 ) + " / " + at.get( start ) + "˚C" ) );
 
 				attach.addFields( super.field( "舒適度", data[ 3 ] ) ).addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
 
