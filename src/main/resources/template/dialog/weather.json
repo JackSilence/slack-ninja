@@ -6,7 +6,7 @@
 			"label": "行政區",
 			"type": "select",
 			"name": "district",
-			"value": "6301000",
+			"value": "%s",
 			"placeholder": "請選擇行政區",
 			"options": %s
 		},
