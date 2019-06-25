@@ -147,12 +147,9 @@ public class WeatherController extends BaseController {
 
 		String hours = json( IntStream.rangeClosed( 0, 48 ).filter( i -> i % 6 == 0 ).mapToObj( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
 
-		Map<String, String> map = new HashMap<>();
+		String dialog = String.format( Utils.getResourceAsString( DIALOG_TEMPLATE ), Heroku.TASK_ID, district, hours );
 
-		map.put( "trigger_id", id );
-		map.put( "dialog", String.format( Utils.getResourceAsString( DIALOG_TEMPLATE ), Heroku.TASK_ID, district, hours ) );
-
-		log.info( super.post( "dialog.open", token, map ) );
+		log.info( post( "dialog.open", token, ImmutableMap.of( "trigger_id", id, "dialog", dialog ) ) );
 	}
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {

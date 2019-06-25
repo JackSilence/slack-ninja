@@ -3,15 +3,19 @@
 	"title": "台北市天氣查詢",
 	"elements": [
 		{
-			"label": "請選擇行政區",
+			"label": "行政區",
 			"type": "select",
 			"name": "district",
+			"value": "內湖區",
+			"placeholder": "請選擇行政區",
 			"options": %s
 		},
 		{
-			"label": "請選擇預報時間",
+			"label": "預報時間",
 			"type": "select",
 			"name": "hours",
+			"value": "0",
+			"placeholder": "請選擇預報時間",
 			"options": %s
 		}
 	]
