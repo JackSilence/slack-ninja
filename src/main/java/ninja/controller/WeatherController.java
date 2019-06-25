@@ -95,9 +95,8 @@ public class WeatherController extends BaseController {
 			} );
 
 			each( elements, "AT", j -> at.put( string( j, "dataTime" ), string( first( j, "elementValue" ), "value" ) ) );
-			log.info( elements.toString() );
-			log.info( elements.subList( 0, 2 ).toString() );
-			each( elements.subList( 0, 2 ), "WeatherDescription", j -> {
+
+			each( elements, "WeatherDescription", j -> {
 				String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
 
 				String weather = data[ 0 ], color = weather.contains( "晴" ) ? "good" : weather.contains( "雨" ) ? "danger" : "warning";
@@ -131,7 +130,7 @@ public class WeatherController extends BaseController {
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {
 		elements.stream().map( this::map ).filter( i -> name.equals( i.get( "elementName" ) ) ).forEach( i -> {
-			list( i, "time" ).stream().map( this::map ).forEach( action );
+			list( i, "time" ).subList( 0, 2 ).stream().map( this::map ).forEach( action );
 		} );
 	}
 
