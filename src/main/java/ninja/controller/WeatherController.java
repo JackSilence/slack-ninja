@@ -152,7 +152,7 @@ public class WeatherController extends BaseController {
 
 	@PostMapping( "/dialog" )
 	public void dialog( @RequestParam( "trigger_id" ) String id ) {
-		String district = json( DISTRICTS.entrySet().stream().map( i -> option( i.getKey(), i.getValue() ) ) );
+		String district = json( DISTRICTS.keySet().stream().map( i -> option( i, i ) ) );
 
 		String hours = json( IntStream.rangeClosed( 0, 48 ).filter( i -> i % 6 == 0 ).mapToObj( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
 
@@ -179,7 +179,7 @@ public class WeatherController extends BaseController {
 		return map( list( map, key ).get( 0 ) );
 	}
 
-	private Map<String, String> option( String label, Integer value ) {
+	private Map<String, String> option( String label, Object value ) {
 		return ImmutableMap.of( "label", label, "value", value.toString() );
 	}
 

@@ -61,7 +61,7 @@ public class TaskController extends BaseController {
 
 			Assert.notEmpty( submission, payload );
 
-			text = submission.get( "district" ) + StringUtils.SPACE + submission.get( "hours" );
+			text = submission.get( "district" ) + "%20" + submission.get( "hours" );
 		}
 
 		String token = System.getenv( "slack.legacy.token." + message.getUser().getName() );
