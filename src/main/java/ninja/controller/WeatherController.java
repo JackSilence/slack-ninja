@@ -72,6 +72,9 @@ public class WeatherController extends BaseController {
 	@Value( "${cwb.icon.url:}" )
 	private String url;
 
+	@Value( "${slack.user.token:}" )
+	private String token;
+
 	@PostMapping
 	public String weather( @RequestParam String command, @RequestParam String text ) {
 		String district = StringUtils.appendIfMissing( StringUtils.defaultIfEmpty( text, "內湖區" ), "區" );
@@ -139,12 +142,17 @@ public class WeatherController extends BaseController {
 	}
 
 	@PostMapping( "/dialog" )
-	public String dialog() {
+	public void dialog( @RequestParam( "trigger_id" ) String id ) {
 		String district = json( DISTRICTS.entrySet().stream().map( i -> option( i.getKey(), i.getValue() ) ) );
 
 		String hours = json( IntStream.rangeClosed( 0, 48 ).filter( i -> i % 6 == 0 ).mapToObj( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
 
-		return String.format( Utils.getResourceAsString( DIALOG_TEMPLATE ), Heroku.TASK_ID, district, hours );
+		Map<String, String> map = new HashMap<>();
+
+		map.put( "trigger_id", id );
+		map.put( "dialog", String.format( Utils.getResourceAsString( DIALOG_TEMPLATE ), Heroku.TASK_ID, district, hours ) );
+
+		log.info( super.post( "dialog.open", token, map ) );
 	}
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {
