@@ -1,0 +1,18 @@
+{
+	"callback_id": "%s",
+	"title": "台北市天氣查詢",
+	"elements": [
+		{
+			"label": "請選擇行政區",
+			"type": "select",
+			"name": "district",
+			"options": %s
+		},
+		{
+			"label": "請選擇預報時間",
+			"type": "select",
+			"name": "hours",
+			"options": %s
+		}
+	]
+}

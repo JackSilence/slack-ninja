@@ -10,16 +10,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collector;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 
 import magic.util.Utils;
@@ -27,15 +33,19 @@ import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.util.Gson;
+import ninja.util.Heroku;
 import ninja.util.Slack;
 
 @RestController
+@RequestMapping( "/weather" )
 public class WeatherController extends BaseController {
 	private static final String API_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-061";
 
 	private static final String WEB_URL = "https://www.cwb.gov.tw/V8/C/W/Town/Town.html?TID=", TITLE = "台北市%s天氣預報", DELIMITER = "。";
 
 	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s&elementName=Wx,AT,WeatherDescription";
+
+	private static final String DIALOG_TEMPLATE = "/template/dialog/weather.json";
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
 
@@ -62,7 +72,7 @@ public class WeatherController extends BaseController {
 	@Value( "${cwb.icon.url:}" )
 	private String url;
 
-	@PostMapping( "/weather" )
+	@PostMapping
 	public String weather( @RequestParam String command, @RequestParam String text ) {
 		String district = StringUtils.appendIfMissing( StringUtils.defaultIfEmpty( text, "內湖區" ), "區" );
 
@@ -128,6 +138,15 @@ public class WeatherController extends BaseController {
 		}
 	}
 
+	@PostMapping( "/dialog" )
+	public String dialog() {
+		String district = json( DISTRICTS.entrySet().stream().map( i -> option( i.getKey(), i.getValue() ) ) );
+
+		String hours = json( IntStream.rangeClosed( 0, 48 ).filter( i -> i % 6 == 0 ).mapToObj( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
+
+		return String.format( Utils.getResourceAsString( DIALOG_TEMPLATE ), Heroku.TASK_ID, district, hours );
+	}
+
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {
 		elements.stream().map( this::map ).filter( i -> name.equals( i.get( "elementName" ) ) ).forEach( i -> {
 			list( i, "time" ).subList( 0, 2 ).stream().map( this::map ).forEach( action );
@@ -146,6 +165,10 @@ public class WeatherController extends BaseController {
 		return map( list( map, key ).get( 0 ) );
 	}
 
+	private Map<String, String> option( String label, Integer value ) {
+		return ImmutableMap.of( "label", label, "value", value.toString() );
+	}
+
 	private List<?> list( Map<?, ?> map, String key ) {
 		return ( List<?> ) map.get( key );
 	}
@@ -156,6 +179,10 @@ public class WeatherController extends BaseController {
 
 	private String time( ZonedDateTime time ) {
 		return time.toLocalDateTime() + ":00";
+	}
+
+	private String json( Stream<Map<String, String>> stream ) {
+		return stream.collect( Collector.of( JSONArray::new, JSONArray::put, JSONArray::put ) ).toString();
 	}
 
 	private int hour( String time ) {
