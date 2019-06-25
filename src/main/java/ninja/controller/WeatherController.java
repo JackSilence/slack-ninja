@@ -97,7 +97,7 @@ public class WeatherController extends BaseController {
 			Assert.isTrue( ObjectUtils.allNotNull( town = DISTRICTS.get( district ), hours = Ints.tryParse( params[ 1 ] ) ) && hours >= -12 && hours <= 48, "參數有誤: " + text );
 
 			// 氣象局於5, 11, 17, 23時左右會刷新資料, 但詳細時間不確定; 所以在這些時間多往後抓一個區間再設定limit
-			String from = time( time = time.plusHours( hours ).with( LocalTime.of( hour / 3 * 3, 0 ) ) ), to = time( time.plusHours( plus ) );
+			String from = time( time = time.with( LocalTime.of( hour / 3 * 3, 0 ) ).plusHours( hours ) ), to = time( time.plusHours( plus ) );
 
 			log.info( "From: {}, to: {}", from, to );
 
