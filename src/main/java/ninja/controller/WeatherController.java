@@ -9,13 +9,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
@@ -49,7 +49,7 @@ public class WeatherController extends BaseController {
 
 	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s&elementName=Wx,AT,WeatherDescription";
 
-	private static final String DIALOG_TEMPLATE = "/template/dialog/weather.json";
+	private static final String DEFAULT_DIST = "內湖區", DEFAULT_HOURS = "0", DIALOG_TEMPLATE = "/template/dialog/weather.json";
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
 
@@ -82,22 +82,22 @@ public class WeatherController extends BaseController {
 	@PostMapping
 	public String weather( @RequestParam String command, @RequestParam String text ) {
 		try {
-			String[] params = ( params = StringUtils.split( text ) ).length == 0 ? new String[] { "內湖區", "0" } : params;
+			String[] params = ( params = StringUtils.split( text ) ).length == 0 ? new String[] { DEFAULT_DIST, DEFAULT_HOURS } : params;
 
 			Assert.isTrue( params.length <= 2, "參數個數有誤: " + text );
 
-			params = params.length == 1 ? Ints.tryParse( params[ 0 ] ) != null ? ObjectArrays.concat( "內湖區", params ) : ArrayUtils.add( params, "0" ) : params;
+			params = params.length == 1 ? Ints.tryParse( params[ 0 ] ) != null ? ObjectArrays.concat( DEFAULT_DIST, params ) : ArrayUtils.add( params, DEFAULT_HOURS ) : params;
 
-			String district = StringUtils.appendIfMissing( params[ 0 ], "區" ), hours = params[ 1 ];
+			String district = StringUtils.appendIfMissing( params[ 0 ], "區" );
 
 			ZonedDateTime time = ZonedDateTime.now( ZoneId.of( "Asia/Taipei" ) );
 
-			Integer hour = time.getHour() + Integer.parseInt( hours ), plus = Arrays.asList( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6, town;
+			Integer hour = time.getHour(), plus = Arrays.asList( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6, town, hours;
 
-			Assert.isTrue( Objects.nonNull( town = DISTRICTS.get( district ) ) && Ints.tryParse( hours ) != null, "參數有誤: " + text );
+			Assert.isTrue( ObjectUtils.allNotNull( town = DISTRICTS.get( district ), hours = Ints.tryParse( params[ 1 ] ) ) && Math.abs( hours ) <= 48, "參數有誤: " + text );
 
 			// 氣象局於5, 11, 17, 23時左右會刷新資料, 但詳細時間不確定; 所以在這些時間多往後抓一個區間再sublist
-			String from = time( time = time.with( LocalTime.of( hour / 3 * 3, 0 ) ) ), to = time( time.plusHours( plus ) );
+			String from = time( time = time.plusHours( hours ).with( LocalTime.of( hour / 3 * 3, 0 ) ) ), to = time( time.plusHours( plus ) );
 
 			log.info( "From: {}, to: {}", from, to );
 
