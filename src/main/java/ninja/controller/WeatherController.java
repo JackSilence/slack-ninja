@@ -37,7 +37,6 @@ import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.util.Gson;
-import ninja.util.Heroku;
 import ninja.util.Slack;
 
 @RestController
@@ -157,7 +156,7 @@ public class WeatherController extends BaseController {
 
 		String hours = json( IntStream.rangeClosed( 0, 48 ).filter( i -> i % 6 == 0 ).mapToObj( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
 
-		String dialog = String.format( Utils.getResourceAsString( DIALOG_TEMPLATE ), Heroku.TASK_ID, district, hours );
+		String dialog = String.format( Utils.getResourceAsString( DIALOG_TEMPLATE ), district, hours );
 
 		log.info( post( "dialog.open", token, ImmutableMap.of( "trigger_id", id, "dialog", dialog ) ) );
 	}

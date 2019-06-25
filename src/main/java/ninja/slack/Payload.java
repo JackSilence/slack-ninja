@@ -1,6 +1,7 @@
 package ninja.slack;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -18,6 +19,8 @@ public class Payload {
 	private Channel channel;
 
 	private User user;
+
+	private Map<String, String> submission;
 
 	private List<SlackAction> actions;
 
@@ -59,6 +62,14 @@ public class Payload {
 
 	public void setUser( User user ) {
 		this.user = user;
+	}
+
+	public Map<String, String> getSubmission() {
+		return submission;
+	}
+
+	public void setSubmission( Map<String, String> submission ) {
+		this.submission = submission;
 	}
 
 	public List<SlackAction> getActions() {
