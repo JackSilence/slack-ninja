@@ -95,7 +95,8 @@ public class WeatherController extends BaseController {
 			} );
 
 			each( elements, "AT", j -> at.put( string( j, "dataTime" ), string( first( j, "elementValue" ), "value" ) ) );
-
+			log.info( elements.toString() );
+			log.info( elements.subList( 0, 2 ).toString() );
 			each( elements.subList( 0, 2 ), "WeatherDescription", j -> {
 				String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
 
