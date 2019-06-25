@@ -55,7 +55,7 @@ public class TaskController extends BaseController {
 			command = Task.valueOf( action.getValue() ).name().toLowerCase(); // 可確定Task存在
 
 		} else {
-			check( "wx", command = id, payload );
+			check( "weather", command = id, payload );
 
 			Map<String, String> submission = message.getSubmission();
 
