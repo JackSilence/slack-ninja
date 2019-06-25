@@ -9,11 +9,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
@@ -26,7 +28,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Range;
+import com.google.common.primitives.Ints;
 
 import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
@@ -77,19 +81,25 @@ public class WeatherController extends BaseController {
 
 	@PostMapping
 	public String weather( @RequestParam String command, @RequestParam String text ) {
-		String district = StringUtils.appendIfMissing( StringUtils.defaultIfEmpty( text, "內湖區" ), "區" );
-
-		ZonedDateTime time = ZonedDateTime.now( ZoneId.of( "Asia/Taipei" ) );
-
-		Integer hour = time.getHour(), plus = Arrays.asList( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6, town;
-
-		// 氣象局於5, 11, 17, 23時左右會刷新資料, 但詳細時間不確定; 所以在這些時間多往後抓一個區間再sublist
-		String from = time( time = time.with( LocalTime.of( hour / 3 * 3, 0 ) ) ), to = time( time.plusHours( plus ) );
-
-		log.info( "From: {}, to: {}", from, to );
-
 		try {
-			Assert.notNull( town = DISTRICTS.get( district ), "查無此行政區: " + text );
+			String[] params = ( params = StringUtils.split( text ) ).length == 0 ? new String[] { "內湖區", "0" } : params;
+
+			Assert.isTrue( params.length <= 2, "參數個數有誤: " + text );
+
+			params = params.length == 1 ? Ints.tryParse( params[ 0 ] ) != null ? ObjectArrays.concat( "內湖區", params ) : ArrayUtils.add( params, "0" ) : params;
+
+			String district = StringUtils.appendIfMissing( params[ 0 ], "區" ), hours = params[ 1 ];
+
+			ZonedDateTime time = ZonedDateTime.now( ZoneId.of( "Asia/Taipei" ) );
+
+			Integer hour = time.getHour() + Integer.parseInt( hours ), plus = Arrays.asList( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6, town;
+
+			Assert.isTrue( Objects.nonNull( town = DISTRICTS.get( district ) ) && Ints.tryParse( hours ) != null, "參數有誤: " + text );
+
+			// 氣象局於5, 11, 17, 23時左右會刷新資料, 但詳細時間不確定; 所以在這些時間多往後抓一個區間再sublist
+			String from = time( time = time.with( LocalTime.of( hour / 3 * 3, 0 ) ) ), to = time( time.plusHours( plus ) );
+
+			log.info( "From: {}, to: {}", from, to );
 
 			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( API_URL + String.format( QUERY, key, district, from, to ) ) ), Map.class );
 
