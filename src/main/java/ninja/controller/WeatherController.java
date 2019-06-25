@@ -88,7 +88,7 @@ public class WeatherController extends BaseController {
 
 			Map<String, String> image = new HashMap<>(), at = new HashMap<>();
 
-			each( elements.subList( 0, 2 ), "Wx", j -> {
+			each( elements, "Wx", j -> {
 				String start = string( j, "startTime" ), when = Range.closedOpen( 6, 18 ).contains( hour( start ) ) ? "day" : "night";
 
 				image.put( start, String.format( url, when, string( map( list( j, "elementValue" ).get( 1 ) ), "value" ) ) );
@@ -96,7 +96,7 @@ public class WeatherController extends BaseController {
 
 			each( elements, "AT", j -> at.put( string( j, "dataTime" ), string( first( j, "elementValue" ), "value" ) ) );
 
-			each( elements, "WeatherDescription", j -> {
+			each( elements.subList( 0, 2 ), "WeatherDescription", j -> {
 				String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
 
 				String weather = data[ 0 ], color = weather.contains( "晴" ) ? "good" : weather.contains( "雨" ) ? "danger" : "warning";
