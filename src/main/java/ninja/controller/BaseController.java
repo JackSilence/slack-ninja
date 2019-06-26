@@ -39,7 +39,7 @@ public abstract class BaseController {
 	@Value( "${slack.signing.secret:}" )
 	private String secret;
 
-	//@ModelAttribute
+	@ModelAttribute
 	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, @RequestBody String body, HttpServletRequest request ) {
 		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
 
