@@ -108,7 +108,7 @@ public class WeatherController extends BaseController {
 
 			List<?> elements = list( first( first( map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
-			Map<String, String> image = new HashMap<>(), at = new HashMap<>();
+			Map<String, String> image = new HashMap<>(), at = new HashMap<>(), ci = new HashMap<>();
 
 			each( elements, "Wx", j -> {
 				String start = string( j, "startTime" ), when = Range.closedOpen( 6, 18 ).contains( hour( start ) ) ? "day" : "night";
@@ -118,10 +118,17 @@ public class WeatherController extends BaseController {
 
 			each( elements, "AT", j -> at.put( string( j, "dataTime" ), string( first( j, "elementValue" ), "value" ) ) );
 
+			each( elements, "CI", j -> {
+				int idx = Integer.parseInt( string( first( j, "elementValue" ), "value" ) );
+
+				// 指數10以下為非常寒冷, 11-15為寒冷, 16至19為稍有寒意, 20至26為舒適, 27至30為悶熱, 31以上為易中暑
+				String color = idx < 16 ? "#3AA3E3" : idx > 15 && idx < 20 ? "#B0E2FF" : idx > 19 && idx < 27 ? "good" : idx > 26 && idx < 31 ? "warning" : "danger";
+
+				ci.put( string( j, "dataTime" ), color );
+			} );
+
 			each( elements, "WeatherDescription", j -> {
 				String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
-
-				String weather = data[ 0 ], color = weather.contains( "晴" ) ? "good" : weather.contains( "雨" ) ? "danger" : "warning";
 
 				String wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
 
@@ -129,7 +136,7 @@ public class WeatherController extends BaseController {
 
 				String period = hr == 12 ? "中午" : hr >= 0 && hr < 6 ? "凌晨" : hr >= 6 && hr < 12 ? "早上" : hr >= 13 && hr < 18 ? "下午" : "晚上";
 
-				String title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點";
+				String title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點", weather = data[ 0 ];
 
 				SlackAttachment attach = Slack.attachment().setAuthorName( title ).setAuthorIcon( image.get( start ) );
 
@@ -137,7 +144,7 @@ public class WeatherController extends BaseController {
 
 				attach.addFields( super.field( "舒適度", data[ 3 ] ) ).addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
 
-				message.addAttachments( attach.setText( weather + DELIMITER + wind ).setColor( color ) );
+				message.addAttachments( attach.setText( weather + DELIMITER + wind ).setColor( ci.get( start ) ) );
 			} );
 
 			return message.prepare().toString();
