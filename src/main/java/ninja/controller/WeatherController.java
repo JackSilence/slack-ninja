@@ -136,7 +136,7 @@ public class WeatherController extends BaseController {
 
 				String period = hr == 12 ? "中午" : hr >= 0 && hr < 6 ? "凌晨" : hr >= 6 && hr < 12 ? "早上" : hr >= 13 && hr < 18 ? "下午" : "晚上";
 
-				String title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點", weather = data[ 0 ];
+				String title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點";
 
 				SlackAttachment attach = Slack.attachment().setAuthorName( title ).setAuthorIcon( image.get( start ) );
 
@@ -144,7 +144,7 @@ public class WeatherController extends BaseController {
 
 				attach.addFields( super.field( "舒適度", data[ 3 ] ) ).addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
 
-				message.addAttachments( attach.setText( weather + DELIMITER + wind ).setColor( ci.get( start ) ) );
+				message.addAttachments( attach.setText( data[ 0 ] + DELIMITER + wind ).setColor( ci.get( start ) ) );
 			} );
 
 			return message.prepare().toString();
