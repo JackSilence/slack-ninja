@@ -119,14 +119,15 @@ public class WeatherController extends BaseController {
 			each( elements, "AT", j -> at.put( string( j, "dataTime" ), string( first( j, "elementValue" ), "value" ) ) );
 
 			each( elements, "CI", j -> {
+				log.info( j.toString() );
 				int idx = Integer.parseInt( string( first( j, "elementValue" ), "value" ) );
-
+				log.info( String.valueOf( idx ) );
 				// 指數10以下為非常寒冷, 11-15為寒冷, 16至19為稍有寒意, 20至26為舒適, 27至30為悶熱, 31以上為易中暑
 				String color = idx < 16 ? "#3AA3E3" : idx > 15 && idx < 20 ? "#B0E2FF" : idx > 19 && idx < 27 ? "good" : idx > 26 && idx < 31 ? "warning" : "danger";
 
 				ci.put( string( j, "dataTime" ), color );
 			} );
-
+			log.info( ci.toString() );
 			each( elements, "WeatherDescription", j -> {
 				String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
 
