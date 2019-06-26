@@ -107,7 +107,7 @@ public class WeatherController extends BaseController {
 			SlackMessage message = Slack.message( attachment, command, text );
 
 			List<?> elements = list( first( first( map( result, "records" ), "locations" ), "location" ), "weatherElement" );
-
+			log.info( elements.toString() );
 			Map<String, String> image = new HashMap<>(), at = new HashMap<>(), ci = new HashMap<>();
 
 			each( elements, "Wx", j -> {
