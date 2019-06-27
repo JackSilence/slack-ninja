@@ -50,7 +50,7 @@ public class BusController extends BaseController {
 			Assert.isTrue( params.length == 2, "路線及站牌關鍵字皆須輸入" );
 
 			String route = params[ 0 ], keyword = params[ 1 ];
-			log.info( "keyword is empty: " + keyword.isEmpty() );
+
 			Map<String, ?> bus = call( "Route", route ).stream().findFirst().orElseThrow( () -> new IllegalArgumentException( "查無路線: " + route ) );
 
 			String departure = string( bus, "DepartureStopNameZh" ), destination = string( bus, "DestinationStopNameZh" );
