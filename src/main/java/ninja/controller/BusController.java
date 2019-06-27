@@ -50,9 +50,7 @@ public class BusController extends BaseController {
 
 			String route = params[ 0 ], keyword = params[ 1 ];
 
-			Map<String, ?> bus = call( "Route", route ).get( 0 );
-
-			Assert.notEmpty( bus, "查無路線: " + route );
+			Map<String, ?> bus = call( "Route", route ).stream().findFirst().orElseThrow( () -> new IllegalArgumentException( "查無路線: " + route ) );
 
 			String departure = string( bus, "DepartureStopNameZh" ), destination = string( bus, "DestinationStopNameZh" );
 
@@ -67,8 +65,6 @@ public class BusController extends BaseController {
 				SlackAttachment attach = Slack.attachment().setTitle( k );
 
 				v.forEach( i -> {
-					log.info( "time class: " + i.get( "EstimateTime" ).getClass() );
-
 					int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
 
 					String value = ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds + "秒";
