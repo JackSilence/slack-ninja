@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.util.Gson;
 import ninja.util.Slack;
 
@@ -67,7 +68,11 @@ public abstract class BaseController {
 	}
 
 	protected String message( SlackAttachment attach, String command, String text ) {
-		return Slack.message( attach, command, text ).prepare().toString();
+		return message( Slack.message( attach, command, text ) );
+	}
+
+	protected String message( SlackMessage message ) {
+		return message.prepare().toString();
 	}
 
 	protected String get( String method, String token, String channel, String query ) {

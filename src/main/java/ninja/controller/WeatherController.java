@@ -147,7 +147,7 @@ public class WeatherController extends BaseController {
 				message.addAttachments( attach.setText( data[ 0 ] + DELIMITER + wind ).setColor( ci.get( start ) ) );
 			} );
 
-			return message.prepare().toString();
+			return message( message );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );

@@ -59,23 +59,25 @@ public class BusController extends BaseController {
 
 			SlackMessage message = Slack.message( attachment, command, text );
 
-			if ( !keyword.isEmpty() ) {
-				call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
-					return station( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
-
-				} ).collect( Collectors.groupingBy( i -> station( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
-					message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setFields( v.stream().map( i -> {
-						int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
-
-						String value = ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds + "秒";
-
-						return field( "往".concat( direction( i ).equals( 0d ) ? destination : departure ), value );
-
-					} ).collect( Collectors.toList() ) ) );
-				} );
+			if ( keyword.isEmpty() ) {
+				return message( message );
 			}
 
-			return message.prepare().toString();
+			call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
+				return station( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
+
+			} ).collect( Collectors.groupingBy( i -> station( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
+				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setFields( v.stream().map( i -> {
+					int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
+
+					String value = ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds + "秒";
+
+					return field( "往".concat( direction( i ).equals( 0d ) ? destination : departure ), value );
+
+				} ).collect( Collectors.toList() ) ) );
+			} );
+
+			return message( message );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
