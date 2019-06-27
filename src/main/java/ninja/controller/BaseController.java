@@ -12,6 +12,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -31,11 +32,11 @@ import ninja.util.Slack;
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	protected static final String REQ_BODY = "req_body", VERSION = "v0", ALGORITHM = "HmacSHA256";
+	protected static final String REQ_BODY = "req_body";
 
 	private static final String HEADER_TIMESTAMP = "X-Slack-Request-Timestamp", HEADER_SIGNATURE = "X-Slack-Signature";
 
-	private static final String API_URL = "https://slack.com/api/", QUERY = "?token=%s&channel=%s";
+	private static final String VERSION = "v0", API_URL = "https://slack.com/api/", QUERY = "?token=%s&channel=%s";
 
 	@Value( "${slack.signing.secret:}" )
 	private String secret;
@@ -83,18 +84,24 @@ public abstract class BaseController {
 		return new SlackField().setShorten( true ).setTitle( title ).setValue( value );
 	}
 
-	private String digest( String content ) {
+	protected byte[] signature( String data, String secret, HmacAlgorithms hmac ) {
 		try {
-			Mac mac = Mac.getInstance( ALGORITHM );
+			String algorithm = hmac.toString();
 
-			mac.init( new SecretKeySpec( secret.getBytes( StandardCharsets.UTF_8 ), ALGORITHM ) );
+			Mac mac = Mac.getInstance( algorithm );
 
-			return String.join( "=", VERSION, Hex.encodeHexString( mac.doFinal( content.getBytes( StandardCharsets.UTF_8 ) ) ) );
+			mac.init( new SecretKeySpec( secret.getBytes( StandardCharsets.UTF_8 ), algorithm ) );
+
+			return mac.doFinal( data.getBytes( StandardCharsets.UTF_8 ) );
 
 		} catch ( NoSuchAlgorithmException | InvalidKeyException e ) {
 			throw new RuntimeException( e );
 
 		}
+	}
+
+	private String digest( String content ) {
+		return String.join( "=", VERSION, Hex.encodeHexString( signature( content, secret, HmacAlgorithms.HMAC_SHA_256 ) ) );
 	}
 
 	private String uri( String method ) {

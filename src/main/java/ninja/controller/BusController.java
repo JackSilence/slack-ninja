@@ -1,11 +1,18 @@
 package ninja.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,9 +25,17 @@ import ninja.util.Gson;
 
 @RestController
 public class BusController extends BaseController {
+	private static final String AUTH_HEADER = "hmac username=\"%s\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"%s\"";
+
 	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei/%s?$format=JSON&%s";
 
 	private static final String WEB_URL = "http://www.e-bus.gov.taipei/newmap/Tw/Map?rid=%d&sec=0";
+
+	@Value( "${ptx.app.id:}" )
+	private String id;
+
+	@Value( "${ptx.app.key:}" )
+	private String key;
 
 	@PostMapping( "/bus" )
 	public String bus( @RequestParam String command, @RequestParam String text ) {
@@ -52,11 +67,25 @@ public class BusController extends BaseController {
 	}
 
 	private List<Map<String, ?>> call( String method, String route, String... query ) {
-		return Gson.from( Utils.getEntityAsString( Request.Get( String.format( API_URL, method, route, String.join( "&", query ) ) ) ), new TypeToken<List<Map<Integer, ?>>>() {
+		Request request = Request.Get( String.format( API_URL, method, route, String.join( "&", query ) ) );
+
+		String xdate = xdate(), signature = Base64.getEncoder().encodeToString( signature( "x-date: " + xdate, key, HmacAlgorithms.HMAC_SHA_1 ) );
+
+		request.addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
+
+		return Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<Map<Integer, ?>>>() {
 		}.getType() );
 	}
 
 	private String stop( Map<String, ?> map ) {
 		return string( map( map, "StopName" ), "Zh_tw" );
+	}
+
+	private String xdate() {
+		SimpleDateFormat sdf = new SimpleDateFormat( "EEE, dd MMM yyyy HH:mm:ss z", Locale.US );
+
+		sdf.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+
+		return sdf.format( new Date() );
 	}
 }
