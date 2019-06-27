@@ -40,7 +40,7 @@ public class TaskController extends BaseController {
 		Assert.notNull( type, payload );
 
 		String id = message.getId(), command, text = StringUtils.EMPTY;
-
+		log.info( "state: " + message.getState() );
 		if ( Type.INTERACTIVE_MESSAGE.equals( type ) ) {
 			check( Heroku.TASK_ID, id, payload );
 

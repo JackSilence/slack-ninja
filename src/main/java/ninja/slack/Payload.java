@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 import net.gpedro.integrations.slack.SlackAction;
 
 public class Payload {
-	private String type;
+	private String type, state;
 
 	@SerializedName( "callback_id" )
 	private String id;
@@ -30,6 +30,14 @@ public class Payload {
 
 	public void setType( String type ) {
 		this.type = type;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState( String state ) {
+		this.state = state;
 	}
 
 	public String getId() {

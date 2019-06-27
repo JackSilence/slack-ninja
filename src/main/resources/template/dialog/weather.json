@@ -1,7 +1,6 @@
 {
 	"callback_id": "weather",
 	"title": "台北市天氣查詢",
-	"state": "test state",
 	"elements": [
 		{
 			"label": "行政區",
