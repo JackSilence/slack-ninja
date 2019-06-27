@@ -1,13 +1,13 @@
 package ninja.controller;
 
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
@@ -34,7 +34,9 @@ public class BusController extends BaseController {
 
 	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei/%s?$format=JSON&%s";
 
-	private static final String WEB_URL = "http://www.e-bus.gov.taipei/newmap/Tw/Map?rid=%s&sec=0";
+	private static final String WEB_URL = "http://www.e-bus.gov.taipei/newmap/Tw/Map?rid=%s&sec=0", STATION = ":busstop:_%s_";
+
+	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "EEE, dd MMM yyyy HH:mm:ss z", Locale.US );
 
 	@Value( "${ptx.app.id:}" )
 	private String id;
@@ -67,7 +69,7 @@ public class BusController extends BaseController {
 				return station( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
 
 			} ).collect( Collectors.groupingBy( i -> station( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
-				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {
+				message.addAttachments( Slack.attachment().setText( String.format( STATION, k ) ).setColor( "good" ).setFields( v.stream().map( i -> {
 					int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
 
 					String value = ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds + "秒";
@@ -90,7 +92,9 @@ public class BusController extends BaseController {
 	private List<Map<String, ?>> call( String method, String route, String... query ) {
 		Request request = Request.Get( String.format( API_URL, method, route, String.join( "&", query ) ) );
 
-		String xdate = xdate(), signature = Base64.getEncoder().encodeToString( signature( "x-date: " + xdate, key, HmacAlgorithms.HMAC_SHA_1 ) );
+		String xdate = ZonedDateTime.now( ZoneId.of( "GMT" ) ).format( DATE_TIME_FORMATTER );
+
+		String signature = Base64.getEncoder().encodeToString( signature( "x-date: " + xdate, key, HmacAlgorithms.HMAC_SHA_1 ) );
 
 		request.addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
 
@@ -100,14 +104,6 @@ public class BusController extends BaseController {
 
 	private String station( Map<String, ?> map ) {
 		return string( map( map, "StopName" ), "Zh_tw" );
-	}
-
-	private String xdate() {
-		SimpleDateFormat sdf = new SimpleDateFormat( "EEE, dd MMM yyyy HH:mm:ss z", Locale.US );
-
-		sdf.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-
-		return sdf.format( new Date() );
 	}
 
 	private Double direction( Map<String, ?> map ) {
