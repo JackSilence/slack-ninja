@@ -34,7 +34,7 @@ public class BusController extends BaseController {
 
 	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei/%s?$format=JSON&%s";
 
-	private static final String WEB_URL = "http://www.e-bus.gov.taipei/newmap/Tw/Map?rid=%s&sec=0", STATION = ":busstop:_%s_";
+	private static final String WEB_URL = "http://www.e-bus.gov.taipei/newmap/Tw/Map?rid=%s&sec=0";
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "EEE, dd MMM yyyy HH:mm:ss z", Locale.US );
 
@@ -66,10 +66,10 @@ public class BusController extends BaseController {
 			}
 
 			call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
-				return station( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
+				return stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
 
-			} ).collect( Collectors.groupingBy( i -> station( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
-				message.addAttachments( Slack.attachment().setText( String.format( STATION, k ) ).setColor( "good" ).setFields( v.stream().map( i -> {
+			} ).collect( Collectors.groupingBy( i -> stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
+				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {
 					int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
 
 					String value = ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds + "秒";
@@ -102,7 +102,7 @@ public class BusController extends BaseController {
 		}.getType() );
 	}
 
-	private String station( Map<String, ?> map ) {
+	private String stop( Map<String, ?> map ) {
 		return string( map( map, "StopName" ), "Zh_tw" );
 	}
 
