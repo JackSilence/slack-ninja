@@ -11,6 +11,7 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,12 +45,12 @@ public class BusController extends BaseController {
 	@PostMapping( "/bus" )
 	public String bus( @RequestParam String command, @RequestParam String text ) {
 		try {
-			String[] params = StringUtils.split( text );
+			String[] params = ( params = StringUtils.split( text ) ).length == 1 ? ArrayUtils.add( params, StringUtils.EMPTY ) : params;
 
 			Assert.isTrue( params.length == 2, "路線及站牌關鍵字皆須輸入" );
 
 			String route = params[ 0 ], keyword = params[ 1 ];
-
+			log.info( "keyword is empty: " + keyword.isEmpty() );
 			Map<String, ?> bus = call( "Route", route ).stream().findFirst().orElseThrow( () -> new IllegalArgumentException( "查無路線: " + route ) );
 
 			String departure = string( bus, "DepartureStopNameZh" ), destination = string( bus, "DestinationStopNameZh" );
@@ -58,19 +59,21 @@ public class BusController extends BaseController {
 
 			SlackMessage message = Slack.message( attachment, command, text );
 
-			call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
-				return station( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
+			if ( !keyword.isEmpty() ) {
+				call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
+					return station( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
 
-			} ).collect( Collectors.groupingBy( i -> station( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
-				message.addAttachments( Slack.attachment().setText( k ).setFields( v.stream().map( i -> {
-					int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
+				} ).collect( Collectors.groupingBy( i -> station( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
+					message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setFields( v.stream().map( i -> {
+						int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
 
-					String value = ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds + "秒";
+						String value = ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds + "秒";
 
-					return field( "往".concat( direction( i ).equals( 0d ) ? destination : departure ), value );
+						return field( "往".concat( direction( i ).equals( 0d ) ? destination : departure ), value );
 
-				} ).collect( Collectors.toList() ) ) );
-			} );
+					} ).collect( Collectors.toList() ) ) );
+				} );
+			}
 
 			return message.prepare().toString();
 
