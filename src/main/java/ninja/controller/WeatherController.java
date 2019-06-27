@@ -174,14 +174,6 @@ public class WeatherController extends BaseController {
 		} );
 	}
 
-	private Map<?, ?> map( Map<?, ?> map, String key ) {
-		return map( map.get( key ) );
-	}
-
-	private Map<?, ?> map( Object object ) {
-		return ( Map<?, ?> ) object;
-	}
-
 	private Map<?, ?> first( Map<?, ?> map, String key ) {
 		return map( list( map, key ).get( 0 ) );
 	}
@@ -192,10 +184,6 @@ public class WeatherController extends BaseController {
 
 	private List<?> list( Map<?, ?> map, String key ) {
 		return ( List<?> ) map.get( key );
-	}
-
-	private String string( Map<?, ?> map, String key ) {
-		return ( String ) map.get( key );
 	}
 
 	private String time( ZonedDateTime time ) {

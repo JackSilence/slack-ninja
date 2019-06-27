@@ -5,6 +5,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -50,6 +51,18 @@ public abstract class BaseController {
 		Assert.isTrue( signature.equals( digest ), String.join( "!=", signature, digest ) );
 
 		request.setAttribute( REQ_BODY, body );
+	}
+
+	protected Map<?, ?> map( Map<?, ?> map, String key ) {
+		return map( map.get( key ) );
+	}
+
+	protected Map<?, ?> map( Object object ) {
+		return ( Map<?, ?> ) object;
+	}
+
+	protected String string( Map<?, ?> map, String key ) {
+		return ( String ) map.get( key );
 	}
 
 	protected String message( SlackAttachment attach, String command, String text ) {
