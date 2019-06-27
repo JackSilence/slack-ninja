@@ -1,6 +1,7 @@
 package ninja.controller;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.reflect.TypeToken;
 
 import magic.util.Utils;
+import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.util.Gson;
+import ninja.util.Slack;
 
 @RestController
 public class BusController extends BaseController {
@@ -29,7 +33,7 @@ public class BusController extends BaseController {
 
 	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei/%s?$format=JSON&%s";
 
-	private static final String WEB_URL = "http://www.e-bus.gov.taipei/newmap/Tw/Map?rid=%d&sec=0";
+	private static final String WEB_URL = "http://www.e-bus.gov.taipei/newmap/Tw/Map?rid=%s&sec=0";
 
 	@Value( "${ptx.app.id:}" )
 	private String id;
@@ -48,15 +52,34 @@ public class BusController extends BaseController {
 
 			Map<String, ?> bus = call( "Route", route ).get( 0 );
 
+			Assert.notEmpty( bus, "查無路線: " + route );
+
+			String departure = string( bus, "DepartureStopNameZh" ), destination = string( bus, "DestinationStopNameZh" );
+
+			SlackAttachment attachment = Slack.attachment().setTitle( route + "公車動態" ).setTitleLink( String.format( WEB_URL, bus.get( "RouteID" ) ) );
+
+			SlackMessage message = Slack.message( attachment, command, text );
+
 			call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
-				log.info( i.get( "Direction" ).getClass().getName() );
-				return stop( i ).contains( keyword );
+				return station( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
 
-			} ).collect( Collectors.groupingBy( i -> string( map( i, "StopName" ), "Zh_tw" ), Collectors.toList() ) ).forEach( ( k, v ) -> {
+			} ).collect( Collectors.groupingBy( i -> station( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
+				SlackAttachment attach = Slack.attachment().setTitle( k );
 
+				v.forEach( i -> {
+					log.info( "time class: " + i.get( "EstimateTime" ).getClass() );
+
+					int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
+
+					String value = ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds + "秒";
+
+					attach.addFields( field( "往".concat( direction( i ).equals( 0d ) ? destination : departure ), value ) );
+				} );
+
+				message.addAttachments( attach );
 			} );
 
-			return null;
+			return message.prepare().toString();
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
@@ -77,7 +100,7 @@ public class BusController extends BaseController {
 		}.getType() );
 	}
 
-	private String stop( Map<String, ?> map ) {
+	private String station( Map<String, ?> map ) {
 		return string( map( map, "StopName" ), "Zh_tw" );
 	}
 
@@ -87,5 +110,9 @@ public class BusController extends BaseController {
 		sdf.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
 
 		return sdf.format( new Date() );
+	}
+
+	private Double direction( Map<String, ?> map ) {
+		return ( Double ) map.get( "Direction" );
 	}
 }
