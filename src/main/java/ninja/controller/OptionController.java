@@ -40,10 +40,10 @@ public class OptionController extends BaseController {
 
 		Map<String, ?> info = bus.call( "DisplayStopOfRoute", route, "$filter=Direction%20eq%20%270%27" ).stream().findFirst().orElseGet( () -> null );
 
-		return options( info == null ? Collections.EMPTY_LIST : Cast.list( info, "Stops" ).stream().map( Cast::map ).map( bus::stop ).map( i -> {
-			return option( i, route + "%20" + i );
+		return options( info == null ? Collections.EMPTY_LIST : Cast.list( info, "Stops" ).stream().map( Cast::map ).filter( i -> {
+			return bus.route( i ).equals( route );
 
-		} ).collect( Collectors.toList() ) );
+		} ).map( bus::stop ).map( i -> option( i, route + "%20" + i ) ).collect( Collectors.toList() ) );
 	}
 
 	private Map<String, List<?>> options( List<?> options ) {

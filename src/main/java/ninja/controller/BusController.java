@@ -56,19 +56,13 @@ public class BusController extends BaseController {
 			}
 
 			bus.call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
-				return bus.stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
+				return bus.route( i ).equals( route ) && bus.stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
 
 			} ).collect( Collectors.groupingBy( i -> bus.stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
 				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {
-					Double time = ( Double ) i.get( "EstimateTime" );
+					int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
 
-					String value = StringUtils.EMPTY;
-
-					if ( time != null ) {
-						int seconds = time.intValue(), minutes = seconds / 60;
-
-						value = ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds % 60 + "秒";
-					}
+					String value = ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds + "秒";
 
 					return field( "往".concat( direction( i ).equals( 0d ) ? destination : departure ), value );
 

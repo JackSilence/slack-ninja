@@ -6,7 +6,7 @@
 			"label": "站牌名稱",
 			"type": "select",
 			"name": "stop",
-			"placeholder": "請選擇站牌",
+			"placeholder": "請輸入路線以選擇站牌",
 			"data_source": "external",
 			"min_query_length": 1
 		}

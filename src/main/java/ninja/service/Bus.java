@@ -58,7 +58,15 @@ public class Bus {
 	}
 
 	public String stop( Map<?, ?> map ) {
-		return Cast.string( Cast.map( map, "StopName" ), "Zh_tw" );
+		return name( map, "StopName" );
+	}
+
+	public String route( Map<?, ?> map ) {
+		return name( map, "RouteName" );
+	}
+
+	public String name( Map<?, ?> map, String key ) {
+		return Cast.string( Cast.map( map, key ), "Zh_tw" );
 	}
 
 	public String id( String route ) {
