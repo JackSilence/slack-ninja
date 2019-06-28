@@ -1,9 +1,15 @@
 package ninja.controller;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.common.collect.ImmutableMap;
 
 import ninja.consts.Dialog;
 import ninja.service.Transport;
@@ -18,7 +24,7 @@ public class OptionController extends BaseController {
 	private Transport transport;
 
 	@PostMapping( "/option" )
-	public String option( @RequestAttribute( REQ_BODY ) String body, String payload ) {
+	public Map<String, List<?>> option( @RequestAttribute( REQ_BODY ) String body, String payload ) {
 		log.info( "REQ_BODY: " + body );
 		log.info( "payload: " + payload );
 
@@ -30,8 +36,15 @@ public class OptionController extends BaseController {
 
 		check( STOP, message.getName(), payload );
 
-		System.out.println( transport.call( "DisplayStopOfRoute", message.getValue(), "$filter=Direction%20eq%20%270%27" ) );
+		List<Map<String, ?>> elements = transport.call( "DisplayStopOfRoute", message.getValue(), "$filter=Direction%20eq%20%270%27" );
+		System.out.println( "with filter: " + elements.size() );
+		System.out.println( "no filter: " + transport.call( "DisplayStopOfRoute", message.getValue() ).size() );
 
-		return null;
+		Map<String, ?> stop = elements.stream().findFirst().orElseGet( () -> options( Collections.EMPTY_LIST ) );
+		return ImmutableMap.of( "options", Collections.EMPTY_LIST );
+	}
+
+	private Map<String, List<?>> options( List<?> options ) {
+		return ImmutableMap.of( "options", options );
 	}
 }
