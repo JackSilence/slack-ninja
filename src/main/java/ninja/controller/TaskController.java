@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAction;
+import ninja.consts.Dialog;
 import ninja.consts.Task;
 import ninja.slack.Payload;
 import ninja.util.Gson;
@@ -54,25 +55,29 @@ public class TaskController extends BaseController {
 
 			check( Heroku.TASK_ID, action.getName(), payload );
 
-			command = Task.valueOf( action.getValue() ).name().toLowerCase(); // 可確定Task存在
+			check( Task.class, command = action.getValue(), payload );
 
 		} else {
-			check( "weather", command = id, payload );
+			check( Dialog.class, id, payload );
 
 			Map<String, String> submission = message.getSubmission();
 
 			Assert.notEmpty( submission, payload );
 
-			text = submission.get( "district" ) + "%20" + submission.get( "hours" );
+			text = Dialog.valueOf( command = id ).text( submission );
 		}
 
 		String token = System.getenv( "slack.legacy.token." + message.getUser().getName() );
 
 		// 使用legacy token執行command, 只有對應的帳號才會看到return message
-		log.info( get( METHOD, token, message.getChannel().getId(), String.format( QUERY, command, text ) ) );
+		log.info( get( METHOD, token, message.getChannel().getId(), String.format( QUERY, command.toLowerCase(), text ) ) );
 	}
 
 	private void check( String expected, String actual, String payload ) {
 		Assert.isTrue( expected.equals( actual ), payload );
+	}
+
+	private <E extends Enum<E>> void check( Class<E> expected, String actual, String payload ) {
+		Assert.isTrue( EnumUtils.isValidEnum( expected, actual ), payload );
 	}
 }

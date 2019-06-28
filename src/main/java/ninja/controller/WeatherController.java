@@ -36,6 +36,7 @@ import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
+import ninja.consts.Dialog;
 import ninja.util.Gson;
 import ninja.util.Slack;
 
@@ -48,7 +49,7 @@ public class WeatherController extends BaseController {
 
 	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s&elementName=Wx,AT,WeatherDescription";
 
-	private static final String DEFAULT_DIST = "內湖區", DEFAULT_HOURS = "0", DIALOG_TEMPLATE = "/template/dialog/weather.json";
+	private static final String DEFAULT_DIST = "內湖區", DEFAULT_HOURS = "0";
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
 
@@ -74,9 +75,6 @@ public class WeatherController extends BaseController {
 
 	@Value( "${cwb.icon.url:}" )
 	private String url;
-
-	@Value( "${slack.user.token:}" )
-	private String token;
 
 	@PostMapping
 	public String weather( @RequestParam String command, @RequestParam String text ) {
@@ -152,13 +150,9 @@ public class WeatherController extends BaseController {
 
 	@PostMapping( "/dialog" )
 	public void dialog( @RequestParam( "trigger_id" ) String id ) {
-		String district = json( DISTRICTS.keySet().stream().map( i -> option( i, i ) ) );
-
 		String hours = json( IntStream.rangeClosed( 0, 48 ).filter( i -> i % 6 == 0 ).mapToObj( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
 
-		String dialog = String.format( Utils.getResourceAsString( DIALOG_TEMPLATE ), DEFAULT_DIST, district, hours );
-
-		log.info( post( "dialog.open", token, ImmutableMap.of( "trigger_id", id, "dialog", dialog ) ) );
+		dialog( id, Dialog.WEATHER, DEFAULT_DIST, json( DISTRICTS.keySet().stream().map( i -> option( i, i ) ) ), hours );
 	}
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {

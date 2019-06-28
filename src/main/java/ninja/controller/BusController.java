@@ -25,6 +25,7 @@ import com.google.gson.reflect.TypeToken;
 import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
+import ninja.consts.Dialog;
 import ninja.util.Gson;
 import ninja.util.Slack;
 
@@ -45,7 +46,13 @@ public class BusController extends BaseController {
 	private String key;
 
 	@PostMapping( "/bus" )
-	public String bus( @RequestParam String command, @RequestParam String text ) {
+	public String bus( @RequestParam String command, @RequestParam String text, @RequestParam( "trigger_id" ) String id ) {
+		if ( text.isEmpty() ) {
+			dialog( id, Dialog.BUS );
+
+			return StringUtils.EMPTY;
+		}
+
 		try {
 			String[] params = ( params = StringUtils.split( text ) ).length == 1 ? ArrayUtils.add( params, StringUtils.EMPTY ) : params;
 

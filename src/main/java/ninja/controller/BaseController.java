@@ -23,10 +23,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import com.google.common.collect.ImmutableMap;
+
 import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
+import ninja.consts.Dialog;
 import ninja.util.Gson;
 import ninja.util.Slack;
 
@@ -39,8 +42,13 @@ public abstract class BaseController {
 
 	private static final String VERSION = "v0", API_URL = "https://slack.com/api/", QUERY = "?token=%s&channel=%s";
 
+	private static final String DIALOG_TEMPLATE = "/template/dialog/%s.json";
+
 	@Value( "${slack.signing.secret:}" )
 	private String secret;
+
+	@Value( "${slack.user.token:}" )
+	private String token;
 
 	@ModelAttribute
 	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, @RequestBody String body, HttpServletRequest request ) {
@@ -75,8 +83,16 @@ public abstract class BaseController {
 		return message.prepare().toString();
 	}
 
+	protected String get( String method, String channel, String query ) {
+		return get( method, token, channel, query );
+	}
+
 	protected String get( String method, String token, String channel, String query ) {
 		return call( Request.Get( uri( method ) + String.format( QUERY, token, channel ) + query ) );
+	}
+
+	protected String post( String method, Object src ) {
+		return post( method, token, src );
 	}
 
 	protected String post( String method, String token, Object src ) {
@@ -103,6 +119,12 @@ public abstract class BaseController {
 			throw new RuntimeException( e );
 
 		}
+	}
+
+	protected void dialog( String id, Dialog dialog, Object... args ) {
+		String template = String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() );
+
+		log.info( post( "dialog.open", ImmutableMap.of( "trigger_id", id, "dialog", String.format( template, args ) ) ) );
 	}
 
 	private String digest( String content ) {

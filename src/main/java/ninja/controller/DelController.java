@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,9 +27,6 @@ public class DelController extends BaseController {
 
 	private static final Map<String, Long> DAYS_AGO = ImmutableMap.of( StringUtils.EMPTY, 0L, "今天", 0L, "昨天", 1L, "前天", 2L );
 
-	@Value( "${slack.user.token:}" )
-	private String token;
-
 	@PostMapping( value = "/delete" )
 	public String delete( @RequestParam( "channel_id" ) String channel, @RequestParam String command, @RequestParam String text ) {
 		try {
@@ -40,14 +36,14 @@ public class DelController extends BaseController {
 
 			String title = date.toString(), query = String.format( QUERY, epochSecond( date ), epochSecond( date.plusDays( 1 ) ) );
 
-			History history = Gson.from( get( HISTORY_METHOD, token, channel, query ), History.class );
+			History history = Gson.from( get( HISTORY_METHOD, channel, query ), History.class );
 
 			List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
 
 			for ( Event i : message ) {
 				i.setChannel( channel );
 
-				String response = post( DEL_METHOD, token, i );
+				String response = post( DEL_METHOD, i );
 
 				success += response.contains( "\"ok\":true" ) ? 1 : 0;
 
