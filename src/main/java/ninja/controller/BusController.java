@@ -60,11 +60,9 @@ public class BusController extends BaseController {
 
 			} ).collect( Collectors.groupingBy( i -> bus.stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
 				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {
-					int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
+					Double time = ( Double ) i.get( "EstimateTime" );
 
-					String value = ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds + "秒";
-
-					return field( "往".concat( direction( i ).equals( 0d ) ? destination : departure ), value );
+					return field( "往".concat( direction( i ).equals( 0d ) ? destination : departure ), time == null ? StringUtils.EMPTY : time( time ) );
 
 				} ).collect( Collectors.toList() ) ) );
 			} );
@@ -77,6 +75,12 @@ public class BusController extends BaseController {
 			return e.getMessage();
 
 		}
+	}
+
+	private String time( Double time ) {
+		int seconds = time.intValue(), minutes = seconds / 60;
+
+		return ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds % 60 + "秒";
 	}
 
 	private Double direction( Map<String, ?> map ) {
