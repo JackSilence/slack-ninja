@@ -73,10 +73,6 @@ public class TaskController extends BaseController {
 		log.info( get( METHOD, token, message.getChannel().getId(), String.format( QUERY, command.toLowerCase(), text ) ) );
 	}
 
-	private void check( String expected, String actual, String payload ) {
-		Assert.isTrue( expected.equals( actual ), payload );
-	}
-
 	private <E extends Enum<E>> void check( Class<E> expected, String actual, String payload ) {
 		Assert.isTrue( EnumUtils.isValidEnum( expected, actual ), payload );
 	}

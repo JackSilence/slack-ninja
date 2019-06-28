@@ -3,18 +3,12 @@
 	"title": "台北市公車動態查詢",
 	"elements": [
 		{
-			"label": "公車路線",
-			"type": "text",
-			"name": "route",
-			"placeholder": "請輸入路線",
-			"max_length": 10
-		},
-		{
 			"label": "站牌名稱",
 			"type": "select",
 			"name": "stop",
 			"placeholder": "請選擇站牌",
-			"data_source": "external"
+			"data_source": "external",
+			"min_query_length": 3
 		}
 	]
 }

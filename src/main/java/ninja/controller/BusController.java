@@ -1,49 +1,29 @@
 package ninja.controller;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.fluent.Request;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.reflect.TypeToken;
-
-import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Dialog;
-import ninja.util.Gson;
+import ninja.service.Transport;
 import ninja.util.Slack;
 
 @RestController
 public class BusController extends BaseController {
-	private static final String AUTH_HEADER = "hmac username=\"%s\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"%s\"";
-
-	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei/%s?$format=JSON&%s";
-
 	private static final String WEB_URL = "http://www.e-bus.gov.taipei/newmap/Tw/Map?rid=%s&sec=0";
 
-	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "EEE, dd MMM yyyy HH:mm:ss z", Locale.US );
-
-	@Value( "${ptx.app.id:}" )
-	private String id;
-
-	@Value( "${ptx.app.key:}" )
-	private String key;
+	@Autowired
+	private Transport transport;
 
 	@PostMapping( "/bus" )
 	public String bus( @RequestParam String command, @RequestParam String text, @RequestParam( "trigger_id" ) String id ) {
@@ -60,7 +40,7 @@ public class BusController extends BaseController {
 
 			String route = params[ 0 ], keyword = params[ 1 ];
 
-			Map<String, ?> bus = call( "Route", route ).stream().findFirst().orElseThrow( () -> new IllegalArgumentException( "查無路線: " + route ) );
+			Map<String, ?> bus = transport.call( "Route", route ).stream().findFirst().orElseThrow( () -> new IllegalArgumentException( "查無路線: " + route ) );
 
 			String departure = string( bus, "DepartureStopNameZh" ), destination = string( bus, "DestinationStopNameZh" );
 
@@ -72,7 +52,7 @@ public class BusController extends BaseController {
 				return message( message );
 			}
 
-			call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
+			transport.call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
 				return stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
 
 			} ).collect( Collectors.groupingBy( i -> stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
@@ -94,19 +74,6 @@ public class BusController extends BaseController {
 			return e.getMessage();
 
 		}
-	}
-
-	private List<Map<String, ?>> call( String method, String route, String... query ) {
-		Request request = Request.Get( String.format( API_URL, method, route, String.join( "&", query ) ) );
-
-		String xdate = ZonedDateTime.now( ZoneId.of( "GMT" ) ).format( DATE_TIME_FORMATTER );
-
-		String signature = Base64.getEncoder().encodeToString( signature( "x-date: " + xdate, key, HmacAlgorithms.HMAC_SHA_1 ) );
-
-		request.addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
-
-		return Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<?>>() {
-		}.getType() );
 	}
 
 	private String stop( Map<String, ?> map ) {

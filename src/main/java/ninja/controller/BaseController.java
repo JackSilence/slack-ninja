@@ -1,14 +1,9 @@
 package ninja.controller;
 
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
@@ -31,6 +26,7 @@ import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Dialog;
 import ninja.util.Gson;
+import ninja.util.Signature;
 import ninja.util.Slack;
 
 public abstract class BaseController {
@@ -105,30 +101,18 @@ public abstract class BaseController {
 		return new SlackField().setShorten( true ).setTitle( title ).setValue( value );
 	}
 
-	protected byte[] signature( String data, String secret, HmacAlgorithms hmac ) {
-		try {
-			String algorithm = hmac.toString();
-
-			Mac mac = Mac.getInstance( algorithm );
-
-			mac.init( new SecretKeySpec( secret.getBytes( StandardCharsets.UTF_8 ), algorithm ) );
-
-			return mac.doFinal( data.getBytes( StandardCharsets.UTF_8 ) );
-
-		} catch ( NoSuchAlgorithmException | InvalidKeyException e ) {
-			throw new RuntimeException( e );
-
-		}
-	}
-
 	protected void dialog( String id, Dialog dialog, Object... args ) {
 		String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
 
 		log.info( post( "dialog.open", ImmutableMap.of( "trigger_id", id, "dialog", String.format( template, args ) ) ) );
 	}
 
+	protected void check( String expected, String actual, String payload ) {
+		Assert.isTrue( expected.equals( actual ), payload );
+	}
+
 	private String digest( String content ) {
-		return String.join( "=", VERSION, Hex.encodeHexString( signature( content, secret, HmacAlgorithms.HMAC_SHA_256 ) ) );
+		return String.join( "=", VERSION, Hex.encodeHexString( Signature.hmac( content, secret, HmacAlgorithms.HMAC_SHA_256 ) ) );
 	}
 
 	private String uri( String method ) {
