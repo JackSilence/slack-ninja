@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
@@ -37,6 +36,7 @@ import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Dialog;
+import ninja.util.Cast;
 import ninja.util.Gson;
 import ninja.util.Slack;
 
@@ -104,26 +104,26 @@ public class WeatherController extends BaseController {
 
 			SlackMessage message = Slack.message( attachment, command, text );
 
-			List<?> elements = list( first( first( map( result, "records" ), "locations" ), "location" ), "weatherElement" );
+			List<?> elements = Cast.list( first( first( Cast.map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
 			Map<String, String> image = new HashMap<>(), at = new HashMap<>();
 
 			each( elements, "Wx", j -> {
-				String start = string( j, "startTime" ), when = Range.closedOpen( 6, 18 ).contains( hour( start ) ) ? "day" : "night";
+				String start = Cast.string( j, "startTime" ), when = Range.closedOpen( 6, 18 ).contains( hour( start ) ) ? "day" : "night";
 
-				image.put( start, String.format( url, when, string( map( list( j, "elementValue" ).get( 1 ) ), "value" ) ) );
+				image.put( start, String.format( url, when, Cast.string( Cast.map( Cast.list( j, "elementValue" ).get( 1 ) ), "value" ) ) );
 			} );
 
-			each( elements, "AT", j -> at.put( string( j, "dataTime" ), string( first( j, "elementValue" ), "value" ) ) );
+			each( elements, "AT", j -> at.put( Cast.string( j, "dataTime" ), Cast.string( first( j, "elementValue" ), "value" ) ) );
 
 			each( elements, "WeatherDescription", j -> {
-				String[] data = string( first( j, "elementValue" ), "value" ).split( DELIMITER );
+				String[] data = Cast.string( first( j, "elementValue" ), "value" ).split( DELIMITER );
 
 				String ci = data[ 3 ], color = "舒適".equals( ci ) ? "good" : "悶熱".equals( ci ) ? "warning" : "易中暑".equals( ci ) ? "danger" : "#3AA3E3";
 
 				String wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
 
-				int hr = hour( start = string( j, "startTime" ) );
+				int hr = hour( start = Cast.string( j, "startTime" ) );
 
 				String period = hr == 12 ? "中午" : hr >= 0 && hr < 6 ? "凌晨" : hr >= 6 && hr < 12 ? "早上" : hr >= 13 && hr < 18 ? "下午" : "晚上";
 
@@ -156,21 +156,13 @@ public class WeatherController extends BaseController {
 	}
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {
-		elements.stream().map( this::map ).filter( i -> name.equals( i.get( "elementName" ) ) ).forEach( i -> {
-			list( i, "time" ).stream().limit( 2 ).map( this::map ).forEach( action );
+		elements.stream().map( Cast::map ).filter( i -> name.equals( i.get( "elementName" ) ) ).forEach( i -> {
+			Cast.list( i, "time" ).stream().limit( 2 ).map( Cast::map ).forEach( action );
 		} );
 	}
 
 	private Map<?, ?> first( Map<?, ?> map, String key ) {
-		return map( list( map, key ).get( 0 ) );
-	}
-
-	private Map<String, String> option( String label, Object value ) {
-		return ImmutableMap.of( "label", label, "value", value.toString() );
-	}
-
-	private List<?> list( Map<?, ?> map, String key ) {
-		return ( List<?> ) map.get( key );
+		return Cast.map( Cast.list( map, key ).get( 0 ) );
 	}
 
 	private String time( ZonedDateTime time ) {

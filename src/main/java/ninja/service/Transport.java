@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.reflect.TypeToken;
 
 import magic.util.Utils;
+import ninja.util.Cast;
 import ninja.util.Gson;
 import ninja.util.Signature;
 
@@ -44,5 +45,9 @@ public class Transport {
 
 		return Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<?>>() {
 		}.getType() );
+	}
+
+	public String stop( Map<?, ?> map ) {
+		return Cast.string( Cast.map( map, "StopName" ), "Zh_tw" );
 	}
 }

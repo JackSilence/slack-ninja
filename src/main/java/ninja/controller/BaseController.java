@@ -59,16 +59,8 @@ public abstract class BaseController {
 		request.setAttribute( REQ_BODY, body );
 	}
 
-	protected Map<?, ?> map( Map<?, ?> map, String key ) {
-		return map( map.get( key ) );
-	}
-
-	protected Map<?, ?> map( Object object ) {
-		return ( Map<?, ?> ) object;
-	}
-
-	protected String string( Map<?, ?> map, String key ) {
-		return ( String ) map.get( key );
+	protected Map<String, String> option( String label, Object value ) {
+		return ImmutableMap.of( "label", label, "value", value.toString() );
 	}
 
 	protected String message( SlackAttachment attach, String command, String text ) {

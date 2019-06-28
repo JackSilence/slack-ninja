@@ -16,6 +16,7 @@ import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Dialog;
 import ninja.service.Transport;
+import ninja.util.Cast;
 import ninja.util.Slack;
 
 @RestController
@@ -42,7 +43,7 @@ public class BusController extends BaseController {
 
 			Map<String, ?> bus = transport.call( "Route", route ).stream().findFirst().orElseThrow( () -> new IllegalArgumentException( "查無路線: " + route ) );
 
-			String departure = string( bus, "DepartureStopNameZh" ), destination = string( bus, "DestinationStopNameZh" );
+			String departure = Cast.string( bus, "DepartureStopNameZh" ), destination = Cast.string( bus, "DestinationStopNameZh" );
 
 			SlackAttachment attachment = Slack.attachment().setTitle( route + "公車動態" ).setTitleLink( String.format( WEB_URL, bus.get( "RouteID" ) ) );
 
@@ -53,9 +54,9 @@ public class BusController extends BaseController {
 			}
 
 			transport.call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
-				return stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
+				return transport.stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
 
-			} ).collect( Collectors.groupingBy( i -> stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
+			} ).collect( Collectors.groupingBy( i -> transport.stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
 				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {
 					int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
 
@@ -74,10 +75,6 @@ public class BusController extends BaseController {
 			return e.getMessage();
 
 		}
-	}
-
-	private String stop( Map<String, ?> map ) {
-		return string( map( map, "StopName" ), "Zh_tw" );
 	}
 
 	private Double direction( Map<String, ?> map ) {

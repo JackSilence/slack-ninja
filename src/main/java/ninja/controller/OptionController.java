@@ -3,10 +3,10 @@ package ninja.controller;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.ImmutableMap;
@@ -14,20 +14,20 @@ import com.google.common.collect.ImmutableMap;
 import ninja.consts.Dialog;
 import ninja.service.Transport;
 import ninja.slack.Payload;
+import ninja.util.Cast;
 import ninja.util.Gson;
 
 @RestController
 public class OptionController extends BaseController {
-	private static final String TYPE = "dialog_suggestion", STOP = "stop";
+	private static final String TYPE = "dialog_suggestion", STOP = "stop", METHOD = "DisplayStopOfRoute";
+
+	private static final String QUERY = "$filter=Direction%20eq%20%270%27";
 
 	@Autowired
 	private Transport transport;
 
 	@PostMapping( "/option" )
-	public Map<String, List<?>> option( @RequestAttribute( REQ_BODY ) String body, String payload ) {
-		log.info( "REQ_BODY: " + body );
-		log.info( "payload: " + payload );
-
+	public Map<String, List<?>> option( String payload ) {
 		Payload message = Gson.from( payload, Payload.class );
 
 		check( TYPE, message.getType(), payload );
@@ -36,12 +36,15 @@ public class OptionController extends BaseController {
 
 		check( STOP, message.getName(), payload );
 
-		List<Map<String, ?>> elements = transport.call( "DisplayStopOfRoute", message.getValue(), "$filter=Direction%20eq%20%270%27" );
-		System.out.println( "with filter: " + elements.size() );
-		System.out.println( "no filter: " + transport.call( "DisplayStopOfRoute", message.getValue() ).size() );
+		String route = message.getValue();
 
-		Map<String, ?> stop = elements.stream().findFirst().orElseGet( () -> options( Collections.EMPTY_LIST ) );
-		return ImmutableMap.of( "options", Collections.EMPTY_LIST );
+		Map<String, ?> bus = transport.call( METHOD, route, QUERY ).stream().findFirst().orElseGet( () -> null );
+
+		if ( bus == null ) {
+			return options( Collections.EMPTY_LIST );
+		}
+
+		return options( Cast.list( bus, "stops" ).stream().map( Cast::map ).map( transport::stop ).map( i -> option( i, route + "%20" + i ) ).collect( Collectors.toList() ) );
 	}
 
 	private Map<String, List<?>> options( List<?> options ) {
