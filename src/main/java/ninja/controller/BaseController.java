@@ -122,7 +122,7 @@ public abstract class BaseController {
 	}
 
 	protected void dialog( String id, Dialog dialog, Object... args ) {
-		String template = String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() );
+		String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
 
 		log.info( post( "dialog.open", ImmutableMap.of( "trigger_id", id, "dialog", String.format( template, args ) ) ) );
 	}
