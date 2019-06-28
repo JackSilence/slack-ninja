@@ -34,6 +34,10 @@ public class OptionController extends BaseController {
 
 		String route = message.getValue();
 
+		if ( !bus.check( route ) ) {
+			return options( Collections.EMPTY_LIST );
+		}
+
 		Map<String, ?> info = bus.call( "DisplayStopOfRoute", route, "$filter=Direction%20eq%20%270%27" ).stream().findFirst().orElseGet( () -> null );
 
 		return options( info == null ? Collections.EMPTY_LIST : Cast.list( info, "Stops" ).stream().map( Cast::map ).map( bus::stop ).map( i -> {

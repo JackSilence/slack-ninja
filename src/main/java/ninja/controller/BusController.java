@@ -21,7 +21,7 @@ import ninja.util.Slack;
 
 @RestController
 public class BusController extends BaseController {
-	private static final String WEB_URL = "http://www.e-bus.gov.taipei/newmap/Tw/Map?rid=%s&sec=0";
+	private static final String WEB_URL = "https://ebus.gov.taipei/EBus/VsSimpleMap?routeid=%s&gb=0";
 
 	@Autowired
 	private Bus bus;
@@ -41,11 +41,13 @@ public class BusController extends BaseController {
 
 			String route = params[ 0 ], keyword = params[ 1 ];
 
-			Map<String, ?> info = bus.call( "Route", route ).stream().findFirst().orElseThrow( () -> new IllegalArgumentException( "查無路線: " + route ) );
+			Assert.isTrue( bus.check( route ), "查無路線: " + route );
+
+			Map<String, ?> info = bus.call( "Route", route ).get( 0 );
 
 			String departure = Cast.string( info, "DepartureStopNameZh" ), destination = Cast.string( info, "DestinationStopNameZh" );
 
-			SlackAttachment attachment = Slack.attachment().setTitle( route + "公車動態" ).setTitleLink( String.format( WEB_URL, info.get( "RouteID" ) ) );
+			SlackAttachment attachment = Slack.attachment().setTitle( route + "公車動態" ).setTitleLink( String.format( WEB_URL, bus.id( route ) ) );
 
 			SlackMessage message = Slack.message( attachment, command, text );
 

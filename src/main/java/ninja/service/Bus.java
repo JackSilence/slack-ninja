@@ -61,6 +61,18 @@ public class Bus {
 		return Cast.string( Cast.map( map, "StopName" ), "Zh_tw" );
 	}
 
+	public String id( String route ) {
+		return ROUTES.get( route );
+	}
+
+	public boolean check( String route ) {
+		if ( ROUTES.isEmpty() ) {
+			init();
+		}
+
+		return ROUTES.containsKey( route );
+	}
+
 	@PostConstruct
 	private void init() {
 		Jsoup.select( ROUTES_URL, "section.busline li > a", i -> {
@@ -70,7 +82,5 @@ public class Bus {
 				ROUTES.put( i.text(), matcher.group( 1 ) );
 			}
 		} );
-
-		System.out.println( ROUTES.keySet() );
 	}
 }
