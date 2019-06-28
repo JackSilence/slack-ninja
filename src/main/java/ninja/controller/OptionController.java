@@ -30,7 +30,7 @@ public class OptionController extends BaseController {
 
 		check( STOP, message.getName(), payload );
 
-		System.out.println( transport.call( "DisplayStopOfRoute", message.getValue(), "$filter=Direction eq '0'" ) );
+		System.out.println( transport.call( "DisplayStopOfRoute", message.getValue(), "$filter=Direction%20eq%20%270%27" ) );
 
 		return null;
 	}
