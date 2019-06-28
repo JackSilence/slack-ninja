@@ -38,12 +38,14 @@ public class OptionController extends BaseController {
 			return options( Collections.EMPTY_LIST );
 		}
 
-		Map<String, ?> info = bus.call( "DisplayStopOfRoute", route, "$filter=Direction%20eq%20%270%27" ).stream().findFirst().orElseGet( () -> null );
+		List<Map<String, ?>> elements = bus.call( "DisplayStopOfRoute", route, "$filter=Direction%20eq%20%270%27" );
 
-		return options( info == null ? Collections.EMPTY_LIST : Cast.list( info, "Stops" ).stream().map( Cast::map ).filter( i -> {
-			return bus.route( i ).equals( route );
+		Map<String, ?> info = elements.stream().filter( i -> bus.route( i ).equals( route ) ).findFirst().orElseGet( () -> null );
 
-		} ).map( bus::stop ).map( i -> option( i, route + "%20" + i ) ).collect( Collectors.toList() ) );
+		return options( info == null ? Collections.EMPTY_LIST : Cast.list( info, "Stops" ).stream().map( Cast::map ).map( bus::stop ).map( i -> {
+			return option( i, route + "%20" + i );
+
+		} ).collect( Collectors.toList() ) );
 	}
 
 	private Map<String, List<?>> options( List<?> options ) {
