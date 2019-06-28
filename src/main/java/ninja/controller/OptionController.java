@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.collect.ImmutableMap;
 
 import ninja.consts.Dialog;
-import ninja.service.Transport;
+import ninja.service.Bus;
 import ninja.slack.Payload;
 import ninja.util.Cast;
 import ninja.util.Gson;
@@ -20,7 +20,7 @@ import ninja.util.Gson;
 @RestController
 public class OptionController extends BaseController {
 	@Autowired
-	private Transport transport;
+	private Bus bus;
 
 	@PostMapping( "/option" )
 	public Map<String, List<?>> option( String payload ) {
@@ -34,9 +34,9 @@ public class OptionController extends BaseController {
 
 		String route = message.getValue();
 
-		Map<String, ?> bus = transport.call( "DisplayStopOfRoute", route, "$filter=Direction%20eq%20%270%27" ).stream().findFirst().orElseGet( () -> null );
+		Map<String, ?> info = bus.call( "DisplayStopOfRoute", route, "$filter=Direction%20eq%20%270%27" ).stream().findFirst().orElseGet( () -> null );
 
-		return options( bus == null ? Collections.EMPTY_LIST : Cast.list( bus, "Stops" ).stream().map( Cast::map ).map( transport::stop ).map( i -> {
+		return options( info == null ? Collections.EMPTY_LIST : Cast.list( info, "Stops" ).stream().map( Cast::map ).map( bus::stop ).map( i -> {
 			return option( i, route + "%20" + i );
 
 		} ).collect( Collectors.toList() ) );

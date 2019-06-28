@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Dialog;
-import ninja.service.Transport;
+import ninja.service.Bus;
 import ninja.util.Cast;
 import ninja.util.Slack;
 
@@ -24,7 +24,7 @@ public class BusController extends BaseController {
 	private static final String WEB_URL = "http://www.e-bus.gov.taipei/newmap/Tw/Map?rid=%s&sec=0";
 
 	@Autowired
-	private Transport transport;
+	private Bus bus;
 
 	@PostMapping( "/bus" )
 	public String bus( @RequestParam String command, @RequestParam String text, @RequestParam( "trigger_id" ) String id ) {
@@ -41,11 +41,11 @@ public class BusController extends BaseController {
 
 			String route = params[ 0 ], keyword = params[ 1 ];
 
-			Map<String, ?> bus = transport.call( "Route", route ).stream().findFirst().orElseThrow( () -> new IllegalArgumentException( "查無路線: " + route ) );
+			Map<String, ?> info = bus.call( "Route", route ).stream().findFirst().orElseThrow( () -> new IllegalArgumentException( "查無路線: " + route ) );
 
-			String departure = Cast.string( bus, "DepartureStopNameZh" ), destination = Cast.string( bus, "DestinationStopNameZh" );
+			String departure = Cast.string( info, "DepartureStopNameZh" ), destination = Cast.string( info, "DestinationStopNameZh" );
 
-			SlackAttachment attachment = Slack.attachment().setTitle( route + "公車動態" ).setTitleLink( String.format( WEB_URL, bus.get( "RouteID" ) ) );
+			SlackAttachment attachment = Slack.attachment().setTitle( route + "公車動態" ).setTitleLink( String.format( WEB_URL, info.get( "RouteID" ) ) );
 
 			SlackMessage message = Slack.message( attachment, command, text );
 
@@ -53,10 +53,10 @@ public class BusController extends BaseController {
 				return message( message );
 			}
 
-			transport.call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
-				return transport.stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
+			bus.call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
+				return bus.stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
 
-			} ).collect( Collectors.groupingBy( i -> transport.stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
+			} ).collect( Collectors.groupingBy( i -> bus.stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
 				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {
 					int time = ( ( Double ) i.get( "EstimateTime" ) ).intValue(), minutes = time / 60, seconds = time % 60;
 
