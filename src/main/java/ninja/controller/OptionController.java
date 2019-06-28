@@ -19,10 +19,6 @@ import ninja.util.Gson;
 
 @RestController
 public class OptionController extends BaseController {
-	private static final String TYPE = "dialog_suggestion", STOP = "stop", METHOD = "DisplayStopOfRoute";
-
-	private static final String QUERY = "$filter=Direction%20eq%20%270%27";
-
 	@Autowired
 	private Transport transport;
 
@@ -30,21 +26,20 @@ public class OptionController extends BaseController {
 	public Map<String, List<?>> option( String payload ) {
 		Payload message = Gson.from( payload, Payload.class );
 
-		check( TYPE, message.getType(), payload );
+		check( "dialog_suggestion", message.getType(), payload );
 
 		check( Dialog.BUS.name(), message.getId(), payload );
 
-		check( STOP, message.getName(), payload );
+		check( "stop", message.getName(), payload );
 
 		String route = message.getValue();
 
-		Map<String, ?> bus = transport.call( METHOD, route, QUERY ).stream().findFirst().orElseGet( () -> null );
+		Map<String, ?> bus = transport.call( "DisplayStopOfRoute", route, "$filter=Direction%20eq%20%270%27" ).stream().findFirst().orElseGet( () -> null );
 
-		if ( bus == null ) {
-			return options( Collections.EMPTY_LIST );
-		}
+		return options( bus == null ? Collections.EMPTY_LIST : Cast.list( bus, "Stops" ).stream().map( Cast::map ).map( transport::stop ).map( i -> {
+			return option( i, route + "%20" + i );
 
-		return options( Cast.list( bus, "Stops" ).stream().map( Cast::map ).map( transport::stop ).map( i -> option( i, route + "%20" + i ) ).collect( Collectors.toList() ) );
+		} ).collect( Collectors.toList() ) );
 	}
 
 	private Map<String, List<?>> options( List<?> options ) {
