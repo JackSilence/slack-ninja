@@ -1,6 +1,5 @@
 package ninja.controller;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,8 +8,6 @@ import java.util.Optional;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.util.Assert;
@@ -20,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
+import ninja.util.Jsoup;
 
 @RestController
 public class MetroController extends BaseController {
@@ -48,7 +46,7 @@ public class MetroController extends BaseController {
 
 			log.info( "Start: {}, end: {}", start, end );
 
-			Elements tables = get( url = URL.concat( String.format( QUERY, start, end ) ) ).select( "form table" );
+			Elements tables = Jsoup.get( url = URL.concat( String.format( QUERY, start, end ) ) ).select( "form table" );
 
 			Element table = tables.first(), row = row( table, 2 );
 
@@ -60,7 +58,7 @@ public class MetroController extends BaseController {
 
 			return message( attach.setFallback( txt ), command, text );
 
-		} catch ( RuntimeException | IOException e ) {
+		} catch ( RuntimeException e ) {
 			log.error( "", e );
 
 			return e.getMessage();
@@ -89,16 +87,12 @@ public class MetroController extends BaseController {
 		return table.select( String.format( "tr:eq(%d)", index ) ).first();
 	}
 
-	private Document get( String url ) throws IOException {
-		return Jsoup.connect( url ).get();
-	}
-
 	@PostConstruct
 	private void init() {
 		try {
-			get( URL ).getElementById( "sstation" ).select( "option" ).forEach( i -> STATIONS.put( i.text(), i.val() ) );
+			Jsoup.get( URL ).getElementById( "sstation" ).select( "option" ).forEach( i -> STATIONS.put( i.text(), i.val() ) );
 
-		} catch ( IOException e ) {
+		} catch ( RuntimeException e ) {
 			log.error( "", e );
 
 		}
