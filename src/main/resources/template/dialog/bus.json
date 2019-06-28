@@ -1,6 +1,6 @@
 {
 	"callback_id": "BUS",
-	"title": "台北市公車動態及預估到站時間查詢",
+	"title": "台北市公車動態查詢",
 	"elements": [
 		{
 			"label": "公車路線",
