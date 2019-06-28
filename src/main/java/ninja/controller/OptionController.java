@@ -44,7 +44,7 @@ public class OptionController extends BaseController {
 			return options( Collections.EMPTY_LIST );
 		}
 
-		return options( Cast.list( bus, "stops" ).stream().map( Cast::map ).map( transport::stop ).map( i -> option( i, route + "%20" + i ) ).collect( Collectors.toList() ) );
+		return options( Cast.list( bus, "Stops" ).stream().map( Cast::map ).map( transport::stop ).map( i -> option( i, route + "%20" + i ) ).collect( Collectors.toList() ) );
 	}
 
 	private Map<String, List<?>> options( List<?> options ) {
