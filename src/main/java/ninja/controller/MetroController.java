@@ -89,12 +89,6 @@ public class MetroController extends BaseController {
 
 	@PostConstruct
 	private void init() {
-		try {
-			Jsoup.get( URL ).getElementById( "sstation" ).select( "option" ).forEach( i -> STATIONS.put( i.text(), i.val() ) );
-
-		} catch ( RuntimeException e ) {
-			log.error( "", e );
-
-		}
+		Jsoup.select( URL, "select#sstation option", i -> STATIONS.put( i.text(), i.val() ) );
 	}
 }
