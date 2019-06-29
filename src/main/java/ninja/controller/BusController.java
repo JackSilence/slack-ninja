@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.ImmutableMap;
+
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Dialog;
@@ -22,6 +24,8 @@ import ninja.util.Slack;
 @RestController
 public class BusController extends BaseController {
 	private static final String WEB_URL = "https://ebus.gov.taipei/EBus/VsSimpleMap?routeid=%s&gb=0";
+
+	private static final Map<Double, String> STATUS = ImmutableMap.of( 1d, "尚未發車", 2d, "交管不停靠", 3d, "末班車已過", 4d, "今日未營運" );
 
 	@Autowired
 	private Bus bus;
@@ -43,7 +47,7 @@ public class BusController extends BaseController {
 
 			Assert.isTrue( bus.check( route ), "查無路線: " + route );
 
-			Map<String, ?> info = bus.call( "Route", route ).get( 0 );
+			Map<String, ?> info = bus.call( "Route", route ).findFirst().get(); // 原則上不可能拿不到
 
 			String departure = Cast.string( info, "DepartureStopNameZh" ), destination = Cast.string( info, "DestinationStopNameZh" );
 
@@ -55,14 +59,14 @@ public class BusController extends BaseController {
 				return message( message );
 			}
 
-			bus.call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
-				return bus.route( i ).equals( route ) && bus.stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
+			bus.call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).filter( i -> {
+				return bus.stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
 
 			} ).collect( Collectors.groupingBy( i -> bus.stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
 				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {
-					Double time = ( Double ) i.get( "EstimateTime" );
+					Double time = ( Double ) i.get( "EstimateTime" ), status = ( Double ) i.get( "StopStatus" );
 
-					return field( "往".concat( direction( i ).equals( 0d ) ? destination : departure ), time == null ? StringUtils.EMPTY : time( time ) );
+					return field( "往".concat( direction( i ).equals( 0d ) ? destination : departure ), time == null ? STATUS.get( status ) : time( time ) );
 
 				} ).collect( Collectors.toList() ) ) );
 			} );

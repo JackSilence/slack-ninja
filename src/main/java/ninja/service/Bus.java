@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
@@ -44,7 +45,7 @@ public class Bus {
 	@Value( "${ptx.app.key:}" )
 	private String key;
 
-	public List<Map<String, ?>> call( String method, String route, String... query ) {
+	public Stream<Map<String, ?>> call( String method, String route, String... query ) {
 		Request request = Request.Get( String.format( API_URL, method, route, String.join( "&", query ) ) );
 
 		String xdate = ZonedDateTime.now( ZoneId.of( "GMT" ) ).format( DATE_TIME_FORMATTER );
@@ -53,16 +54,14 @@ public class Bus {
 
 		request.addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
 
-		return Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<?>>() {
+		List<Map<String, ?>> list = Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<?>>() {
 		}.getType() );
+
+		return list.stream().filter( i -> name( i, "RouteName" ).equals( route ) );
 	}
 
 	public String stop( Map<?, ?> map ) {
 		return name( map, "StopName" );
-	}
-
-	public String route( Map<?, ?> map ) {
-		return name( map, "RouteName" );
 	}
 
 	public String name( Map<?, ?> map, String key ) {
