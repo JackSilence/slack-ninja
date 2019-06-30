@@ -102,7 +102,7 @@ public class WeatherController extends BaseController {
 
 			SlackAttachment attachment = Slack.attachment().setTitle( String.format( TITLE, district ) ).setTitleLink( WEB_URL + town );
 
-			SlackMessage message = Slack.message( attachment, command, text );
+			SlackMessage message = Slack.message( attachment.setFallback( String.format( TITLE, district ) ), command, text );
 
 			List<?> elements = Cast.list( first( first( Cast.map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
