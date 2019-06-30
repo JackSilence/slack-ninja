@@ -100,9 +100,7 @@ public class WeatherController extends BaseController {
 
 			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( API_URL + String.format( QUERY, key, district, from, to ) ) ), Map.class );
 
-			SlackAttachment attachment = Slack.attachment().setTitle( String.format( TITLE, district ) ).setTitleLink( WEB_URL + town );
-
-			SlackMessage message = Slack.message( attachment.setFallback( String.format( TITLE, district ) ), command, text );
+			SlackMessage message = Slack.message( attachment( String.format( TITLE, district ), WEB_URL + town ), command, text );
 
 			List<?> elements = Cast.list( first( first( Cast.map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
@@ -175,6 +173,10 @@ public class WeatherController extends BaseController {
 
 	private int hour( String time ) {
 		return LocalDateTime.parse( time, DATE_TIME_FORMATTER ).getHour();
+	}
+
+	private SlackAttachment attachment( String title, String link ) {
+		return Slack.attachment().setTitle( title ).setFallback( title ).setTitleLink( link );
 	}
 
 	private SlackField field( String data, int index ) {
