@@ -40,9 +40,6 @@ public class OptionController extends BaseController {
 			return options( Collections.EMPTY_LIST );
 		}
 
-		log.info( "No filter, size: {}", bus.call( "DisplayStopOfRoute", route ).size() );
-		log.info( "With filter, size: {}", bus.call( "DisplayStopOfRoute", route, QUERY ).size() );
-
 		Map<String, ?> info = bus.call( "DisplayStopOfRoute", route, QUERY ).stream().findFirst().orElseGet( () -> null );
 
 		return options( info == null ? Collections.EMPTY_LIST : Cast.list( info, "Stops" ).stream().map( Cast::map ).map( bus::stop ).map( i -> {

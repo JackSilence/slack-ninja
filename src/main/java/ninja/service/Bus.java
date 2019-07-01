@@ -58,11 +58,8 @@ public class Bus {
 
 		Request request = Request.Get( uri ).addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
 
-		List<Map<String, ?>> list = Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<?>>() {
+		return Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<?>>() {
 		}.getType() );
-
-		log.info( "Uri: {}, size: {}", uri, list.size() );
-		return list;
 	}
 
 	public String stop( Map<?, ?> map ) {
