@@ -3,7 +3,6 @@ package ninja.service;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
@@ -53,20 +51,17 @@ public class Bus {
 	private String key;
 
 	public Stream<Map<String, ?>> call( String method, String route, String... query ) {
-		String q = Arrays.stream( query ).map( UrlEscapers.urlFragmentEscaper()::escape ).collect( Collectors.joining( "&" ) );
-		
-		String xdate = ZonedDateTime.now( ZoneId.of( "GMT" ) ).format( DATE_TIME_FORMATTER ), uri = String.format( API_URL, method, route, q );
+		String xdate = ZonedDateTime.now( ZoneId.of( "GMT" ) ).format( DATE_TIME_FORMATTER ), uri;
 
 		String signature = Base64.getEncoder().encodeToString( Signature.hmac( "x-date: " + xdate, key, HmacAlgorithms.HMAC_SHA_1 ) );
 
+		log.info( "Uri: {}", uri = UrlEscapers.urlFragmentEscaper().escape( String.format( API_URL, method, route, String.join( "&", query ) ) ) );
+
 		Request request = Request.Get( uri ).addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
 
-		log.info( uri );
-		
 		List<Map<String, ?>> list = Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<?>>() {
 		}.getType() );
 
-		log.info( uri + " size: " + list.size() );
 		return list.stream().filter( i -> name( i, "RouteName" ).equals( route ) );
 	}
 

@@ -19,6 +19,8 @@ import ninja.util.Gson;
 
 @RestController
 public class OptionController extends BaseController {
+	private static final String QUERY = "$filter=Direction eq Service.Enumeration.Version2.Bus.BusDirectionEnum'去程'";
+
 	@Autowired
 	private Bus bus;
 
@@ -38,13 +40,10 @@ public class OptionController extends BaseController {
 			return options( Collections.EMPTY_LIST );
 		}
 
-		System.out.println( bus.call( "DisplayStopOfRoute", route, "$filter=Direction eq Service.Enumeration.Version2.Bus.BusDirectionEnum'去程'" ).count() );
+		log.info( "No filter, size: {}", bus.call( "DisplayStopOfRoute", route ).count() );
+		log.info( "With filter, size: {}", bus.call( "DisplayStopOfRoute", route, QUERY ).count() );
 
-		System.out.println( bus.call( "DisplayStopOfRoute", route, "$filter=Direction eq '0'" ).count() );
-		
-		System.out.println( bus.call( "DisplayStopOfRoute", route ).count() );
-		
-		Map<String, ?> info = bus.call( "DisplayStopOfRoute", route, "$filter=Direction%20eq%20%270%27" ).findFirst().orElseGet( () -> null );
+		Map<String, ?> info = bus.call( "DisplayStopOfRoute", route, QUERY ).findFirst().orElseGet( () -> null );
 
 		return options( info == null ? Collections.EMPTY_LIST : Cast.list( info, "Stops" ).stream().map( Cast::map ).map( bus::stop ).map( i -> {
 			return option( i, route + "%20" + i );
