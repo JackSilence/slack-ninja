@@ -1,7 +1,9 @@
 package ninja.controller;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,7 @@ public class DelController extends BaseController {
 		try {
 			Long days = DAYS_AGO.get( text ), success = 0L;
 
-			LocalDate date = days == null ? LocalDate.parse( text ) : LocalDate.now().minusDays( days );
+			LocalDateTime date = days == null ? LocalDateTime.parse( text ) : LocalDateTime.now().minusDays( days );
 
 			String title = date.toString(), query = String.format( QUERY, epochSecond( date ), epochSecond( date.plusDays( 1 ) ) );
 
@@ -60,7 +62,9 @@ public class DelController extends BaseController {
 		}
 	}
 
-	private long epochSecond( LocalDate date ) {
-		return date.atStartOfDay( ZoneId.of( "Asia/Taipei" ) ).toEpochSecond();
+	private long epochSecond( LocalDateTime date ) {
+		log.info( ZonedDateTime.of( date, ZoneId.of( "Asia/Taipei" ) ).toString() );
+		log.info( ZonedDateTime.of( date, ZoneId.of( "Asia/Taipei" ) ).truncatedTo( ChronoUnit.DAYS ).toString() );
+		return ZonedDateTime.of( date, ZoneId.of( "Asia/Taipei" ) ).truncatedTo( ChronoUnit.DAYS ).toEpochSecond();
 	}
 }
