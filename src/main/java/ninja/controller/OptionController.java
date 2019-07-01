@@ -19,7 +19,7 @@ import ninja.util.Gson;
 
 @RestController
 public class OptionController extends BaseController {
-	private static final String QUERY = "$filter=Direction eq Service.Enumeration.Version2.Bus.BusDirectionEnum'去程'";
+	private static final String QUERY = " and Direction eq Service.Enumeration.Version2.Bus.BusDirectionEnum'去程'";
 
 	@Autowired
 	private Bus bus;
