@@ -1,7 +1,7 @@
 package ninja.controller;
 
 import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +59,6 @@ public class DelController extends BaseController {
 	}
 
 	private long epochSecond( LocalDate date ) {
-		return date.atStartOfDay( ZoneOffset.UTC ).toEpochSecond();
+		return date.atStartOfDay( ZoneId.of( "Asia/Taipei" ) ).toEpochSecond();
 	}
 }
