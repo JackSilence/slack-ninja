@@ -38,6 +38,12 @@ public class OptionController extends BaseController {
 			return options( Collections.EMPTY_LIST );
 		}
 
+		System.out.println( bus.call( "DisplayStopOfRoute", route, "$filter=Direction eq Service.Enumeration.Version2.Bus.BusDirectionEnum'去程'" ).count() );
+
+		System.out.println( bus.call( "DisplayStopOfRoute", route, "$filter=Direction eq '0'" ).count() );
+		
+		System.out.println( bus.call( "DisplayStopOfRoute", route ).count() );
+		
 		Map<String, ?> info = bus.call( "DisplayStopOfRoute", route, "$filter=Direction%20eq%20%270%27" ).findFirst().orElseGet( () -> null );
 
 		return options( info == null ? Collections.EMPTY_LIST : Cast.list( info, "Stops" ).stream().map( Cast::map ).map( bus::stop ).map( i -> {
