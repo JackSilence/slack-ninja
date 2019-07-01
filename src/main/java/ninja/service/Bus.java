@@ -18,6 +18,8 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.http.client.fluent.Request;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,8 @@ import ninja.util.Signature;
 
 @Service
 public class Bus {
+	private final Logger log = LoggerFactory.getLogger( this.getClass() );
+
 	private static final String AUTH_HEADER = "hmac username=\"%s\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"%s\"";
 
 	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei/%s?$format=JSON&%s";
@@ -57,11 +61,12 @@ public class Bus {
 
 		Request request = Request.Get( uri ).addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
 
-		// TODO: log.info( uri );
+		log.info( uri );
 		
 		List<Map<String, ?>> list = Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<?>>() {
 		}.getType() );
 
+		log.info( uri + " size: " + list.size() );
 		return list.stream().filter( i -> name( i, "RouteName" ).equals( route ) );
 	}
 
