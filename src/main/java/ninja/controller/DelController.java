@@ -36,6 +36,8 @@ public class DelController extends BaseController {
 
 			String title = date.toString(), query = String.format( QUERY, epochSecond( date ), epochSecond( date.plusDays( 1 ) ) );
 
+			log.info( "Date: {}, query: {}", date, query );
+
 			History history = Gson.from( get( HISTORY_METHOD, channel, query ), History.class );
 
 			List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
