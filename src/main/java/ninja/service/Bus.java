@@ -36,7 +36,7 @@ public class Bus {
 
 	private static final String AUTH_HEADER = "hmac username=\"%s\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"%s\"";
 
-	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei/%s?$format=JSON&%s";
+	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei/%s?$format=JSON&$filter=RouteName/Zh_tw eq '%s'%s";
 
 	private static final String ROUTES_URL = "https://ebus.gov.taipei/EBus/RouteList?ct=tpc", ROUTE_ID_REGEX = "javascript:go\\('(.+?)'\\)";
 
@@ -50,7 +50,7 @@ public class Bus {
 	@Value( "${ptx.app.key:}" )
 	private String key;
 
-	public Stream<Map<String, ?>> call( String method, String route, String... query ) {
+	public List<Map<String, ?>> call( String method, String route, String... query ) {
 		String xdate = ZonedDateTime.now( ZoneId.of( "GMT" ) ).format( DATE_TIME_FORMATTER ), uri;
 
 		String signature = Base64.getEncoder().encodeToString( Signature.hmac( "x-date: " + xdate, key, HmacAlgorithms.HMAC_SHA_1 ) );
@@ -62,7 +62,8 @@ public class Bus {
 		List<Map<String, ?>> list = Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<?>>() {
 		}.getType() );
 
-		return list.stream().filter( i -> name( i, "RouteName" ).equals( route ) );
+		log.info( "Uri: {}, size: {}", uri, list.size() );
+		return list;
 	}
 
 	public String stop( Map<?, ?> map ) {

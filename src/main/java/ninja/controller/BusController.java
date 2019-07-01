@@ -47,7 +47,7 @@ public class BusController extends BaseController {
 
 			Assert.isTrue( bus.check( route ), "查無路線: " + route );
 
-			Map<String, ?> info = bus.call( "Route", route ).findFirst().get(); // 原則上不可能拿不到
+			Map<String, ?> info = bus.call( "Route", route ).get( 0 ); // 原則上不可能拿不到
 
 			String departure = Cast.string( info, "DepartureStopNameZh" ), destination = Cast.string( info, "DestinationStopNameZh" );
 
@@ -59,7 +59,7 @@ public class BusController extends BaseController {
 				return message( message );
 			}
 
-			bus.call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).filter( i -> {
+			bus.call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
 				return bus.stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
 
 			} ).collect( Collectors.groupingBy( i -> bus.stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
