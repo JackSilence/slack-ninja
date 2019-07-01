@@ -24,7 +24,7 @@ public class Weather implements IService {
 	@Value( "${slack.webhook.url:}" )
 	private String url;
 
-	@Scheduled( cron = "0 0 0,6,12,18 * * *" )
+	@Scheduled( cron = "0 0 4,10,16,22 * * *" )
 	@Override
 	public void exec() {
 		Request request = Request.Post( url ).bodyString( weather.weather( "scheduled-task", StringUtils.EMPTY ), ContentType.APPLICATION_JSON );
