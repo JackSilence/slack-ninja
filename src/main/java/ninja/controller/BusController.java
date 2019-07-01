@@ -59,7 +59,7 @@ public class BusController extends BaseController {
 				return message( message );
 			}
 
-			bus.call( "EstimatedTimeOfArrival", route, "$orderby=Direction" ).stream().filter( i -> {
+			bus.call( "EstimatedTimeOfArrival", route, "&$orderby=Direction" ).stream().filter( i -> {
 				return bus.stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
 
 			} ).collect( Collectors.groupingBy( i -> bus.stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
