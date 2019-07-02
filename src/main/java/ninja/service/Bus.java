@@ -35,7 +35,7 @@ public class Bus {
 
 	private static final String AUTH_HEADER = "hmac username=\"%s\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"%s\"";
 
-	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei/%s?$format=JSON&$filter=RouteName/Zh_tw eq '%s'%s";
+	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei?$format=JSON&$filter=RouteName/Zh_tw eq '%s'%s";
 
 	private static final String ROUTES_URL = "https://ebus.gov.taipei/EBus/RouteList?ct=tpc", ROUTE_ID_REGEX = "javascript:go\\('(.+?)'\\)";
 
@@ -54,7 +54,7 @@ public class Bus {
 
 		String signature = Base64.getEncoder().encodeToString( Signature.hmac( "x-date: " + xdate, key, HmacAlgorithms.HMAC_SHA_1 ) );
 
-		log.info( "Uri: {}", uri = UrlEscapers.urlFragmentEscaper().escape( String.format( API_URL, method, route, route, String.join( "&", query ) ) ) );
+		log.info( "Uri: {}", uri = UrlEscapers.urlFragmentEscaper().escape( String.format( API_URL, method, route, String.join( "&", query ) ) ) );
 
 		Request request = Request.Get( uri ).addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
 
