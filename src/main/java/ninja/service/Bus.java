@@ -50,8 +50,8 @@ public class Bus {
 	@Value( "${ptx.app.key:}" )
 	private String key;
 
-	public List<Map<String, ?>> call( String method, String keyword, String... query ) {
-		return call( method, Filter.ROUTE, keyword, query );
+	public List<Map<String, ?>> call( String method, String route, String... query ) {
+		return call( method, Filter.ROUTE, route, query );
 	}
 
 	public List<Map<String, ?>> call( String method, Filter filter, String keyword, String... query ) {
