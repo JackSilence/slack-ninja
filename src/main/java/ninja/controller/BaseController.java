@@ -1,6 +1,7 @@
 package ninja.controller;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
@@ -33,6 +34,8 @@ public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
 	protected static final String REQ_BODY = "req_body";
+
+	protected static final ZoneId ZONE_ID = ZoneId.of( "Asia/Taipei" );
 
 	private static final String HEADER_TIMESTAMP = "X-Slack-Request-Timestamp", HEADER_SIGNATURE = "X-Slack-Signature";
 

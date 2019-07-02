@@ -2,7 +2,6 @@ package ninja.controller;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -87,7 +86,7 @@ public class WeatherController extends BaseController {
 
 			String district = StringUtils.appendIfMissing( params[ 0 ], "區" );
 
-			ZonedDateTime time = ZonedDateTime.now( ZoneId.of( "Asia/Taipei" ) );
+			ZonedDateTime time = ZonedDateTime.now( ZONE_ID );
 
 			Integer hour = time.getHour(), plus = Arrays.asList( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6, town, hours;
 
