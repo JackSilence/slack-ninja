@@ -31,7 +31,7 @@ public class BusController extends BaseController {
 	private Bus bus;
 
 	@PostMapping( "/bus" )
-	public String bus( @RequestParam String command, @RequestParam String text, @RequestParam( "trigger_id" ) String id ) {
+	public String bus( @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
 		if ( text.isEmpty() ) {
 			dialog( id, Dialog.BUS );
 

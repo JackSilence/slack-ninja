@@ -33,7 +33,7 @@ import ninja.util.Slack;
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	protected static final String REQ_BODY = "req_body";
+	protected static final String REQ_BODY = "req_body", TRIGGER_ID = "trigger_id";
 
 	protected static final ZoneId ZONE_ID = ZoneId.of( "Asia/Taipei" );
 
@@ -99,7 +99,7 @@ public abstract class BaseController {
 	protected void dialog( String id, Dialog dialog, Object... args ) {
 		String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
 
-		log.info( post( "dialog.open", ImmutableMap.of( "trigger_id", id, "dialog", String.format( template, args ) ) ) );
+		log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, id, "dialog", String.format( template, args ) ) ) );
 	}
 
 	protected void check( String expected, String actual, String payload ) {
