@@ -1,6 +1,5 @@
 package ninja.controller;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -17,6 +16,7 @@ import com.google.common.collect.ImmutableMap;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Dialog;
+import ninja.consts.Filter;
 import ninja.service.Bus;
 import ninja.util.Cast;
 import ninja.util.Slack;
@@ -43,11 +43,11 @@ public class BusController extends BaseController {
 
 			Assert.isTrue( params.length == 2, "參數個數有誤: " + text );
 
-			String route = params[ 0 ], keyword = params[ 1 ];
+			String route = params[ 0 ], stop = params[ 1 ], filter;
 
 			Assert.isTrue( bus.check( route ), "查無路線: " + route );
 
-			Map<String, ?> info = bus.call( "Route", route ).get( 0 ); // 原則上不可能拿不到
+			Map<String, ?> info = bus.call( "Route", filter = Filter.ROUTE.eq( route ) ).get( 0 ); // 原則上不可能拿不到
 
 			String departure = Cast.string( info, "DepartureStopNameZh" ), destination = Cast.string( info, "DestinationStopNameZh" );
 
@@ -55,14 +55,13 @@ public class BusController extends BaseController {
 
 			SlackMessage message = Slack.message( attachment, command, text );
 
-			if ( keyword.isEmpty() ) {
+			if ( stop.isEmpty() ) {
 				return message( message );
 			}
 
-			bus.call( "EstimatedTimeOfArrival", route, "&$orderby=Direction" ).stream().filter( i -> {
-				return bus.stop( i ).contains( keyword ) && Arrays.asList( 0d, 1d ).contains( direction( i ) ); // 0: 去程, 1: 返程
+			filter = Filter.and( filter, Filter.STOP.contains( stop ), Filter.DIRECTION.le( "1" ) );
 
-			} ).collect( Collectors.groupingBy( i -> bus.stop( i ), Collectors.toList() ) ).forEach( ( k, v ) -> {
+			bus.call( "EstimatedTimeOfArrival", filter, "$orderby=Direction" ).stream().collect( Collectors.groupingBy( bus::stop, Collectors.toList() ) ).forEach( ( k, v ) -> {
 				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {
 					Double time = ( Double ) i.get( "EstimateTime" ), status = ( Double ) i.get( "StopStatus" );
 

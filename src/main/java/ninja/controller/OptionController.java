@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.collect.ImmutableMap;
 
 import ninja.consts.Dialog;
+import ninja.consts.Filter;
 import ninja.service.Bus;
 import ninja.slack.Payload;
 import ninja.util.Cast;
@@ -19,8 +20,6 @@ import ninja.util.Gson;
 
 @RestController
 public class OptionController extends BaseController {
-	private static final String QUERY = " and Direction eq Service.Enumeration.Version2.Bus.BusDirectionEnum'去程'";
-
 	@Autowired
 	private Bus bus;
 
@@ -40,9 +39,9 @@ public class OptionController extends BaseController {
 			return options( Collections.EMPTY_LIST );
 		}
 
-		Map<String, ?> info = bus.call( "DisplayStopOfRoute", route, QUERY ).stream().findFirst().orElseGet( () -> null );
+		List<Map<String, ?>> info = bus.call( "DisplayStopOfRoute", Filter.and( Filter.ROUTE.eq( route ), Filter.DIRECTION.eq( "0" ) ) );
 
-		return options( info == null ? Collections.EMPTY_LIST : Cast.list( info, "Stops" ).stream().map( Cast::map ).map( bus::stop ).map( i -> {
+		return options( info.isEmpty() ? info : Cast.list( info.get( 0 ), "Stops" ).stream().map( Cast::map ).map( bus::stop ).map( i -> {
 			return option( i, route + "%20" + i );
 
 		} ).collect( Collectors.toList() ) );

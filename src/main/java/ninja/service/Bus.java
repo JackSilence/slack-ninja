@@ -24,7 +24,6 @@ import com.google.common.net.UrlEscapers;
 import com.google.gson.reflect.TypeToken;
 
 import magic.util.Utils;
-import ninja.consts.Filter;
 import ninja.util.Cast;
 import ninja.util.Gson;
 import ninja.util.Jsoup;
@@ -36,7 +35,7 @@ public class Bus {
 
 	private static final String AUTH_HEADER = "hmac username=\"%s\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"%s\"";
 
-	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei?$format=JSON&%s%s";
+	private static final String API_URL = "https://ptx.transportdata.tw/MOTC/v2/Bus/%s/City/Taipei?$format=JSON&$filter=%s&%s";
 
 	private static final String ROUTES_URL = "https://ebus.gov.taipei/EBus/RouteList?ct=tpc", ROUTE_ID_REGEX = "javascript:go\\('(.+?)'\\)";
 
@@ -50,16 +49,12 @@ public class Bus {
 	@Value( "${ptx.app.key:}" )
 	private String key;
 
-	public List<Map<String, ?>> call( String method, String route, String... query ) {
-		return call( method, Filter.ROUTE, route, query );
-	}
-
-	public List<Map<String, ?>> call( String method, Filter filter, String keyword, String... query ) {
-		String xdate = ZonedDateTime.now( ZoneId.of( "GMT" ) ).format( DATE_TIME_FORMATTER ), q = String.join( "&", query ), uri;
+	public List<Map<String, ?>> call( String method, String filter, String... query ) {
+		String xdate = ZonedDateTime.now( ZoneId.of( "GMT" ) ).format( DATE_TIME_FORMATTER ), uri;
 
 		String signature = Base64.getEncoder().encodeToString( Signature.hmac( "x-date: " + xdate, key, HmacAlgorithms.HMAC_SHA_1 ) );
 
-		log.info( "Uri: {}", uri = UrlEscapers.urlFragmentEscaper().escape( String.format( API_URL, method, filter.name( keyword ), q ) ) );
+		log.info( "Uri: {}", uri = UrlEscapers.urlFragmentEscaper().escape( String.format( API_URL, method, filter, String.join( "&", query ) ) ) );
 
 		Request request = Request.Get( uri ).addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
 

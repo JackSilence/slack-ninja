@@ -3,9 +3,42 @@ package ninja.consts;
 import org.apache.commons.lang3.StringUtils;
 
 public enum Filter {
-	ROUTE, STATION;
+	ROUTE( true ), STOP( true ), STATION( true ), DIRECTION( false );
 
-	public String name( String keyword ) {
-		return String.format( "$filter=%sName/Zh_tw eq '%s'", StringUtils.capitalize( name().toLowerCase() ), keyword );
+	private static final String AND = " and ", OR = " or ";
+
+	private boolean name;
+
+	private Filter( boolean name ) {
+		this.name = name;
+	}
+
+	public String eq( String keyword ) {
+		return format( "%s eq '%s'", keyword );
+	}
+
+	public String le( String keyword ) {
+		return format( "%s le '%s'", keyword );
+	}
+
+	public String contains( String keyword ) {
+		return format( "contains(%s,'%s')", keyword );
+	}
+
+	public static String and( String... filter ) {
+		return String.join( AND, filter );
+	}
+
+	public static String or( String... filter ) {
+		return String.join( OR, filter );
+	}
+
+	@Override
+	public String toString() {
+		return StringUtils.capitalize( name().toLowerCase() ).concat( this.name ? "Name/Zh_tw" : StringUtils.EMPTY );
+	}
+
+	private String format( String format, String keyword ) {
+		return String.format( format, this, keyword );
 	}
 }
