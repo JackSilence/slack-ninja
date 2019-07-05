@@ -49,7 +49,7 @@ public class TaskController extends BaseController {
 
 			List<SlackAction> actions = message.getActions();
 
-			Assert.isTrue( CollectionUtils.isNotEmpty( actions ) && actions.size() == 1, payload );
+			check( CollectionUtils.isNotEmpty( actions ) && actions.size() == 1, payload );
 
 			SlackAction action = actions.get( 0 );
 
@@ -74,6 +74,6 @@ public class TaskController extends BaseController {
 	}
 
 	private <E extends Enum<E>> void check( Class<E> expected, String actual, String payload ) {
-		Assert.isTrue( EnumUtils.isValidEnum( expected, actual ), payload );
+		check( EnumUtils.isValidEnum( expected, actual ), payload );
 	}
 }

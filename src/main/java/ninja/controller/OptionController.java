@@ -15,7 +15,6 @@ import ninja.consts.Dialog;
 import ninja.consts.Filter;
 import ninja.service.Bus;
 import ninja.slack.Payload;
-import ninja.util.Cast;
 import ninja.util.Gson;
 
 @RestController
@@ -41,7 +40,7 @@ public class OptionController extends BaseController {
 
 		List<Map<String, ?>> info = bus.call( "DisplayStopOfRoute", Filter.and( Filter.ROUTE.eq( route ), Filter.DIRECTION.eq( "0" ) ) );
 
-		return options( info.isEmpty() ? info : Cast.list( info.get( 0 ), "Stops" ).stream().map( Cast::map ).map( bus::stop ).map( i -> {
+		return options( info.isEmpty() ? info : bus.stops( info.get( 0 ), bus::stop ).map( i -> {
 			return option( i, route + "%20" + i );
 
 		} ).collect( Collectors.toList() ) );

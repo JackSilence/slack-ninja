@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -80,7 +79,7 @@ public class WeatherController extends BaseController {
 		try {
 			String[] params = ( params = StringUtils.split( text ) ).length == 0 ? new String[] { DEFAULT_DIST, DEFAULT_HOURS } : params;
 
-			Assert.isTrue( params.length <= 2, "參數個數有誤: " + text );
+			check( params.length <= 2, "參數個數有誤: " + text );
 
 			params = params.length == 1 ? Ints.tryParse( params[ 0 ] ) != null ? ObjectArrays.concat( DEFAULT_DIST, params ) : ArrayUtils.add( params, DEFAULT_HOURS ) : params;
 
@@ -90,7 +89,7 @@ public class WeatherController extends BaseController {
 
 			Integer hour = time.getHour(), plus = Arrays.asList( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6, town, hours;
 
-			Assert.isTrue( ObjectUtils.allNotNull( town = DISTRICTS.get( district ), hours = Ints.tryParse( params[ 1 ] ) ) && hours >= -12 && hours <= 48, "參數有誤: " + text );
+			check( ObjectUtils.allNotNull( town = DISTRICTS.get( district ), hours = Ints.tryParse( params[ 1 ] ) ) && hours >= -12 && hours <= 48, "參數有誤: " + text );
 
 			// 氣象局於5, 11, 17, 23時左右會刷新資料, 但詳細時間不確定; 所以在這些時間多往後抓一個區間再設定limit
 			String from = time( time = time.with( LocalTime.of( hour / 3 * 3, 0 ) ).plusHours( hours ) ), to = time( time.plusHours( plus ) );

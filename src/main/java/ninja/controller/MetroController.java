@@ -10,7 +10,6 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,11 +37,11 @@ public class MetroController extends BaseController {
 		try {
 			String[] params = StringUtils.split( text );
 
-			Assert.isTrue( params.length == 2, "起訖站皆須輸入" );
+			check( params.length == 2, "起訖站皆須輸入" );
 
 			String start = find( params[ 0 ] ), end = find( params[ 1 ] ), url, txt;
 
-			Assert.isTrue( !start.equals( end ), "起訖站不得相同: " + text );
+			check( !start.equals( end ), "起訖站不得相同: " + text );
 
 			log.info( "Start: {}, end: {}", start, end );
 
@@ -74,7 +73,7 @@ public class MetroController extends BaseController {
 	private String find( String name ) {
 		Optional<String> station = STATIONS.entrySet().stream().filter( i -> check( i.getKey(), name ) ).map( Entry::getValue ).findFirst();
 
-		Assert.isTrue( station.isPresent(), "查無此站: " + name );
+		check( station.isPresent(), "查無此站: " + name );
 
 		return station.get();
 	}

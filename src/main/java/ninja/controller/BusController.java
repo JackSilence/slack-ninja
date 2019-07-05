@@ -1,17 +1,18 @@
 package ninja.controller;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
@@ -41,11 +42,11 @@ public class BusController extends BaseController {
 		try {
 			String[] params = ( params = StringUtils.split( text ) ).length == 1 ? ArrayUtils.add( params, StringUtils.EMPTY ) : params;
 
-			Assert.isTrue( params.length == 2, "參數個數有誤: " + text );
+			check( params.length == 2, "參數個數有誤: " + text );
 
 			String route = params[ 0 ], stop = params[ 1 ], filter;
 
-			Assert.isTrue( bus.check( route ), "查無路線: " + route );
+			check( bus.check( route ), "查無路線: " + route );
 
 			Map<String, ?> info = bus.call( "Route", filter = Filter.ROUTE.eq( route ) ).get( 0 ); // 原則上不可能拿不到
 
@@ -63,9 +64,9 @@ public class BusController extends BaseController {
 
 			bus.call( "EstimatedTimeOfArrival", filter, "$orderby=Direction" ).stream().collect( Collectors.groupingBy( bus::stop, Collectors.toList() ) ).forEach( ( k, v ) -> {
 				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {
-					Double time = ( Double ) i.get( "EstimateTime" ), status = ( Double ) i.get( "StopStatus" );
+					Double direction = ( Double ) i.get( "Direction" ), time = ( Double ) i.get( "EstimateTime" ), status = ( Double ) i.get( "StopStatus" );
 
-					return field( "往".concat( direction( i ).equals( 0d ) ? destination : departure ), time == null ? STATUS.get( status ) : time( time ) );
+					return field( "往".concat( direction.equals( 0d ) ? destination : departure ), time == null ? STATUS.get( status ) : time( time ) );
 
 				} ).collect( Collectors.toList() ) ) );
 			} );
@@ -80,13 +81,37 @@ public class BusController extends BaseController {
 		}
 	}
 
+	@PostMapping( "/station" )
+	public String station( @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
+		try {
+			String[] params = StringUtils.split( text );
+
+			check( params.length == 2, "參數個數有誤: " + text );
+
+			String start = params[ 0 ], end = params[ 1 ], filter = Filter.or( Filter.STATION.eq( start ), Filter.STATION.eq( end ) );
+
+			Map<String, Set<String>> info = bus.call( "Station", filter ).stream().collect( Collectors.toMap( bus::station, i -> {
+				return bus.stops( i, j -> bus.name( j, "RouteName" ) ).collect( Collectors.toSet() );
+
+			}, Sets::union ) );
+
+			check( info.keySet().size() == 2, "查無起站或訖站: " + text );
+
+			log.info( Sets.intersection( info.get( start ), info.get( end ) ).toString() );
+
+			return message( Slack.message( Slack.attachment(), command, text ) );
+
+		} catch ( RuntimeException e ) {
+			log.error( "", e );
+
+			return e.getMessage();
+
+		}
+	}
+
 	private String time( Double time ) {
 		int seconds = time.intValue(), minutes = seconds / 60;
 
 		return ( minutes > 0 ? minutes + "分" : StringUtils.EMPTY ) + seconds % 60 + "秒";
-	}
-
-	private Double direction( Map<String, ?> map ) {
-		return ( Double ) map.get( "Direction" );
 	}
 }

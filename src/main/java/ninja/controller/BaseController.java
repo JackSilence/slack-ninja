@@ -53,11 +53,11 @@ public abstract class BaseController {
 	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, @RequestBody String body, HttpServletRequest request ) {
 		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
 
-		Assert.isTrue( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
+		check( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
 
 		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
 
-		Assert.isTrue( signature.equals( digest ), String.join( "!=", signature, digest ) );
+		check( signature.equals( digest ), String.join( "!=", signature, digest ) );
 
 		request.setAttribute( REQ_BODY, body );
 	}
@@ -102,8 +102,12 @@ public abstract class BaseController {
 		log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, id, "dialog", String.format( template, args ) ) ) );
 	}
 
-	protected void check( String expected, String actual, String payload ) {
-		Assert.isTrue( expected.equals( actual ), payload );
+	protected void check( String expected, String actual, String message ) {
+		check( expected.equals( actual ), message );
+	}
+
+	protected void check( boolean expression, String message ) {
+		Assert.isTrue( expression, message );
 	}
 
 	private String digest( String content ) {

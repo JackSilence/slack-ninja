@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
@@ -62,8 +64,16 @@ public class Bus {
 		}.getType() );
 	}
 
+	public Stream<String> stops( Map<String, ?> map, Function<? super Map<?, ?>, ? extends String> mapper ) {
+		return Cast.list( map, "Stops" ).stream().map( Cast::map ).map( mapper );
+	}
+
 	public String stop( Map<?, ?> map ) {
 		return name( map, "StopName" );
+	}
+
+	public String station( Map<?, ?> map ) {
+		return name( map, "StationName" );
 	}
 
 	public String name( Map<?, ?> map, String key ) {
