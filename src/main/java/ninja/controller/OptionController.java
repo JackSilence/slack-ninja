@@ -41,7 +41,7 @@ public class OptionController extends BaseController {
 		List<Map<String, ?>> info = bus.call( "DisplayStopOfRoute", Filter.and( Filter.ROUTE.eq( route ), Filter.DIRECTION.eq( "0" ) ) );
 
 		return options( info.isEmpty() ? info : bus.stops( info.get( 0 ), bus::stop ).map( i -> {
-			return option( i, route + "%20" + i );
+			return option( i, String.join( "%20", route, i, DIALOG ) );
 
 		} ).collect( Collectors.toList() ) );
 	}

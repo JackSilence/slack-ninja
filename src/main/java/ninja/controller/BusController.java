@@ -1,10 +1,10 @@
 package ninja.controller;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,13 +40,14 @@ public class BusController extends BaseController {
 		}
 
 		try {
-			String[] params = ( params = StringUtils.split( text ) ).length == 1 ? ArrayUtils.add( params, StringUtils.EMPTY ) : params;
 
-			check( params.length == 2, "參數個數有誤: " + text );
+			String[] params = Arrays.copyOf( params = StringUtils.split( text ), Math.max( params.length, 3 ) );
 
-			String route = params[ 0 ], stop = params[ 1 ], filter;
+			check( params.length == 3, "參數個數有誤: " + text );
 
-			check( bus.check( route ), "查無路線: " + route );
+			String route = params[ 0 ], stop = params[ 1 ], source = params[ 2 ], filter;
+
+			check( bus.check( route ) && StringUtils.equalsAny( source, null, DIALOG ), "參數有誤: " + text );
 
 			Map<String, ?> info = bus.call( "Route", filter = Filter.ROUTE.eq( route ) ).get( 0 ); // 原則上不可能拿不到
 
@@ -56,11 +57,11 @@ public class BusController extends BaseController {
 
 			SlackMessage message = Slack.message( attachment, command, text );
 
-			if ( stop.isEmpty() ) {
+			if ( stop == null ) {
 				return message( message );
 			}
 
-			filter = Filter.and( filter, Filter.STOP.contains( stop ), Filter.DIRECTION.le( "1" ) );
+			filter = Filter.and( filter, DIALOG.equals( source ) ? Filter.STOP.eq( stop ) : Filter.STOP.contains( stop ), Filter.DIRECTION.le( "1" ) );
 
 			bus.call( "EstimatedTimeOfArrival", filter, "$orderby=Direction" ).stream().collect( Collectors.groupingBy( bus::stop, Collectors.toList() ) ).forEach( ( k, v ) -> {
 				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {
