@@ -39,7 +39,9 @@ public abstract class BaseController {
 
 	private static final String HEADER_TIMESTAMP = "X-Slack-Request-Timestamp", HEADER_SIGNATURE = "X-Slack-Signature";
 
-	private static final String VERSION = "v0", API_URL = "https://slack.com/api/", QUERY = "?token=%s&channel=%s";
+	private static final String VERSION = "v0", API_URL = "https://slack.com/api/", API_QUERY = "?token=%s&channel=%s";
+
+	private static final String COMMAND_METHOD = "chat.command", COMMAND_QUERY = "&command=/%s&text=%s";
 
 	private static final String DIALOG_TEMPLATE = "/template/dialog/%s.json";
 
@@ -58,7 +60,7 @@ public abstract class BaseController {
 		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
 
 		check( signature, digest, String.join( "!=", signature, digest ) );
-		log.info( body );
+
 		request.setAttribute( REQ_BODY, body );
 	}
 
@@ -79,7 +81,7 @@ public abstract class BaseController {
 	}
 
 	protected String get( String method, String token, String channel, String query ) {
-		return call( Request.Get( uri( method ) + String.format( QUERY, token, channel ) + query ) );
+		return call( Request.Get( uri( method ) + String.format( API_QUERY, token, channel ) + query ) );
 	}
 
 	protected String post( String method, Object src ) {
@@ -92,9 +94,6 @@ public abstract class BaseController {
 		return call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
 	}
 
-	// protected String command() {
-	//
-	// }
 	protected SlackField field( String title, String value ) {
 		return new SlackField().setShorten( true ).setTitle( title ).setValue( value );
 	}
@@ -103,6 +102,11 @@ public abstract class BaseController {
 		String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
 
 		log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, id, DIALOG, String.format( template, args ) ) ) );
+	}
+
+	protected void command( String user, String channel, String command, String text ) {
+		// 使用legacy token執行command, 只有對應的帳號才會看到return message
+		log.info( get( COMMAND_METHOD, System.getenv( "slack.legacy.token." + user ), channel, String.format( COMMAND_QUERY, command, text ) ) );
 	}
 
 	protected void check( String expected, String actual, String message ) {

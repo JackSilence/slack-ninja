@@ -21,8 +21,6 @@ import ninja.util.Heroku;
 @RestController
 @RequestMapping( "/task" )
 public class TaskController extends BaseController {
-	private static final String METHOD = "chat.command", QUERY = "&command=/%s&text=%s";
-
 	private enum Type {
 		INTERACTIVE_MESSAGE, DIALOG_SUBMISSION;
 	}
@@ -67,10 +65,7 @@ public class TaskController extends BaseController {
 			text = Dialog.valueOf( command = id ).text( submission );
 		}
 
-		String token = System.getenv( "slack.legacy.token." + message.getUser().getName() );
-
-		// 使用legacy token執行command, 只有對應的帳號才會看到return message
-		log.info( get( METHOD, token, message.getChannel().getId(), String.format( QUERY, command.toLowerCase(), text ) ) );
+		command( message.getUser().getName(), message.getChannel().getId(), command.toLowerCase(), text );
 	}
 
 	private <E extends Enum<E>> void check( Class<E> expected, String actual, String payload ) {

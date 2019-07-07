@@ -98,7 +98,7 @@ public class BusController extends BaseController {
 
 			check( info.keySet().size() == 2, "查無起站或訖站: " + text );
 
-			log.info( Sets.intersection( info.get( start ), info.get( end ) ).toString() );
+			Sets.intersection( info.get( start ), info.get( end ) ).forEach( i -> command( user, channel, "bus", i + "%20" + start ) );
 
 			return message( Slack.message( Slack.attachment(), command, text ) );
 
