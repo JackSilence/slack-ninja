@@ -58,7 +58,7 @@ public class BusController extends BaseController {
 
 			String route = params[ 0 ], stop = params[ 1 ], source = params[ 2 ], filter;
 
-			check( bus.check( route ) && StringUtils.equalsAny( source, null, ASTERISK ), "參數有誤: " + text );
+			check( bus.check( route ) && StringUtils.equalsAny( source, null, AT ), "參數有誤: " + text );
 
 			Map<String, ?> info = bus.call( "Route", filter = Filter.ROUTE.eq( route ) ).get( 0 ); // 原則上不可能拿不到
 
@@ -72,7 +72,7 @@ public class BusController extends BaseController {
 				return message( message );
 			}
 
-			filter = Filter.and( filter, ASTERISK.equals( source ) ? Filter.STOP.eq( stop ) : Filter.STOP.contains( stop ), Filter.DIRECTION.le( "1" ) );
+			filter = Filter.and( filter, AT.equals( source ) ? Filter.STOP.eq( stop ) : Filter.STOP.contains( stop ), Filter.DIRECTION.le( "1" ) );
 
 			bus.call( "EstimatedTimeOfArrival", filter, "$orderby=Direction" ).stream().collect( Collectors.groupingBy( bus::stop, Collectors.toList() ) ).forEach( ( k, v ) -> {
 				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {

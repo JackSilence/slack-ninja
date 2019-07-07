@@ -33,7 +33,7 @@ import ninja.util.Slack;
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id", ASTERISK = "%2A";
+	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id", AT = "@";
 
 	protected static final ZoneId ZONE_ID = ZoneId.of( "Asia/Taipei" );
 
@@ -54,7 +54,7 @@ public abstract class BaseController {
 	@ModelAttribute
 	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, @RequestBody String body, HttpServletRequest request ) {
 		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
-		log.info( body );
+
 		check( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
 
 		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
@@ -101,7 +101,7 @@ public abstract class BaseController {
 	}
 
 	protected String text( String route, String stop ) {
-		return String.join( "%20", route, stop, ASTERISK );
+		return String.join( "%20", route, stop, AT );
 	}
 
 	protected SlackField field( String title, String value ) {
