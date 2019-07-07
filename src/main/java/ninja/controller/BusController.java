@@ -40,7 +40,6 @@ public class BusController extends BaseController {
 		}
 
 		try {
-
 			String[] params = Arrays.copyOf( params = StringUtils.split( text ), Math.max( params.length, 3 ) );
 
 			check( params.length == 3, "參數個數有誤: " + text );
@@ -98,7 +97,7 @@ public class BusController extends BaseController {
 
 			check( info.keySet().size() == 2, "查無起站或訖站: " + text );
 
-			Sets.intersection( info.get( start ), info.get( end ) ).forEach( i -> command( user, channel, "bus", i + "%20" + start ) );
+			Sets.intersection( info.get( start ), info.get( end ) ).parallelStream().forEach( i -> command( user, channel, "bus", i + "%20" + start ) );
 
 			return message( Slack.message( Slack.attachment(), command, text ) );
 
