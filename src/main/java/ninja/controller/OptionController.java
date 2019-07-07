@@ -40,7 +40,7 @@ public class OptionController extends BaseController {
 			return options( info.isEmpty() ? Stream.empty() : bus.stops( info.get( 0 ), bus::stop ).map( i -> option( i, String.join( "%20", value, i, DIALOG ) ) ) );
 
 		} else if ( Dialog.STATION.name().equals( id ) ) {
-			return options( bus.call( "Station", Filter.STATION.contains( value ), "$select=StationName" ).stream().map( bus::station ).map( super::option ) );
+			return options( bus.call( "Station", Filter.STATION.contains( value ), "$select=StationName" ).stream().map( bus::station ).distinct().map( super::option ) );
 
 		} else {
 			throw new IllegalArgumentException( payload );

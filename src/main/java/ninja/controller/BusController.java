@@ -37,13 +37,14 @@ public class BusController extends BaseController {
 	private Bus bus;
 
 	@ExceptionHandler( SlackException.class )
-	public String ex() {
-		return StringUtils.EMPTY;
+	public void ex() {
 	}
 
 	@ModelAttribute
 	public void dialog( @RequestParam String text, @RequestParam( TRIGGER_ID ) String id, HttpServletRequest request ) {
 		if ( text.isEmpty() ) {
+			log.info( request.getPathInfo() );
+			log.info( request.getRequestURI() );
 			dialog( id, Dialog.BUS );
 
 			throw new SlackException( null );
@@ -51,8 +52,9 @@ public class BusController extends BaseController {
 	}
 
 	@PostMapping( "/bus" )
-	public String bus( @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
+	public String bus( @RequestParam String command, @RequestParam String text ) {
 		try {
+			log.info( "qqqqqqqqqq" );
 			String[] params = Arrays.copyOf( params = StringUtils.split( text ), Math.max( params.length, 3 ) );
 
 			check( params.length == 3, "參數個數有誤: " + text );
@@ -95,7 +97,7 @@ public class BusController extends BaseController {
 	}
 
 	@PostMapping( "/station" )
-	public String station( @RequestParam( CHANNEL_ID ) String channel, @RequestParam( "user_name" ) String user, @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
+	public String station( @RequestParam( CHANNEL_ID ) String channel, @RequestParam( "user_name" ) String user, @RequestParam String command, @RequestParam String text ) {
 		try {
 			String[] params = StringUtils.split( text );
 
