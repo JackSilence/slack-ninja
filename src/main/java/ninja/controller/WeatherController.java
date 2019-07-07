@@ -148,7 +148,7 @@ public class WeatherController extends BaseController {
 	public void dialog( @RequestParam( TRIGGER_ID ) String id ) {
 		String hours = json( IntStream.rangeClosed( 0, 48 ).filter( i -> i % 6 == 0 ).mapToObj( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
 
-		dialog( id, Dialog.WEATHER, DEFAULT_DIST, json( DISTRICTS.keySet().stream().map( i -> option( i, i ) ) ), hours );
+		dialog( id, Dialog.WEATHER, DEFAULT_DIST, json( DISTRICTS.keySet().stream().map( super::option ) ), hours );
 	}
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {

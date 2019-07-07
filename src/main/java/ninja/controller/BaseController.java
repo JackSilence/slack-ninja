@@ -64,6 +64,10 @@ public abstract class BaseController {
 		request.setAttribute( REQ_BODY, body );
 	}
 
+	protected Map<String, String> option( String label ) {
+		return option( label, label );
+	}
+
 	protected Map<String, String> option( String label, Object value ) {
 		return ImmutableMap.of( "label", label, "value", value.toString() );
 	}

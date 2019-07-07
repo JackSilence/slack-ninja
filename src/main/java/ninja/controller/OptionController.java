@@ -1,9 +1,9 @@
 package ninja.controller;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,31 +22,32 @@ public class OptionController extends BaseController {
 	@Autowired
 	private Bus bus;
 
-	@PostMapping( "/option" )
-	public Map<String, List<?>> option( String payload ) {
+	@PostMapping( "/options" )
+	public Map<String, List<?>> options( String payload ) {
 		Payload message = Gson.from( payload, Payload.class );
+
+		String id = message.getId(), value = message.getValue();
 
 		check( "dialog_suggestion", message.getType(), payload );
 
-		check( Dialog.BUS.name(), message.getId(), payload );
+		if ( Dialog.BUS.name().equals( id ) ) {
+			if ( !bus.check( value ) ) {
+				return options( Stream.empty() );
+			}
 
-		check( "stop", message.getName(), payload );
+			List<Map<String, ?>> info = bus.call( "DisplayStopOfRoute", Filter.and( Filter.ROUTE.eq( value ), Filter.DIRECTION.eq( "0" ) ) );
 
-		String route = message.getValue();
+			return options( info.isEmpty() ? Stream.empty() : bus.stops( info.get( 0 ), bus::stop ).map( i -> option( i, String.join( "%20", value, i, DIALOG ) ) ) );
 
-		if ( !bus.check( route ) ) {
-			return options( Collections.EMPTY_LIST );
+		} else if ( Dialog.STATION.name().equals( id ) ) {
+			return options( bus.call( "Station", Filter.STATION.contains( value ), "$select=StationName" ).stream().map( bus::station ).map( super::option ) );
+
+		} else {
+			throw new IllegalArgumentException( payload );
 		}
-
-		List<Map<String, ?>> info = bus.call( "DisplayStopOfRoute", Filter.and( Filter.ROUTE.eq( route ), Filter.DIRECTION.eq( "0" ) ) );
-
-		return options( info.isEmpty() ? info : bus.stops( info.get( 0 ), bus::stop ).map( i -> {
-			return option( i, String.join( "%20", route, i, DIALOG ) );
-
-		} ).collect( Collectors.toList() ) );
 	}
 
-	private Map<String, List<?>> options( List<?> options ) {
-		return ImmutableMap.of( "options", options );
+	private Map<String, List<?>> options( Stream<?> options ) {
+		return ImmutableMap.of( "options", options.collect( Collectors.toList() ) );
 	}
 }

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public enum Dialog {
-	WEATHER( "district", "hours" ), BUS( "stop" );
+	WEATHER( "district", "hours" ), BUS( "stop" ), STATION( "start", "end" );
 
 	private final String[] key;
 
