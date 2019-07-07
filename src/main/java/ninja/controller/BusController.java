@@ -41,7 +41,7 @@ public class BusController extends BaseController {
 	}
 
 	@Override
-	public void preHandle( HttpServletRequest request ) {
+	protected void preHandle( HttpServletRequest request ) {
 		if ( request.getParameter( "text" ).isEmpty() ) {
 			dialog( request.getParameter( TRIGGER_ID ), EnumUtils.getEnumIgnoreCase( Dialog.class, StringUtils.remove( request.getRequestURI(), "/" ) ) );
 
