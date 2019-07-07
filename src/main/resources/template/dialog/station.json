@@ -1,7 +1,6 @@
 {
 	"callback_id": "STATION",
 	"title": "台北市公車路線查詢",
-	"state": "dialog",
 	"elements": [
 		{
 			"label": "起站名稱",
