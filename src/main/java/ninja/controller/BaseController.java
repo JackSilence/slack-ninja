@@ -33,7 +33,7 @@ import ninja.util.Slack;
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	protected static final String REQ_BODY = "req_body", TRIGGER_ID = "trigger_id", DIALOG = "dialog";
+	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id", DIALOG = "dialog";
 
 	protected static final ZoneId ZONE_ID = ZoneId.of( "Asia/Taipei" );
 
@@ -58,7 +58,7 @@ public abstract class BaseController {
 		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
 
 		check( signature, digest, String.join( "!=", signature, digest ) );
-
+		log.info( body );
 		request.setAttribute( REQ_BODY, body );
 	}
 
@@ -92,6 +92,9 @@ public abstract class BaseController {
 		return call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
 	}
 
+	// protected String command() {
+	//
+	// }
 	protected SlackField field( String title, String value ) {
 		return new SlackField().setShorten( true ).setTitle( title ).setValue( value );
 	}

@@ -83,7 +83,7 @@ public class BusController extends BaseController {
 	}
 
 	@PostMapping( "/station" )
-	public String station( @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
+	public String station( @RequestParam( CHANNEL_ID ) String channel, @RequestParam( "user_name" ) String user, @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
 		try {
 			String[] params = StringUtils.split( text );
 
