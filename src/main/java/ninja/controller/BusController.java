@@ -7,10 +7,10 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,12 +40,10 @@ public class BusController extends BaseController {
 	public void ex() {
 	}
 
-	@ModelAttribute
-	public void dialog( @RequestParam String text, @RequestParam( TRIGGER_ID ) String id, HttpServletRequest request ) {
-		if ( text.isEmpty() ) {
-			log.info( request.getPathInfo() );
-			log.info( request.getRequestURI() );
-			dialog( id, Dialog.BUS );
+	@Override
+	public void preHandle( HttpServletRequest request ) {
+		if ( request.getParameter( "text" ).isEmpty() ) {
+			dialog( request.getParameter( TRIGGER_ID ), EnumUtils.getEnumIgnoreCase( Dialog.class, StringUtils.remove( request.getRequestURI(), "/" ) ) );
 
 			throw new SlackException( null );
 		}
@@ -54,7 +52,6 @@ public class BusController extends BaseController {
 	@PostMapping( "/bus" )
 	public String bus( @RequestParam String command, @RequestParam String text ) {
 		try {
-			log.info( "qqqqqqqqqq" );
 			String[] params = Arrays.copyOf( params = StringUtils.split( text ), Math.max( params.length, 3 ) );
 
 			check( params.length == 3, "參數個數有誤: " + text );

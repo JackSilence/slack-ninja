@@ -62,6 +62,8 @@ public abstract class BaseController {
 		check( signature, digest, String.join( "!=", signature, digest ) );
 
 		request.setAttribute( REQ_BODY, body );
+
+		preHandle( request );
 	}
 
 	protected Map<String, String> option( String label ) {
@@ -106,6 +108,9 @@ public abstract class BaseController {
 		String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
 
 		log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, id, DIALOG, String.format( template, args ) ) ) );
+	}
+
+	protected void preHandle( HttpServletRequest request ) {
 	}
 
 	protected void command( String user, String channel, String command, String text ) {
