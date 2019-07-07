@@ -109,7 +109,7 @@ public class BusController extends BaseController {
 
 			check( info.keySet().size() == 2, "查無起站或訖站: " + text );
 
-			Sets.intersection( info.get( start ), info.get( end ) ).parallelStream().forEach( i -> command( user, channel, "bus", i + "%20" + start ) );
+			Sets.intersection( info.get( start ), info.get( end ) ).parallelStream().forEach( i -> command( user, channel, "bus", text( i, start ) ) );
 
 			return message( Slack.message( Slack.attachment(), command, text ) );
 

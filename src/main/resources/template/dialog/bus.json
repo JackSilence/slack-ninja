@@ -1,6 +1,7 @@
 {
 	"callback_id": "BUS",
 	"title": "台北市公車動態查詢",
+	"state": "dialog",
 	"elements": [
 		{
 			"label": "站牌名稱",

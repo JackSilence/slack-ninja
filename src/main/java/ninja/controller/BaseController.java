@@ -100,6 +100,10 @@ public abstract class BaseController {
 		return call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
 	}
 
+	protected String text( String... args ) {
+		return String.join( "%20", args );
+	}
+
 	protected SlackField field( String title, String value ) {
 		return new SlackField().setShorten( true ).setTitle( title ).setValue( value );
 	}
