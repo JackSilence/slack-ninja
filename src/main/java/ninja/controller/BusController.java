@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
 import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackException;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Dialog;
 import ninja.consts.Filter;
@@ -34,19 +36,22 @@ public class BusController extends BaseController {
 	@Autowired
 	private Bus bus;
 
-	@ModelAttribute
-	public String dialog( @RequestParam String text, @RequestParam( TRIGGER_ID ) String id, HttpServletRequest request ) {
+	@ExceptionHandler( SlackException.class )
+	public String ex() {
 		return StringUtils.EMPTY;
+	}
+
+	@ModelAttribute
+	public void dialog( @RequestParam String text, @RequestParam( TRIGGER_ID ) String id, HttpServletRequest request ) {
+		if ( text.isEmpty() ) {
+			dialog( id, Dialog.BUS );
+
+			throw new SlackException( null );
+		}
 	}
 
 	@PostMapping( "/bus" )
 	public String bus( @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
-		if ( text.isEmpty() ) {
-			dialog( id, Dialog.BUS );
-
-			return StringUtils.EMPTY;
-		}
-
 		try {
 			String[] params = Arrays.copyOf( params = StringUtils.split( text ), Math.max( params.length, 3 ) );
 
@@ -91,12 +96,6 @@ public class BusController extends BaseController {
 
 	@PostMapping( "/station" )
 	public String station( @RequestParam( CHANNEL_ID ) String channel, @RequestParam( "user_name" ) String user, @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
-		if ( text.isEmpty() ) {
-			dialog( id, Dialog.STATION );
-
-			return StringUtils.EMPTY;
-		}
-
 		try {
 			String[] params = StringUtils.split( text );
 
