@@ -83,6 +83,12 @@ public class BusController extends BaseController {
 
 	@PostMapping( "/station" )
 	public String station( @RequestParam( CHANNEL_ID ) String channel, @RequestParam( "user_name" ) String user, @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
+		if ( text.isEmpty() ) {
+			dialog( id, Dialog.STATION );
+
+			return StringUtils.EMPTY;
+		}
+
 		try {
 			String[] params = StringUtils.split( text );
 
