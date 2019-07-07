@@ -38,6 +38,8 @@ public class TaskController extends BaseController {
 
 		Assert.notNull( type, payload );
 
+		log.info( "State: " + message.getState() ); // 目前是dialog有設state就會收到
+
 		String id = message.getId(), command, text = StringUtils.EMPTY;
 
 		if ( Type.INTERACTIVE_MESSAGE.equals( type ) ) {
@@ -60,7 +62,7 @@ public class TaskController extends BaseController {
 
 			Assert.notEmpty( submission, payload );
 
-			text = text( Dialog.valueOf( command = id ).text( submission ), StringUtils.defaultString( message.getState() ) );
+			text = Dialog.valueOf( command = id ).text( submission );
 		}
 
 		command( message.getUser().getName(), message.getChannel().getId(), command.toLowerCase(), text );
