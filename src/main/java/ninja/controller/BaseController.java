@@ -33,7 +33,7 @@ import ninja.util.Slack;
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id", DIALOG = "dialog";
+	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id", ASTERISK = "*";
 
 	protected static final ZoneId ZONE_ID = ZoneId.of( "Asia/Taipei" );
 
@@ -54,7 +54,7 @@ public abstract class BaseController {
 	@ModelAttribute
 	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, @RequestBody String body, HttpServletRequest request ) {
 		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
-
+		log.info( body );
 		check( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
 
 		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
@@ -100,8 +100,8 @@ public abstract class BaseController {
 		return call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
 	}
 
-	protected String text( String... args ) {
-		return String.join( "%20", args );
+	protected String text( String route, String stop ) {
+		return String.join( "%20", route, stop, ASTERISK );
 	}
 
 	protected SlackField field( String title, String value ) {
@@ -111,7 +111,7 @@ public abstract class BaseController {
 	protected void dialog( String id, Dialog dialog, Object... args ) {
 		String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
 
-		log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, id, DIALOG, String.format( template, args ) ) ) );
+		log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, id, "dialog", String.format( template, args ) ) ) );
 	}
 
 	protected void preHandle( HttpServletRequest request ) {
