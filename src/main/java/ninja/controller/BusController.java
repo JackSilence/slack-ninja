@@ -5,8 +5,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +33,11 @@ public class BusController extends BaseController {
 
 	@Autowired
 	private Bus bus;
+
+	@ModelAttribute
+	public String dialog( @RequestParam String text, @RequestParam( TRIGGER_ID ) String id, HttpServletRequest request ) {
+		return StringUtils.EMPTY;
+	}
 
 	@PostMapping( "/bus" )
 	public String bus( @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
