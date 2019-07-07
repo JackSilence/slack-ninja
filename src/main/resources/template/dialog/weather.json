@@ -1,7 +1,6 @@
 {
 	"callback_id": "WEATHER",
 	"title": "台北市天氣查詢",
-	"state": "An optional string that will be echoed back to your app when a user interacts with your dialog.",
 	"elements": [
 		{
 			"label": "行政區",
