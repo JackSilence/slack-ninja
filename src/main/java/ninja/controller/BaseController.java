@@ -54,8 +54,7 @@ public abstract class BaseController {
 	@ModelAttribute
 	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, @RequestBody String body, HttpServletRequest request ) {
 		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
-		log.info( timestamp );
-		log.info( body );
+
 		check( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
 
 		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
