@@ -92,7 +92,9 @@ public abstract class BaseController {
 	}
 
 	protected String get( String method, String token, String channel, String query ) {
-		return call( Request.Get( uri( method ) + String.format( API_QUERY, token, channel ) + query ) );
+		String uri = uri( method ) + String.format( API_QUERY, token, channel ) + query;
+		log.info( uri );
+		return call( Request.Get( uri ) );
 	}
 
 	protected String post( String method, Object src ) {
