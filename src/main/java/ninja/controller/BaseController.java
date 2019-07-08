@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.net.UrlEscapers;
 
 import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
@@ -102,7 +103,7 @@ public abstract class BaseController {
 	}
 
 	protected String text( String route, String stop ) {
-		return String.join( "%20", route, StringUtils.wrap( stop, QUOTE ) );
+		return String.join( StringUtils.SPACE, route, StringUtils.wrap( stop, QUOTE ) );
 	}
 
 	protected SlackField field( String title, String value ) {
@@ -119,8 +120,9 @@ public abstract class BaseController {
 	}
 
 	protected void command( String user, String channel, String command, String text ) {
-		// 使用legacy token執行command, 只有對應的帳號才會看到return message
-		log.info( get( COMMAND_METHOD, System.getenv( "slack.legacy.token." + user ), channel, String.format( COMMAND_QUERY, command, text ) ) );
+		String query = String.format( COMMAND_QUERY, command, UrlEscapers.urlFragmentEscaper().escape( text ) );
+
+		log.info( get( COMMAND_METHOD, System.getenv( "slack.legacy.token." + user ), channel, query ) );
 	}
 
 	protected void check( String expected, String actual, String message ) {
