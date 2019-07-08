@@ -64,7 +64,7 @@ public class Bus {
 		String u = String.format( API_URL, method, URLEncoder.encode( filter ), String.join( "&", query ) );
 		try {
 			Request request2 = Request.Get( uri ).addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
-
+			log.info( "u: " + u );
 		} catch ( Exception e ) {
 			log.info( "uuu: " + u );
 		}
