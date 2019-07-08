@@ -1,12 +1,12 @@
 package ninja.controller;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +52,13 @@ public class BusController extends BaseController {
 	@PostMapping( "/bus" )
 	public String bus( @RequestParam String command, @RequestParam String text ) {
 		try {
-			String[] params = Arrays.copyOf( params = StringUtils.split( text ), Math.max( params.length, 3 ) );
+			String[] params = ( params = StringUtils.split( text ) ).length == 1 ? ArrayUtils.add( params, StringUtils.EMPTY ) : params;
 
-			check( params.length == 3, "參數個數有誤: " + text );
+			check( params.length == 2, "參數個數有誤: " + text );
 
-			String route = params[ 0 ], stop = params[ 1 ], source = params[ 2 ], filter;
+			String route = params[ 0 ], stop = params[ 1 ], unwrap = StringUtils.unwrap( stop, QUOTE ), filter;
 
-			check( bus.check( route ) && StringUtils.equalsAny( source, null, AT ), "參數有誤: " + text );
+			check( bus.check( route ), "查無路線: " + route );
 
 			Map<String, ?> info = bus.call( "Route", filter = Filter.ROUTE.eq( route ) ).get( 0 ); // 原則上不可能拿不到
 
@@ -68,11 +68,11 @@ public class BusController extends BaseController {
 
 			SlackMessage message = Slack.message( attachment, command, text );
 
-			if ( stop == null ) {
+			if ( stop.isEmpty() ) {
 				return message( message );
 			}
 
-			filter = Filter.and( filter, AT.equals( source ) ? Filter.STOP.eq( stop ) : Filter.STOP.contains( stop ), Filter.DIRECTION.le( "1" ) );
+			filter = Filter.and( filter, stop.equals( unwrap ) ? Filter.STOP.contains( stop ) : Filter.STOP.eq( unwrap ), Filter.DIRECTION.le( "1" ) );
 
 			bus.call( "EstimatedTimeOfArrival", filter, "$orderby=Direction" ).stream().collect( Collectors.groupingBy( bus::stop, Collectors.toList() ) ).forEach( ( k, v ) -> {
 				message.addAttachments( Slack.attachment().setText( ":busstop:" + k ).setColor( "good" ).setFields( v.stream().map( i -> {

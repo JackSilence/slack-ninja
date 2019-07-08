@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.HmacAlgorithms;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ import ninja.util.Slack;
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id", AT = "@";
+	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id", QUOTE = "\"";
 
 	protected static final ZoneId ZONE_ID = ZoneId.of( "Asia/Taipei" );
 
@@ -101,7 +102,7 @@ public abstract class BaseController {
 	}
 
 	protected String text( String route, String stop ) {
-		return String.join( "%20", route, stop, AT );
+		return String.join( "%20", route, StringUtils.wrap( stop, QUOTE ) );
 	}
 
 	protected SlackField field( String title, String value ) {
