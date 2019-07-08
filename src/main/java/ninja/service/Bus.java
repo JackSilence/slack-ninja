@@ -1,5 +1,6 @@
 package ninja.service;
 
+import java.net.URLEncoder;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -60,6 +61,13 @@ public class Bus {
 
 		Request request = Request.Get( uri ).addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
 
+		String u = String.format( API_URL, method, URLEncoder.encode( filter ), String.join( "&", query ) );
+		try {
+			Request request2 = Request.Get( uri ).addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
+
+		} catch ( Exception e ) {
+			log.info( "uuu: " + u );
+		}
 		return Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<?>>() {
 		}.getType() );
 	}
