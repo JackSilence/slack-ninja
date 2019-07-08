@@ -1,8 +1,5 @@
 package ninja.controller;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -92,9 +89,7 @@ public abstract class BaseController {
 	}
 
 	protected String get( String method, String token, String channel, String query ) {
-		String uri = uri( method ) + String.format( API_QUERY, token, channel ) + query;
-		log.info( uri );
-		return call( Request.Get( uri ) );
+		return call( Request.Get( uri( method ) + String.format( API_QUERY, token, channel ) + query ) );
 	}
 
 	protected String post( String method, Object src ) {
@@ -125,13 +120,7 @@ public abstract class BaseController {
 	}
 
 	protected void command( String user, String channel, String command, String text ) {
-		String query = "";
-		try {
-			query = String.format( COMMAND_QUERY, command, URLEncoder.encode( text, StandardCharsets.UTF_8.name() ) );
-		} catch ( UnsupportedEncodingException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String query = String.format( COMMAND_QUERY, command, UrlEscapers.urlFragmentEscaper().escape( text ) );
 
 		log.info( get( COMMAND_METHOD, System.getenv( "slack.legacy.token." + user ), channel, query ) );
 	}
