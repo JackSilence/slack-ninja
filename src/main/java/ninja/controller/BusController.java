@@ -102,7 +102,7 @@ public class BusController extends BaseController {
 
 			String start = params[ 0 ], end = params[ 1 ], filter = Filter.or( Filter.STATION.eq( start ), Filter.STATION.eq( end ) );
 
-			check( !start.equals( end ), "起訖站不得重複: " + text );
+			check( !start.equals( end ), "起訖站不得重複: " + start );
 
 			Map<String, Set<String>> info = bus.call( "Station", filter ).stream().collect( Collectors.toMap( bus::station, i -> {
 				return bus.stops( i, j -> bus.name( j, "RouteName" ) ).collect( Collectors.toSet() );
