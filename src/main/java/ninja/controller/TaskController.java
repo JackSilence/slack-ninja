@@ -67,8 +67,4 @@ public class TaskController extends BaseController {
 
 		command( message.getUser().getName(), message.getChannel().getId(), command.toLowerCase(), text );
 	}
-
-	private <E extends Enum<E>> void check( Class<E> expected, String actual, String payload ) {
-		check( EnumUtils.isValidEnum( expected, actual ), payload );
-	}
 }

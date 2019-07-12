@@ -10,7 +10,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -103,7 +102,7 @@ public class BusController extends BaseController {
 
 			String start = params[ 0 ], end = params[ 1 ], filter = Filter.or( Filter.STATION.eq( start ), Filter.STATION.eq( end ) );
 
-			Assert.isTrue( !start.equals( end ), "起訖站不得重複: " + text );
+			check( !start.equals( end ), "起訖站不得重複: " + text );
 
 			Map<String, Set<String>> info = bus.call( "Station", filter ).stream().collect( Collectors.toMap( bus::station, i -> {
 				return bus.stops( i, j -> bus.name( j, "RouteName" ) ).collect( Collectors.toSet() );

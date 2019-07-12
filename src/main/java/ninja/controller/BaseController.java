@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.HmacAlgorithms;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
@@ -123,6 +124,10 @@ public abstract class BaseController {
 		String query = String.format( COMMAND_QUERY, command, UrlEscapers.urlFragmentEscaper().escape( text ) );
 
 		log.info( get( COMMAND_METHOD, System.getenv( "slack.legacy.token." + user ), channel, query ) );
+	}
+
+	protected <E extends Enum<E>> void check( Class<E> expected, String actual, String message ) {
+		check( EnumUtils.isValidEnum( expected, actual ), message );
 	}
 
 	protected void check( String expected, String actual, String message ) {
