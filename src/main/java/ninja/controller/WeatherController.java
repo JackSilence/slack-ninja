@@ -33,14 +33,13 @@ import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
-import ninja.consts.Dialog;
 import ninja.util.Cast;
 import ninja.util.Gson;
 import ninja.util.Slack;
 
 @RestController
 @RequestMapping( "/weather" )
-public class WeatherController extends BaseController {
+public class WeatherController extends DialogController {
 	private static final String API_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-061";
 
 	private static final String WEB_URL = "https://www.cwb.gov.tw/V8/C/W/Town/Town.html?TID=", TITLE = "台北市%s天氣預報", DELIMITER = "。";
@@ -73,6 +72,13 @@ public class WeatherController extends BaseController {
 
 	@Value( "${cwb.icon.url:}" )
 	private String url;
+
+	@Override
+	protected Object[] args() {
+		String hours = json( IntStream.rangeClosed( 0, 48 ).filter( i -> i % 6 == 0 ).mapToObj( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
+
+		return ArrayUtils.toArray( DEFAULT_DIST, json( DISTRICTS.keySet().stream().map( super::option ) ), hours );
+	}
 
 	@PostMapping
 	public String weather( @RequestParam String command, @RequestParam String text ) {
@@ -142,13 +148,6 @@ public class WeatherController extends BaseController {
 			return e.getMessage();
 
 		}
-	}
-
-	@PostMapping( "/dialog" )
-	public void dialog( @RequestParam( TRIGGER_ID ) String id ) {
-		String hours = json( IntStream.rangeClosed( 0, 48 ).filter( i -> i % 6 == 0 ).mapToObj( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
-
-		dialog( id, Dialog.WEATHER, DEFAULT_DIST, json( DISTRICTS.keySet().stream().map( super::option ) ), hours );
 	}
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {

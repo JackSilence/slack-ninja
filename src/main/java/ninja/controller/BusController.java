@@ -4,13 +4,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,35 +15,20 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
 import net.gpedro.integrations.slack.SlackAttachment;
-import net.gpedro.integrations.slack.SlackException;
 import net.gpedro.integrations.slack.SlackMessage;
-import ninja.consts.Dialog;
 import ninja.consts.Filter;
 import ninja.service.Bus;
 import ninja.util.Cast;
 import ninja.util.Slack;
 
 @RestController
-public class BusController extends BaseController {
+public class BusController extends DialogController {
 	private static final String WEB_URL = "https://ebus.gov.taipei/EBus/VsSimpleMap?routeid=%s&gb=0";
 
 	private static final Map<Double, String> STATUS = ImmutableMap.of( 1d, "尚未發車", 2d, "交管不停靠", 3d, "末班車已過", 4d, "今日未營運" );
 
 	@Autowired
 	private Bus bus;
-
-	@ExceptionHandler( SlackException.class )
-	public void ex() {
-	}
-
-	@Override
-	protected void preHandle( HttpServletRequest request ) {
-		if ( request.getParameter( "text" ).isEmpty() ) {
-			dialog( request.getParameter( TRIGGER_ID ), EnumUtils.getEnumIgnoreCase( Dialog.class, StringUtils.remove( request.getRequestURI(), "/" ) ) );
-
-			throw new SlackException( null );
-		}
-	}
 
 	@PostMapping( "/bus" )
 	public String bus( @RequestParam String command, @RequestParam String text ) {

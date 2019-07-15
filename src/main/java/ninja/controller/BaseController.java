@@ -28,7 +28,6 @@ import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
-import ninja.consts.Dialog;
 import ninja.util.Gson;
 import ninja.util.Signature;
 import ninja.util.Slack;
@@ -45,8 +44,6 @@ public abstract class BaseController {
 	private static final String VERSION = "v0", API_URL = "https://slack.com/api/", API_QUERY = "?token=%s&channel=%s";
 
 	private static final String COMMAND_METHOD = "chat.command", COMMAND_QUERY = "&command=/%s&text=%s";
-
-	private static final String DIALOG_TEMPLATE = "/template/dialog/%s.json";
 
 	@Value( "${slack.signing.secret:}" )
 	private String secret;
@@ -109,12 +106,6 @@ public abstract class BaseController {
 
 	protected SlackField field( String title, String value ) {
 		return new SlackField().setShorten( true ).setTitle( title ).setValue( value );
-	}
-
-	protected void dialog( String id, Dialog dialog, Object... args ) {
-		String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
-
-		log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, id, "dialog", String.format( template, args ) ) ) );
 	}
 
 	protected void preHandle( HttpServletRequest request ) {
