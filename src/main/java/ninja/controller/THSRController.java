@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
-import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.service.THSR;
 import ninja.util.Cast;
@@ -31,7 +30,7 @@ import ninja.util.Slack;
 public class THSRController extends DialogController {
 	private static final String PATH = "DailyTimetable/OD/%s/to/%s/%s", TITLE = "高鐵時刻表與票價查詢";
 
-	private static final String URL = "https://m.thsrc.com.tw/tw/TimeTable/%s/";
+	private static final String LINK = "https://m.thsrc.com.tw/tw/TimeTable/SearchResult";
 
 	private static final Map<String, String> STATIONS = new LinkedHashMap<>();
 
@@ -73,16 +72,17 @@ public class THSRController extends DialogController {
 
 			Way way = check( Way.class, params[ 4 ], "方向有誤: " + text );
 
-			SlackMessage message = Slack.message( Slack.attachment().setTitle( TITLE ).setTitleLink( link( "SearchResult" ) ), command, text );
+			SlackMessage message = Slack.message( Slack.attachment().setTitle( TITLE ).setTitleLink( LINK ), command, text );
 
 			String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
 
-			return message( message.setAttachments( thsr.call( String.format( PATH, start, end, date ), filter, order, "$top=4" ).stream().map( i -> {
-				SlackAttachment attach = attachment( Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) );
+			thsr.call( String.format( PATH, start, end, date ), filter, order, "$top=4" ).stream().forEach( i -> {
+				SlackAttachment attach = Slack.attachment( "good" ).addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
-				return attach.setColor( "good" ).addFields( field( i, Way.DEPARTURE ) ).addFields( field( i, Way.ARRIVAL ) );
+				message.addAttachments( attach.addFields( field( "行車時間", String.join( " - ", time( i, Way.DEPARTURE ), time( i, Way.ARRIVAL ) ) ) ) );
+			} );
 
-			} ).collect( Collectors.toList() ) ) );
+			return message( message );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
@@ -96,22 +96,14 @@ public class THSRController extends DialogController {
 		return checkNull( STATIONS.get( station ), "查無此站: " + station );
 	}
 
-	private String link( String path ) {
-		return String.format( URL, path );
-	}
-
 	private String join( String... elements ) {
 		return String.join( StringUtils.SPACE, elements );
 	}
 
-	private SlackAttachment attachment( String train ) {
-		return Slack.attachment().setTitle( ":bullettrain_front:" + train ).setTitleLink( link( "TrainInfo" ) + train );
-	}
-
-	private SlackField field( Map<String, ?> map, Way way ) {
+	private String time( Map<String, ?> map, Way way ) {
 		String[] fields = way.field.split( "/" );
 
-		return super.field( way.text, Cast.string( Cast.map( map, fields[ 0 ] ), fields[ 1 ] ) );
+		return Cast.string( Cast.map( map, fields[ 0 ] ), fields[ 1 ] );
 	}
 
 	private List<String> dates() {

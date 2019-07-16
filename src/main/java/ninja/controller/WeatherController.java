@@ -127,13 +127,13 @@ public class WeatherController extends DialogController {
 
 				String title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點";
 
-				SlackAttachment attach = Slack.attachment().setAuthorName( title ).setAuthorIcon( image.get( start ) );
+				SlackAttachment attach = Slack.attachment( color ).setAuthorName( title ).setAuthorIcon( image.get( start ) );
 
 				attach.addFields( super.field( "溫度 / 體感", data[ 2 ].substring( 4, 6 ) + " / " + at.get( start ) + "˚C" ) );
 
 				attach.addFields( super.field( "舒適度", ci ) ).addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
 
-				message.addAttachments( attach.setText( data[ 0 ] + DELIMITER + wind ).setColor( color ) );
+				message.addAttachments( attach.setText( data[ 0 ] + DELIMITER + wind ) );
 			} );
 
 			return message( message );

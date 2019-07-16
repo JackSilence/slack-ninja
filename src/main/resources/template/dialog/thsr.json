@@ -31,10 +31,10 @@
 			"options": %4$s
 		},
 		{
-			"label": " ",
+			"label": "行程",
 			"type": "select",
 			"name": "way",
-			"placeholder": "請選擇",
+			"placeholder": "請選擇行程",
 			"options": %5$s
 		}
 	]

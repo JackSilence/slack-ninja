@@ -16,6 +16,10 @@ public class Slack {
 		return new SlackAttachment( StringUtils.EMPTY );
 	}
 
+	public static SlackAttachment attachment( String color ) {
+		return attachment().setColor( color );
+	}
+
 	private static SlackAttachment footer( SlackAttachment attach, String command, String text ) {
 		return attach.setFooter( String.format( "%s %s", command, text ) ).setFooterIcon( ICON );
 	}
