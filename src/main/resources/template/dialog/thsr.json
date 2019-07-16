@@ -20,22 +20,25 @@
 			"label": "日期",
 			"type": "select",
 			"name": "date",
+			"value": "%3$s",
 			"placeholder": "請選擇日期",
-			"options": %3$s
+			"options": %4$s
 		},
 		{
 			"label": "時間",
 			"type": "select",
 			"name": "time",
+			"value": "%5$s",
 			"placeholder": "請選擇時間",
-			"options": %4$s
+			"options": %6$s
 		},
 		{
 			"label": "行程",
 			"type": "select",
 			"name": "way",
+			"value": "%7$s",
 			"placeholder": "請選擇行程",
-			"options": %5$s
+			"options": %8$s
 		}
 	]
 }

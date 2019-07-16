@@ -1,11 +1,11 @@
 package ninja.controller;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalUnit;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,12 +36,11 @@ public class THSRController extends DialogController {
 	private static final Map<String, String> STATIONS = new LinkedHashMap<>();
 
 	private enum Way {
-		DEPARTURE( "出發", "OriginStopTime/DepartureTime", "ge", "asc" ), ARRIVAL( "抵達", "DestinationStopTime/ArrivalTime", "le", "desc" );
+		出發( "OriginStopTime/DepartureTime", "ge", "asc" ), 抵達( "DestinationStopTime/ArrivalTime", "le", "desc" );
 
-		private final String text, field, operator, order;
+		private final String field, operator, order;
 
-		private Way( String text, String field, String operator, String order ) {
-			this.text = text;
+		private Way( String field, String operator, String order ) {
 			this.field = field;
 			this.operator = operator;
 			this.order = order;
@@ -50,11 +50,14 @@ public class THSRController extends DialogController {
 	@Autowired
 	private THSR thsr;
 
+	@SuppressWarnings( "unchecked" )
 	@Override
 	protected Object[] args() {
-		String way = json( Arrays.stream( Way.values() ).map( i -> option( i.text, i.ordinal() ) ) );
+		String way = options( EnumUtils.getEnumMap( Way.class ).keySet() );
 
-		return ArrayUtils.toArray( TITLE, options( STATIONS.keySet() ), options( dates() ), options( times() ), way );
+		LocalDateTime time = ( time = LocalDateTime.now( ZONE_ID ) ).truncatedTo( ChronoUnit.HOURS ).plusMinutes( 30 * Math.round( time.getMinute() / 30d ) );
+
+		return ArrayUtils.toArray( TITLE, options( STATIONS.keySet() ), time.toLocalDate(), options( dates() ), time.toLocalTime(), options( times() ), Way.出發, way );
 	}
 
 	@PostMapping( "/thsr" )
@@ -70,7 +73,7 @@ public class THSRController extends DialogController {
 
 			check( dates().contains( date ) && times().contains( time ), "時間有誤: " + text );
 
-			Way way = check( Way.class, "DEPARTURE", "行程有誤: " + text );
+			Way way = check( Way.class, params[ 4 ], "行程有誤: " + text );
 
 			SlackMessage message = Slack.message( Slack.attachment().setTitle( TITLE ).setTitleLink( LINK ), command, text );
 
@@ -79,7 +82,7 @@ public class THSRController extends DialogController {
 			thsr.call( String.format( PATH, start, end, date ), filter, order, "$top=4" ).stream().forEach( i -> {
 				SlackAttachment attach = Slack.attachment( "good" ).addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
-				message.addAttachments( attach.addFields( field( "行車時間", String.join( " - ", time( i, Way.DEPARTURE ), time( i, Way.ARRIVAL ) ) ) ) );
+				message.addAttachments( attach.addFields( field( "行車時間", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) ) );
 			} );
 
 			return message( message );
