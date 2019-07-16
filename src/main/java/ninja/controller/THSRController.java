@@ -52,7 +52,7 @@ public class THSRController extends DialogController {
 
 	@Override
 	protected Object[] args() {
-		String way = json( Arrays.stream( Way.values() ).map( i -> option( i.text, i.name() ) ) );
+		String way = json( Arrays.stream( Way.values() ).map( i -> option( i.text, i.ordinal() ) ) );
 
 		return ArrayUtils.toArray( TITLE, options( STATIONS.keySet() ), options( dates() ), options( times() ), way );
 	}
@@ -70,7 +70,7 @@ public class THSRController extends DialogController {
 
 			check( dates().contains( date ) && times().contains( time ), "時間有誤: " + text );
 
-			Way way = check( Way.class, params[ 4 ], "方向有誤: " + text );
+			Way way = check( Way.class, "DEPARTURE", "行程有誤: " + text );
 
 			SlackMessage message = Slack.message( Slack.attachment().setTitle( TITLE ).setTitleLink( LINK ), command, text );
 
