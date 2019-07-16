@@ -31,7 +31,7 @@
 			"options": %4$s
 		},
 		{
-			"label": "",
+			"label": " ",
 			"type": "select",
 			"name": "way",
 			"placeholder": "請選擇",

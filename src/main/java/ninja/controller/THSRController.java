@@ -75,7 +75,7 @@ public class THSRController extends DialogController {
 
 			SlackMessage message = Slack.message( Slack.attachment().setTitle( TITLE ).setTitleLink( link( "SearchResult" ) ), command, text );
 
-			String filter = join( StringUtils.SPACE, way.field, way.operator, time ), order = join( way.field, way.order );
+			String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
 
 			return message( message.setAttachments( thsr.call( String.format( PATH, start, end, date ), filter, order, "$top=4" ).stream().map( i -> {
 				SlackAttachment attach = attachment( Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) );
