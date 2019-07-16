@@ -31,7 +31,7 @@ import ninja.util.Slack;
 public class THSRController extends DialogController {
 	private static final String PATH = "DailyTimetable/OD/%s/to/%s/%s", TITLE = "高鐵時刻表與票價查詢";
 
-	private static final String URL = "https://m.thsrc.com.tw/tw/TimeTable/%s/", SEARCH = "SearchResult", INFO = "TrainInfo";
+	private static final String URL = "https://m.thsrc.com.tw/tw/TimeTable/%s/";
 
 	private static final Map<String, String> STATIONS = new LinkedHashMap<>();
 
@@ -73,7 +73,7 @@ public class THSRController extends DialogController {
 
 			Way way = check( Way.class, params[ 4 ], "方向有誤: " + text );
 
-			SlackMessage message = Slack.message( Slack.attachment().setTitle( TITLE ).setTitleLink( String.format( URL, SEARCH ) ), command, text );
+			SlackMessage message = Slack.message( Slack.attachment().setTitle( TITLE ).setTitleLink( link( "SearchResult" ) ), command, text );
 
 			String filter = join( StringUtils.SPACE, way.field, way.operator, time ), order = join( way.field, way.order );
 
@@ -96,12 +96,16 @@ public class THSRController extends DialogController {
 		return checkNull( STATIONS.get( station ), "查無此站: " + station );
 	}
 
+	private String link( String path ) {
+		return String.format( URL, path );
+	}
+
 	private String join( String... elements ) {
 		return String.join( StringUtils.SPACE, elements );
 	}
 
 	private SlackAttachment attachment( String train ) {
-		return Slack.attachment().setTitle( ":bullettrain_front:" + train ).setTitleLink( String.format( URL, INFO ) + train );
+		return Slack.attachment().setTitle( ":bullettrain_front:" + train ).setTitleLink( link( "TrainInfo" ) + train );
 	}
 
 	private SlackField field( Map<String, ?> map, Way way ) {
@@ -124,6 +128,6 @@ public class THSRController extends DialogController {
 
 	@PostConstruct
 	private void init() {
-		thsr.call( "Station", StringUtils.EMPTY ).forEach( i -> STATIONS.put( thsr.station( i ), Cast.string( i, "StationID" ) ) );
+		thsr.call( "Station" ).forEach( i -> STATIONS.put( thsr.station( i ), Cast.string( i, "StationID" ) ) );
 	}
 }
