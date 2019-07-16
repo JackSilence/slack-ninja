@@ -38,7 +38,7 @@ public class TaskController extends BaseController {
 
 		Assert.notNull( type, payload );
 
-		log.info( "State: " + message.getState() ); // 目前是dialog有設state就會收到
+		log.info( "Payload: {}, state: {}", payload, message.getState() ); // 目前是dialog有設state就會收到
 
 		String id = message.getId(), command, text = StringUtils.EMPTY;
 
