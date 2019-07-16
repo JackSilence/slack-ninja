@@ -61,7 +61,7 @@ public abstract class BaseController {
 		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
 
 		check( signature, digest, String.join( "!=", signature, digest ) );
-log.info( body );
+
 		request.setAttribute( REQ_BODY, body );
 
 		preHandle( request );

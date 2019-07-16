@@ -90,7 +90,7 @@ public class THSRController extends DialogController {
 			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" ).forEach( i -> {
 				SlackAttachment attach = Slack.attachment( "good" ).addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
-				message.addAttachments( attach.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) ) );
+				message.addAttachments( attach.addFields( field( "時間", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) ) );
 			} );
 
 			return message( message );
