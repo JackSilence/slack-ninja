@@ -29,9 +29,9 @@ import ninja.util.Slack;
 
 @RestController
 public class THSRController extends DialogController {
-	private static final String PATH = "DailyTimetable/OD/%s/to/%s/%s", TITLE = "高鐵時刻表與票價查詢";
+	private static final String TIME = "DailyTimetable/OD/%s/to/%s/%s", FARE = "ODFare/%s/to/%s";
 
-	private static final String LINK = "https://m.thsrc.com.tw/tw/TimeTable/SearchResult";
+	private static final String TITLE = "高鐵時刻表與票價查詢", LINK = "https://m.thsrc.com.tw/tw/TimeTable/SearchResult";
 
 	private static final Map<String, String> STATIONS = new LinkedHashMap<>();
 
@@ -55,7 +55,7 @@ public class THSRController extends DialogController {
 	protected Object[] args() {
 		String way = options( EnumUtils.getEnumMap( Way.class ).keySet() );
 
-		LocalDateTime time = ( time = LocalDateTime.now( ZONE_ID ) ).truncatedTo( ChronoUnit.HOURS ).plusMinutes( 30 * ( int ) Math.ceil( ( time.getMinute() + 1 ) / 30d ) );
+		LocalDateTime time = ( time = LocalDateTime.now( ZONE_ID ) ).truncatedTo( ChronoUnit.HOURS ).plusMinutes( 30 * ( int ) Math.ceil( time.getMinute() / 30d ) );
 
 		return ArrayUtils.toArray( TITLE, options( STATIONS.keySet() ), time.toLocalDate(), options( dates() ), time.toLocalTime(), options( times() ), Way.出發, way );
 	}
@@ -75,11 +75,19 @@ public class THSRController extends DialogController {
 
 			Way way = check( Way.class, params[ 4 ], "行程有誤: " + text );
 
-			SlackMessage message = Slack.message( Slack.attachment().setTitle( TITLE ).setTitleLink( LINK ), command, text );
+			SlackAttachment attachment = Slack.attachment().setTitle( TITLE ).setTitleLink( LINK );
+
+			List<?> fares = Cast.list( thsr.call( String.format( FARE, start, end ) ).get( 0 ), "Fares" );
+
+			fares.stream().map( Cast::map ).sorted( ( i, j ) -> price( i ).compareTo( price( j ) ) ).limit( 2 ).forEach( i -> {
+				attachment.addFields( field( Cast.string( i, "TicketType" ), price( i ).toString() ) );
+			} );
+
+			SlackMessage message = Slack.message( attachment, command, text );
 
 			String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
 
-			thsr.call( String.format( PATH, start, end, date ), filter, order, "$top=4" ).stream().forEach( i -> {
+			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" ).forEach( i -> {
 				SlackAttachment attach = Slack.attachment( "good" ).addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
 				message.addAttachments( attach.addFields( field( "行車時間", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) ) );
@@ -107,6 +115,10 @@ public class THSRController extends DialogController {
 		String[] fields = way.field.split( "/" );
 
 		return Cast.string( Cast.map( map, fields[ 0 ] ), fields[ 1 ] );
+	}
+
+	private Integer price( Map<?, ?> map ) {
+		return ( Integer ) map.get( "Price" );
 	}
 
 	private List<String> dates() {
