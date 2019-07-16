@@ -56,13 +56,11 @@ public class TaskController extends BaseController {
 			check( Task.class, command = action.getValue(), payload );
 
 		} else {
-			check( Dialog.class, id, payload );
-
 			Map<String, String> submission = message.getSubmission();
 
 			Assert.notEmpty( submission, payload );
 
-			text = Dialog.valueOf( command = id ).text( submission );
+			text = check( Dialog.class, command = id, payload ).text( submission );
 		}
 
 		command( message.getUser().getName(), message.getChannel().getId(), command.toLowerCase(), text );

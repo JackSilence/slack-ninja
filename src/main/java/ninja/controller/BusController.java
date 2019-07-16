@@ -45,9 +45,9 @@ public class BusController extends DialogController {
 
 			String departure = Cast.string( info, "DepartureStopNameZh" ), destination = Cast.string( info, "DestinationStopNameZh" );
 
-			SlackAttachment attachment = Slack.attachment().setTitle( route + "公車動態" ).setTitleLink( String.format( WEB_URL, bus.id( route ) ) );
+			SlackAttachment attach = Slack.attachment().setTitle( route + "公車動態" ).setTitleLink( String.format( WEB_URL, bus.id( route ) ) );
 
-			SlackMessage message = Slack.message( attachment, command, text );
+			SlackMessage message = Slack.message( attach, command, text );
 
 			if ( stop.isEmpty() ) {
 				return message( message );

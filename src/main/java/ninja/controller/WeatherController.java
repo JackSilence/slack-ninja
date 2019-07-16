@@ -9,16 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Collector;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
-import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,9 +71,9 @@ public class WeatherController extends DialogController {
 
 	@Override
 	protected Object[] args() {
-		String hours = json( IntStream.rangeClosed( 0, 48 ).filter( i -> i % 6 == 0 ).mapToObj( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
+		String hours = json( iterate( 0, i -> i + 6, 9 ).map( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
 
-		return ArrayUtils.toArray( DEFAULT_DIST, json( DISTRICTS.keySet().stream().map( super::option ) ), hours );
+		return ArrayUtils.toArray( DEFAULT_DIST, options( DISTRICTS.keySet() ), hours );
 	}
 
 	@PostMapping
@@ -162,10 +158,6 @@ public class WeatherController extends DialogController {
 
 	private String time( ZonedDateTime time ) {
 		return time.toLocalDateTime() + ":00";
-	}
-
-	private String json( Stream<Map<String, String>> stream ) {
-		return stream.collect( Collector.of( JSONArray::new, JSONArray::put, JSONArray::put ) ).toString();
 	}
 
 	private int hour( String time ) {

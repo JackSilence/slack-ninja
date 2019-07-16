@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -117,16 +118,20 @@ public abstract class BaseController {
 		log.info( get( COMMAND_METHOD, System.getenv( "slack.legacy.token." + user ), channel, query ) );
 	}
 
-	protected <E extends Enum<E>> void check( Class<E> expected, String actual, String message ) {
-		check( EnumUtils.isValidEnum( expected, actual ), message );
-	}
-
 	protected void check( String expected, String actual, String message ) {
 		check( expected.equals( actual ), message );
 	}
 
 	protected void check( boolean expression, String message ) {
 		Assert.isTrue( expression, message );
+	}
+
+	protected <E extends Enum<E>> E check( Class<E> type, String name, String message ) {
+		return checkNull( EnumUtils.getEnum( type, name ), message );
+	}
+
+	protected <T> T checkNull( T value, String message ) {
+		return Optional.ofNullable( value ).orElseThrow( () -> new IllegalArgumentException( message ) );
 	}
 
 	private String digest( String content ) {

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 public enum Dialog {
-	WEATHER( "district", "hours" ), BUS( "stop" ), STATION( "start", "end" );
+	WEATHER( "district", "hours" ), BUS( "stop" ), STATION( "start", "end" ), THSR( "start", "end", "date", "time", "way" );
 
 	private final String[] key;
 

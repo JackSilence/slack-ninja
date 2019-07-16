@@ -1,0 +1,41 @@
+{
+	"callback_id": "THSR",
+	"title": "%1$s",
+	"elements": [
+		{
+			"label": "出發站",
+			"type": "select",
+			"name": "start",
+			"placeholder": "請選擇出發站",
+			"options": %2$s
+		},
+		{
+			"label": "到達站",
+			"type": "select",
+			"name": "end",
+			"placeholder": "請選擇到達站",
+			"options": %2$s
+		},
+		{
+			"label": "日期",
+			"type": "select",
+			"name": "date",
+			"placeholder": "請選擇日期",
+			"options": %3$s
+		},
+		{
+			"label": "時間",
+			"type": "select",
+			"name": "time",
+			"placeholder": "請選擇時間",
+			"options": %4$s
+		},
+		{
+			"label": "",
+			"type": "select",
+			"name": "way",
+			"placeholder": "請選擇",
+			"options": %5$s
+		}
+	]
+}
