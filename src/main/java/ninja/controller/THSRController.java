@@ -117,8 +117,8 @@ public class THSRController extends DialogController {
 		return Cast.string( Cast.map( map, fields[ 0 ] ), fields[ 1 ] );
 	}
 
-	private Integer price( Map<?, ?> map ) {
-		return ( Integer ) map.get( "Price" );
+	private Double price( Map<?, ?> map ) {
+		return ( Double ) map.get( "Price" );
 	}
 
 	private List<String> dates() {
