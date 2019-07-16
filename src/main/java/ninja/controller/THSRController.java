@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.service.THSR;
 import ninja.util.Cast;
@@ -80,7 +81,7 @@ public class THSRController extends DialogController {
 			List<?> fares = Cast.list( thsr.call( String.format( FARE, start, end ) ).get( 0 ), "Fares" );
 
 			fares.stream().map( Cast::map ).sorted( ( i, j ) -> price( i ).compareTo( price( j ) ) ).limit( 2 ).forEach( i -> {
-				attachment.addFields( field( Cast.string( i, "TicketType" ), price( i ).toString() ) );
+				attachment.addFields( field( Cast.string( i, "TicketType" ), price( i ) ) );
 			} );
 
 			SlackMessage message = Slack.message( attachment, command, text );
@@ -119,6 +120,10 @@ public class THSRController extends DialogController {
 
 	private Double price( Map<?, ?> map ) {
 		return ( Double ) map.get( "Price" );
+	}
+
+	private SlackField field( String title, Double value ) {
+		return super.field( title + ( title.contains( "自由" ) ? "座" : StringUtils.EMPTY ) + "車廂", "$" + value.intValue() );
 	}
 
 	private List<String> dates() {
