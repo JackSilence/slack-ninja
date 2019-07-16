@@ -55,7 +55,7 @@ public class THSRController extends DialogController {
 	protected Object[] args() {
 		String way = options( EnumUtils.getEnumMap( Way.class ).keySet() );
 
-		LocalDateTime time = ( time = LocalDateTime.now( ZONE_ID ) ).truncatedTo( ChronoUnit.HOURS ).plusMinutes( 30 * ( int ) Math.ceil( time.getMinute() / 30d ) );
+		LocalDateTime time = ( time = LocalDateTime.now( ZONE_ID ) ).truncatedTo( ChronoUnit.HOURS ).plusMinutes( 30 * ( int ) Math.ceil( ( time.getMinute() + 1 ) / 30d ) );
 
 		return ArrayUtils.toArray( TITLE, options( STATIONS.keySet() ), time.toLocalDate(), options( dates() ), time.toLocalTime(), options( times() ), Way.出發, way );
 	}
