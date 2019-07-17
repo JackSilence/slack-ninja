@@ -14,7 +14,6 @@ import com.google.common.net.UrlEscapers;
 
 import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.util.Cast;
 import ninja.util.Gson;
 import ninja.util.Slack;
@@ -25,7 +24,7 @@ public class AQIController extends BaseController {
 
 	private static final String FILTER = "County eq '臺北市' and SiteName eq '%s'", DEFAULT_SITE = "松山";
 
-	private static final String AQI = "空氣品質指標AQI: %s (%s)", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw";
+	private static final String TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
 
 	private static final Map<String, String> TITLES = new LinkedHashMap<>(), UNITS = new HashMap<>();
 
@@ -54,15 +53,15 @@ public class AQIController extends BaseController {
 
 			Map<?, ?> info = checkNull( Cast.map( Gson.list( json ).stream().findFirst().orElse( null ) ), "測站有誤: " + text );
 
-			String aqi = String.format( AQI, info.get( "AQI" ), info.get( "Status" ) );
+			String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA );
 
-			SlackMessage message = Slack.message( Slack.attachment().setText( aqi ).setTitle( TITLE ).setTitleLink( LINK ), command, text );
+			SlackAttachment attach = Slack.attachment().setTitle( TITLE ).setTitleLink( LINK );
 
-			SlackAttachment attach = Slack.attachment( "good" );
+			attach.addFields( field( "空氣品質指標", aqi ) ).addFields( field( "狀態", Cast.string( info, "Status" ) ) );
 
-			TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), Cast.string( info, i ) + UNITS.get( i ) ) ) );
+			TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
 
-			return message( message.addAttachments( attach ) );
+			return message( Slack.message( attach, command, text ).addAttachments( attach ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
@@ -70,5 +69,9 @@ public class AQIController extends BaseController {
 			return e.getMessage();
 
 		}
+	}
+
+	private String value( String value, String unit ) {
+		return StringUtils.isEmpty( StringUtils.remove( value, "-" ) ) ? NA : value + unit;
 	}
 }
