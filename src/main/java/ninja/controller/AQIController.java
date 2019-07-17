@@ -19,7 +19,7 @@ import ninja.util.Slack;
 
 @RestController
 public class AQIController extends BaseController {
-	private static final String URL = "https://opendata.epa.gov.tw/ws/Data/AQI/?$format=json&$filter=";
+	private static final String URL = "http://opendata.epa.gov.tw/ws/Data/AQI/?$format=json&$filter=";
 
 	private static final String FILTER = "County eq '臺北市' and SiteName eq '%s'", DEFAULT_SITE = "松山";
 
