@@ -57,7 +57,7 @@ public class AQIController extends BaseController {
 
 			color = "良好".equals( status ) ? "good" : "普通".equals( status ) ? "warning" : "設備維護".equals( status ) ? "#3AA3E3" : "danger";
 
-			SlackAttachment attach = Slack.attachment( color ).setTitle( TITLE ).setTitleLink( LINK );
+			SlackAttachment attach = Slack.attachment( color ).setText( StringUtils.EMPTY ).setTitle( TITLE ).setTitleLink( LINK );
 
 			attach.addFields( field( "AQI指標", aqi ) ).addFields( field( "狀態", Cast.string( info, "Status" ) ) );
 

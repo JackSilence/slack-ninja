@@ -12,7 +12,7 @@ public class AQI extends Task {
 	@Autowired
 	private AQIController aqi;
 
-	@Scheduled( cron = "0 0 * * * *" )
+	@Scheduled( cron = "0 30 * * * *" )
 	@Override
 	public void exec() {
 		exec( aqi.aqi( COMMAND, StringUtils.EMPTY ) );
