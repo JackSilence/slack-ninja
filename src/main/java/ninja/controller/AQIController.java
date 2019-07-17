@@ -1,5 +1,6 @@
 package ninja.controller;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -24,19 +25,24 @@ public class AQIController extends BaseController {
 
 	private static final String FILTER = "County eq '臺北市' and SiteName eq '%s'", DEFAULT_SITE = "松山";
 
-	private static final String TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw";
+	private static final String AQI = "空氣品質指標AQI: %s (%s)", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw";
 
-	private static final Map<String, String> TITLES = new LinkedHashMap<>();
+	private static final Map<String, String> TITLES = new LinkedHashMap<>(), UNITS = new HashMap<>();
 
 	static {
 		TITLES.put( "PM2.5", "細懸浮微粒" );
-		TITLES.put( "PM2.5_AVG", "平均 (μg/m3)" );
 		TITLES.put( "PM10", "懸浮微粒" );
-		TITLES.put( "PM10_AVG", "平均 (μg/m3)" );
 		TITLES.put( "O3", "臭氧" );
-		TITLES.put( "O3_8hr", "平均 (ppb)" );
 		TITLES.put( "CO", "一氧化碳" );
-		TITLES.put( "CO_8hr", "平均 (ppm)" );
+		TITLES.put( "SO2", "一氧化碳" );
+		TITLES.put( "NO2", "二氧化氮" );
+
+		UNITS.put( "PM2.5", " μg/m3" );
+		UNITS.put( "PM10", " μg/m3" );
+		UNITS.put( "O3", " ppb" );
+		UNITS.put( "CO", " ppm" );
+		UNITS.put( "SO2", " ppb" );
+		UNITS.put( "NO2", " ppb" );
 	}
 
 	@PostMapping( "/aqi" )
@@ -48,11 +54,13 @@ public class AQIController extends BaseController {
 
 			Map<?, ?> info = checkNull( Cast.map( Gson.list( json ).stream().findFirst().orElse( null ) ), "測站有誤: " + text );
 
-			SlackMessage message = Slack.message( Slack.attachment().setTitle( TITLE ).setTitleLink( LINK ), command, text );
+			String aqi = String.format( AQI, info.get( "AQI" ), info.get( "Status" ) );
+
+			SlackMessage message = Slack.message( Slack.attachment().setText( aqi ).setTitle( TITLE ).setTitleLink( LINK ), command, text );
 
 			SlackAttachment attach = Slack.attachment( "good" );
 
-			TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), Cast.string( info, i ) ) ) );
+			TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), Cast.string( info, i ) + UNITS.get( i ) ) ) );
 
 			return message( message.addAttachments( attach ) );
 
