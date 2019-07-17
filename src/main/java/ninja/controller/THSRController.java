@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.service.THSR;
 import ninja.util.Cast;
 import ninja.util.Slack;
@@ -67,9 +66,9 @@ public class THSRController extends DialogController {
 
 			check( params.length == 5, "參數個數有誤: " + text );
 
-			String start = params[ 0 ], end = params[ 1 ], date = params[ 2 ], time = params[ 3 ], title = format( start, end );
+			String start = id( params[ 0 ] ), end = id( params[ 1 ] ), date = params[ 2 ], time = params[ 3 ];
 
-			check( !( start = id( start ) ).equals( end = id( end ) ), "起訖站不得重複: " + text );
+			check( !start.equals( end ), "起訖站不得重複: " + text );
 
 			check( dates().contains( date ) && times().contains( time ), "時間有誤: " + text );
 
@@ -88,10 +87,10 @@ public class THSRController extends DialogController {
 			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" ).forEach( i -> {
 				attach2.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
-				attach2.addFields( field( title, format( time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
+				attach2.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
 			} );
 
-			return message( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach1.setText( join( date, time, way.name() ) ) ).addAttachments( attach2 ) );
+			return message( Slack.message( attach1, command, text ).addAttachments( attach2 ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
@@ -107,10 +106,6 @@ public class THSRController extends DialogController {
 
 	private String join( String... elements ) {
 		return String.join( StringUtils.SPACE, elements );
-	}
-
-	private String format( String start, String end ) {
-		return String.format( "%s - %s", start, end );
 	}
 
 	private String time( Map<String, ?> map, Way way ) {
