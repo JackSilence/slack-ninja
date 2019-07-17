@@ -36,12 +36,12 @@ public class AQIController extends BaseController {
 		TITLES.put( "SO2", "二氧化硫" );
 		TITLES.put( "NO2", "二氧化氮" );
 
-		UNITS.put( "PM2.5", " μg/m3" );
-		UNITS.put( "PM10", " μg/m3" );
-		UNITS.put( "O3", " ppb" );
-		UNITS.put( "CO", " ppm" );
-		UNITS.put( "SO2", " ppb" );
-		UNITS.put( "NO2", " ppb" );
+		UNITS.put( "PM2.5", "μg/m3" );
+		UNITS.put( "PM10", "μg/m3" );
+		UNITS.put( "O3", "ppb" );
+		UNITS.put( "CO", "ppm" );
+		UNITS.put( "SO2", "ppb" );
+		UNITS.put( "NO2", "ppb" );
 	}
 
 	@PostMapping( "/aqi" )
@@ -74,6 +74,6 @@ public class AQIController extends BaseController {
 	}
 
 	private String value( String value, String unit ) {
-		return StringUtils.isEmpty( StringUtils.remove( value, "-" ) ) ? NA : value + unit;
+		return StringUtils.isEmpty( StringUtils.remove( value, "-" ) ) ? NA : String.join( StringUtils.SPACE, value, unit );
 	}
 }
