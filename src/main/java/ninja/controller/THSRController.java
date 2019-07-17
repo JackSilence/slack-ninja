@@ -85,13 +85,13 @@ public class THSRController extends DialogController {
 
 			String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
 
-			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=6" ).forEach( i -> {
+			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=11" ).forEach( i -> {
 				attach2.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
 				attach2.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
 			} );
 
-			return message( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach1 ).addAttachments( attach2 ) );
+			return message( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach1 ).addAttachments( footer(attach2,command,text) ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
@@ -100,7 +100,9 @@ public class THSRController extends DialogController {
 
 		}
 	}
-
+	private  SlackAttachment footer( SlackAttachment attach, String command, String text ) {
+		return attach.setFooter( String.format( "%s %s", command, text ) ).setFooterIcon( "\"https://platform.slack-edge.com/img/default_application_icon.png\"" );
+	}
 	private String id( String station ) {
 		return checkNull( STATIONS.get( station ), "查無此站: " + station );
 	}
