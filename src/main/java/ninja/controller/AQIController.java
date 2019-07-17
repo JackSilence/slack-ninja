@@ -63,7 +63,7 @@ public class AQIController extends BaseController {
 
 			TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
 
-			return message( Slack.message( attach, command, text ).addAttachments( attach ) );
+			return message( Slack.message( attach, command, text ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
