@@ -26,16 +26,14 @@ public class AQIController extends BaseController {
 	private static final Map<String, String> TITLES = new LinkedHashMap<>();
 
 	static {
-		TITLES.put( "PM2.5", "細懸浮微粒 (μg/m3)" );
-		TITLES.put( "PM2.5_AVG", "移動平均" );
-		TITLES.put( "PM10", "懸浮微粒 (μg/m3)" );
-		TITLES.put( "PM10_AVG", "移動平均" );
-		TITLES.put( "O3", "臭氧 (ppb)" );
-		TITLES.put( "O3_8hr", "8小時移動平均" );
-		TITLES.put( "CO", "一氧化碳 (ppm)" );
-		TITLES.put( "CO_8hr", "8小時移動平均" );
-		TITLES.put( "SO2", "一氧化碳 (ppb)" );
-		TITLES.put( "NO2", "二氧化氮 (ppb)" );
+		TITLES.put( "PM2.5", "細懸浮微粒" );
+		TITLES.put( "PM2.5_AVG", "平均 (μg/m3)" );
+		TITLES.put( "PM10", "懸浮微粒" );
+		TITLES.put( "PM10_AVG", "平均 (μg/m3)" );
+		TITLES.put( "O3", "臭氧" );
+		TITLES.put( "O3_8hr", "平均 (ppb)" );
+		TITLES.put( "CO", "一氧化碳" );
+		TITLES.put( "CO_8hr", "平均 (ppm)" );
 	}
 
 	@PostMapping( "/aqi" )
