@@ -67,9 +67,9 @@ public class THSRController extends DialogController {
 
 			check( params.length == 5, "參數個數有誤: " + text );
 
-			String start = id( params[ 0 ] ), end = id( params[ 1 ] ), date = params[ 2 ], time = params[ 3 ];
+			String start = params[ 0 ], end = params[ 1 ], date = params[ 2 ], time = params[ 3 ], title = format( start, end );
 
-			check( !start.equals( end ), "起訖站不得重複: " + text );
+			check( !( start = id( start ) ).equals( end = id( end ) ), "起訖站不得重複: " + text );
 
 			check( dates().contains( date ) && times().contains( time ), "時間有誤: " + text );
 
@@ -85,13 +85,13 @@ public class THSRController extends DialogController {
 
 			String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
 
-			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=5" ).forEach( i -> {
+			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" ).forEach( i -> {
 				attach2.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
-				attach2.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
+				attach2.addFields( field( title, format( time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
 			} );
 
-			return message( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach1 ).addAttachments( footer(attach2,command,text) ) );
+			return message( new SlackMessage( StringUtils.substringAfter( text, end ) ).addAttachments( attach1 ).addAttachments( attach2 ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
@@ -100,15 +100,17 @@ public class THSRController extends DialogController {
 
 		}
 	}
-	private  SlackAttachment footer( SlackAttachment attach, String command, String text ) {
-		return attach.setFooter( String.format( "%s %s", command, text ) ).setFooterIcon( "\"https://platform.slack-edge.com/img/default_application_icon.png\"" );
-	}
+
 	private String id( String station ) {
 		return checkNull( STATIONS.get( station ), "查無此站: " + station );
 	}
 
 	private String join( String... elements ) {
 		return String.join( StringUtils.SPACE, elements );
+	}
+
+	private String format( String start, String end ) {
+		return String.format( "%s - %s", start, end );
 	}
 
 	private String time( Map<String, ?> map, Way way ) {
