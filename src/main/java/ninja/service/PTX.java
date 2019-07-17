@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.google.common.net.UrlEscapers;
-import com.google.gson.reflect.TypeToken;
 
 import magic.util.Utils;
 import ninja.util.Cast;
@@ -46,8 +45,7 @@ public abstract class PTX {
 
 		Request request = Request.Get( uri ).addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
 
-		return Gson.from( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ), new TypeToken<List<?>>() {
-		}.getType() );
+		return Gson.list( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ) );
 	}
 
 	public String station( Map<?, ?> map ) {
