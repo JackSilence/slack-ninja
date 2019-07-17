@@ -51,7 +51,9 @@ public class DelController extends BaseController {
 				log.info( response );
 			}
 
-			return message( new SlackAttachment( title ).setTitle( title ).setText( String.format( TEXT, message.size(), success ) ), command, text );
+			SlackAttachment attach = new SlackAttachment( title + "\n訊息刪除通知" ).setTitle( title );
+
+			return message( attach.setText( String.format( TEXT, message.size(), success ) ), command, text );
 
 		} catch ( RuntimeException e ) {
 			return e.getMessage();

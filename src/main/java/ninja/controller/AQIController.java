@@ -46,7 +46,7 @@ public class AQIController extends BaseController {
 
 	@PostMapping( "/aqi" )
 	public String aqi( @RequestParam String command, @RequestParam String text ) {
-		String url = URL + String.format( FILTER, StringUtils.defaultIfEmpty( text, DEFAULT_SITE ) );
+		String site = StringUtils.defaultIfEmpty( text, DEFAULT_SITE ), url = URL + String.format( FILTER, site );
 
 		try {
 			String json = Utils.getEntityAsString( Request.Get( UrlEscapers.urlFragmentEscaper().escape( url ) ) );
@@ -63,7 +63,7 @@ public class AQIController extends BaseController {
 
 			TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
 
-			return message( Slack.message( attach, command, text ) );
+			return message( Slack.message( attach.setFallback( String.format( "%s測站AQI: %s", site, aqi ) ), command, text ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
