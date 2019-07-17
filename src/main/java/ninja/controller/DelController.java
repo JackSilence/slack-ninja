@@ -33,7 +33,7 @@ public class DelController extends BaseController {
 
 			LocalDate date = days == null ? LocalDate.parse( text ) : LocalDate.now( ZONE_ID ).minusDays( days );
 
-			String title = date.toString(), query = String.format( QUERY, epochSecond( date ), epochSecond( date.plusDays( 1 ) ) ), txt;
+			String title = date.toString(), query = String.format( QUERY, epochSecond( date ), epochSecond( date.plusDays( 1 ) ) );
 
 			log.info( "Date: {}, query: {}", date, query );
 
@@ -51,7 +51,9 @@ public class DelController extends BaseController {
 				log.info( response );
 			}
 
-			return message( new SlackAttachment( txt = String.format( TEXT, message.size(), success ) ).setTitle( title ).setText( txt ), command, text );
+			String txt = String.format( TEXT, message.size(), success );
+
+			return message( new SlackAttachment( title + "\n" + txt ).setTitle( title ).setText( txt ), command, text );
 
 		} catch ( RuntimeException e ) {
 			return e.getMessage();
