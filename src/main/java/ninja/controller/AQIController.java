@@ -34,7 +34,7 @@ public class AQIController extends BaseController {
 		TITLES.put( "PM10", "懸浮微粒" );
 		TITLES.put( "O3", "臭氧" );
 		TITLES.put( "CO", "一氧化碳" );
-		TITLES.put( "SO2", "一氧化碳" );
+		TITLES.put( "SO2", "二氧化硫" );
 		TITLES.put( "NO2", "二氧化氮" );
 
 		UNITS.put( "PM2.5", " μg/m3" );

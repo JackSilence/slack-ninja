@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.service.THSR;
 import ninja.util.Cast;
 import ninja.util.Slack;
@@ -75,25 +74,23 @@ public class THSRController extends DialogController {
 
 			Way way = check( Way.class, params[ 4 ], "行程有誤: " + text );
 
-			SlackAttachment attachment = Slack.attachment().setTitle( TITLE ).setTitleLink( LINK );
+			SlackAttachment attach = Slack.attachment().setTitle( TITLE ).setTitleLink( LINK );
 
 			List<?> fares = Cast.list( thsr.call( String.format( FARE, start, end ) ).get( 0 ), "Fares" );
 
 			fares.stream().map( Cast::map ).sorted( ( i, j ) -> price( i ).compareTo( price( j ) ) ).limit( 2 ).forEach( i -> {
-				attachment.addFields( field( Cast.string( i, "TicketType" ), "$" + price( i ).intValue() ) );
+				attach.addFields( field( Cast.string( i, "TicketType" ), "$" + price( i ).intValue() ) );
 			} );
-
-			SlackMessage message = Slack.message( attachment, command, text );
 
 			String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
 
 			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" ).forEach( i -> {
-				SlackAttachment attach = Slack.attachment( "good" ).addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
+				attach.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
-				message.addAttachments( attach.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) ) );
+				attach.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
 			} );
 
-			return message( message );
+			return message( Slack.message( attach, command, text ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
