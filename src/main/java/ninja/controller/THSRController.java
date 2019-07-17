@@ -91,7 +91,7 @@ public class THSRController extends DialogController {
 				attach2.addFields( field( title, format( time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
 			} );
 
-			return message( new SlackMessage( join( date, time, way.name() ) ).addAttachments( attach1 ).addAttachments( attach2 ) );
+			return message( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach1.setText( join( date, time, way.name() ) ) ).addAttachments( attach2 ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
