@@ -74,23 +74,23 @@ public class THSRController extends DialogController {
 
 			Way way = check( Way.class, params[ 4 ], "行程有誤: " + text );
 
-			SlackAttachment attach = Slack.attachment().setTitle( TITLE ).setTitleLink( LINK );
+			SlackAttachment first = Slack.attachment().setTitle( TITLE ).setTitleLink( LINK ), second = Slack.attachment( "good" );
 
 			List<?> fares = Cast.list( thsr.call( String.format( FARE, start, end ) ).get( 0 ), "Fares" );
 
 			fares.stream().map( Cast::map ).sorted( ( i, j ) -> price( i ).compareTo( price( j ) ) ).limit( 2 ).forEach( i -> {
-				attach.addFields( field( Cast.string( i, "TicketType" ), "$" + price( i ).intValue() ) );
+				first.addFields( field( Cast.string( i, "TicketType" ), "$" + price( i ).intValue() ) );
 			} );
 
 			String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
 
 			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" ).forEach( i -> {
-				attach.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
+				second.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
-				attach.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
+				second.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
 			} );
 
-			return message( Slack.message( attach, command, text ) );
+			return message( Slack.message( first, command, text ).addAttachments( second ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
