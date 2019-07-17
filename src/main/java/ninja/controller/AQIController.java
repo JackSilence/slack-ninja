@@ -53,11 +53,13 @@ public class AQIController extends BaseController {
 
 			Map<?, ?> info = checkNull( Cast.map( Gson.list( json ).stream().findFirst().orElse( null ) ), "測站有誤: " + text );
 
-			String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA );
+			String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA ), status = Cast.string( info, "Status" ), color;
 
-			SlackAttachment attach = Slack.attachment().setTitle( TITLE ).setTitleLink( LINK );
+			color = "良好".equals( status ) ? "good" : "普通".equals( status ) ? "warning" : "設備維護".equals( status ) ? "#3AA3E3" : "danger";
 
-			attach.addFields( field( "空氣品質指標", aqi ) ).addFields( field( "狀態", Cast.string( info, "Status" ) ) );
+			SlackAttachment attach = Slack.attachment( color ).setTitle( TITLE ).setTitleLink( LINK );
+
+			attach.addFields( field( "AQI指標", aqi ) ).addFields( field( "狀態", Cast.string( info, "Status" ) ) );
 
 			TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
 
