@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.service.THSR;
 import ninja.util.Cast;
 import ninja.util.Slack;
@@ -84,13 +85,13 @@ public class THSRController extends DialogController {
 
 			String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
 
-			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" ).forEach( i -> {
+			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=6" ).forEach( i -> {
 				attach2.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
 				attach2.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
 			} );
 
-			return message( Slack.message( attach1, command, text ).addAttachments( attach2 ) );
+			return message( new SlackMessage( StringUtils.EMPTY ).addAttachments( attach1 ).addAttachments( attach2 ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
