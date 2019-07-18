@@ -41,7 +41,7 @@ public class OptionController extends BaseController {
 		if ( Type.INTERACTIVE_MESSAGE.equals( type ) && AQI.ID.equals( id ) ) {
 			Filter county = Filter.COUNTY, site = Filter.SITE_NAME;
 
-			return options( AQI.call( Filter.or( county.contains( value ), site.contains( value ) ) ).stream().map( i -> {
+			return options( AQI.call( county.eq( value ) ).stream().map( i -> {
 				return option( String.join( StringUtils.SPACE, Cast.string( i, county.toString() ), Cast.string( i, site.toString() ) ) );
 			} ) );
 		}
