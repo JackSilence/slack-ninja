@@ -5,14 +5,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Filter;
-import ninja.service.AQI;
+import ninja.util.AQI;
 import ninja.util.Cast;
 import ninja.util.Slack;
 
@@ -37,9 +36,6 @@ public class AQIController extends BaseController {
 		UNITS.put( "SO2", "ppb" );
 		UNITS.put( "NO2", "ppb" );
 	}
-
-	@Autowired
-	private AQI AQI;
 
 	@PostMapping( "/aqi" )
 	public String aqi( @RequestParam String command, @RequestParam String text ) {
