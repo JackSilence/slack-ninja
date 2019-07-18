@@ -69,7 +69,7 @@ public class MetroController extends BaseController {
 	}
 
 	private String find( String name ) {
-		return checkNull( STATIONS.get( StringUtils.removeEnd( name, "站" ) ), "查無此站: " + name );
+		return checkNull( STATIONS.get( name ), "查無此站: " + name );
 	}
 
 	private Element row( Element table, int index ) {
