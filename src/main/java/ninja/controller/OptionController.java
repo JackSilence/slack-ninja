@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,10 +22,6 @@ import ninja.util.Gson;
 
 @RestController
 public class OptionController extends BaseController {
-	private enum Type {
-		DIALOG_SUGGESTION, INTERACTIVE_MESSAGE;
-	}
-
 	@Autowired
 	private Bus bus;
 
@@ -34,33 +29,36 @@ public class OptionController extends BaseController {
 	public Map<String, List<?>> options( String payload ) {
 		Payload message = Gson.from( payload, Payload.class );
 
-		Type type = checkNull( EnumUtils.getEnumIgnoreCase( Type.class, message.getType() ), payload );
-
 		String id = message.getId(), value = message.getValue();
 
-		if ( Type.INTERACTIVE_MESSAGE.equals( type ) && AQI.ID.equals( id ) ) {
-			Filter county = Filter.COUNTY, site = Filter.SITE_NAME;
+		check( "dialog_suggestion", message.getType(), payload );
 
-			return options( AQI.call( county.eq( value ) ).stream().map( i -> {
-				return String.join( StringUtils.SPACE, Cast.string( i, county.toString() ), Cast.string( i, site.toString() ) );
-			} ).map( i -> ImmutableMap.of( "text", i, "value", i ) ) );
-		}
-
-		if ( Dialog.BUS.name().equals( id ) ) {
+		if ( equals( Dialog.BUS, id ) ) {
 			if ( !bus.check( value ) ) {
 				return options( Stream.empty() );
 			}
 
 			List<Map<String, ?>> info = bus.call( "DisplayStopOfRoute", Filter.and( Filter.ROUTE.eq( value ), Filter.DIRECTION.eq( "0" ) ) );
 
-			return options( bus.stops( info.get( 0 ), bus::stop ).map( i -> option( i, text( value, i ) ) ) );
+			return options( info.isEmpty() ? Stream.empty() : bus.stops( info.get( 0 ), bus::stop ).map( i -> option( i, text( value, i ) ) ) );
 
-		} else if ( Dialog.STATION.name().equals( id ) ) {
+		} else if ( equals( Dialog.STATION, id ) ) {
 			return options( bus.call( "Station", Filter.STATION.contains( value ), "$select=StationName" ).stream().map( bus::station ).distinct().map( super::option ) );
+
+		} else if ( equals( Dialog.AQI, id ) ) {
+			Filter county = Filter.COUNTY, site = Filter.SITE_NAME;
+
+			return options( AQI.call( county.eq( value ) ).stream().map( i -> {
+				return option( String.join( StringUtils.SPACE, Cast.string( i, county.toString() ), Cast.string( i, site.toString() ) ) );
+			} ) );
 
 		} else {
 			throw new IllegalArgumentException( payload );
 		}
+	}
+
+	private boolean equals( Dialog dialog, String id ) {
+		return dialog.name().equals( id );
 	}
 
 	private Map<String, List<?>> options( Stream<?> options ) {

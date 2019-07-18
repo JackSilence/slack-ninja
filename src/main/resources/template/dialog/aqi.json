@@ -1,0 +1,14 @@
+{
+	"callback_id": "AQI",
+	"title": "各縣市空氣品質概況",
+	"elements": [
+		{
+			"label": "測站名稱",
+			"type": "select",
+			"name": "site",
+			"placeholder": "輸入縣市選擇測站",
+			"data_source": "external",
+			"min_query_length": 3
+		}
+	]
+}

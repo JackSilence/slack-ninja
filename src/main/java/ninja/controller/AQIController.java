@@ -16,7 +16,7 @@ import ninja.util.Cast;
 import ninja.util.Slack;
 
 @RestController
-public class AQIController extends BaseController {
+public class AQIController extends DialogController {
 	private static final String DEFAULT = "臺北市 松山", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
 
 	private static final Map<String, String> TITLES = new LinkedHashMap<>(), UNITS = new HashMap<>();
@@ -44,7 +44,7 @@ public class AQIController extends BaseController {
 
 			check( params.length == 2, "參數個數有誤: " + text );
 
-			String filter = Filter.and( Filter.COUNTY.eq( params[ 0 ] ), Filter.SITE_NAME.eq( params[ 1 ] ) );
+			String county = params[ 0 ], site = params[ 1 ], filter = Filter.and( Filter.COUNTY.eq( county ), Filter.SITE_NAME.eq( site ) );
 
 			Map<String, ?> info = checkNull( AQI.call( filter ).stream().findFirst().orElse( null ), "測站有誤: " + text );
 
@@ -58,7 +58,7 @@ public class AQIController extends BaseController {
 
 			TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
 
-			return message( Slack.message( attach.setFallback( String.format( "%sAQI - %s", text, aqi ) ), command, text ) );
+			return message( Slack.message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
