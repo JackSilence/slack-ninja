@@ -35,7 +35,7 @@ public class MetroController extends BaseController {
 		try {
 			String[] params = StringUtils.split( text );
 
-			check( params.length == 2, "起訖站皆須輸入" );
+			check( params.length == 2, "參數個數有誤: " + text );
 
 			String start = find( params[ 0 ] ), end = find( params[ 1 ] ), url, txt;
 

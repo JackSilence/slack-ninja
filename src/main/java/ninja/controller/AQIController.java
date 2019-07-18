@@ -5,26 +5,20 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.fluent.Request;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.net.UrlEscapers;
-
-import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
+import ninja.consts.Filter;
+import ninja.service.AQI;
 import ninja.util.Cast;
-import ninja.util.Gson;
 import ninja.util.Slack;
 
 @RestController
 public class AQIController extends BaseController {
-	private static final String URL = "http://opendata.epa.gov.tw/ws/Data/AQI/?$format=json&$filter=";
-
-	private static final String FILTER = "County eq '臺北市' and SiteName eq '%s'", DEFAULT_SITE = "松山";
-
-	private static final String TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
+	private static final String DEFAULT = "臺北市 松山", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
 
 	private static final Map<String, String> TITLES = new LinkedHashMap<>(), UNITS = new HashMap<>();
 
@@ -44,14 +38,19 @@ public class AQIController extends BaseController {
 		UNITS.put( "NO2", "ppb" );
 	}
 
+	@Autowired
+	private AQI aqi;
+
 	@PostMapping( "/aqi" )
 	public String aqi( @RequestParam String command, @RequestParam String text ) {
-		String site = StringUtils.defaultIfEmpty( text, DEFAULT_SITE ), url = URL + String.format( FILTER, site );
-
 		try {
-			String json = Utils.getEntityAsString( Request.Get( UrlEscapers.urlFragmentEscaper().escape( url ) ) );
+			String[] params = StringUtils.split( StringUtils.defaultIfEmpty( text, DEFAULT ) );
 
-			Map<?, ?> info = checkNull( Cast.map( Gson.list( json ).stream().findFirst().orElse( null ) ), "測站有誤: " + text );
+			check( params.length == 2, "參數個數有誤: " + text );
+
+			String filter = Filter.and( Filter.COUNTY.eq( params[ 0 ] ), Filter.SITE_NAME.eq( params[ 1 ] ) );
+
+			Map<String, ?> info = checkNull( aqi.call( filter ).stream().findFirst().orElse( null ), "測站有誤: " + text );
 
 			String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA ), status = Cast.string( info, "Status" ), color;
 
@@ -63,7 +62,7 @@ public class AQIController extends BaseController {
 
 			TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
 
-			return message( Slack.message( attach.setFallback( String.format( "%s測站AQI: %s", site, aqi ) ), command, text ) );
+			return message( Slack.message( attach.setFallback( String.format( "%sAQI - %s", text, aqi ) ), command, text ) );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );

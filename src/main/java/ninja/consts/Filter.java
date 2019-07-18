@@ -2,8 +2,10 @@ package ninja.consts;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.base.CaseFormat;
+
 public enum Filter {
-	ROUTE( true ), STOP( true ), STATION( true ), DIRECTION( false );
+	ROUTE( true ), STOP( true ), STATION( true ), DIRECTION( false ), COUNTY( false ), SITE_NAME( false );
 
 	private static final String AND = " and ", OR = " or ";
 
@@ -35,7 +37,7 @@ public enum Filter {
 
 	@Override
 	public String toString() {
-		return StringUtils.capitalize( name().toLowerCase() ).concat( this.name ? "Name/Zh_tw" : StringUtils.EMPTY );
+		return CaseFormat.UPPER_UNDERSCORE.to( CaseFormat.UPPER_CAMEL, name() ).concat( this.name ? "Name/Zh_tw" : StringUtils.EMPTY );
 	}
 
 	private String format( String format, String keyword ) {

@@ -34,9 +34,7 @@ public class TaskController extends BaseController {
 	public void execute( String payload ) {
 		Payload message = Gson.from( payload, Payload.class );
 
-		Type type = EnumUtils.getEnumIgnoreCase( Type.class, message.getType() );
-
-		Assert.notNull( type, payload );
+		Type type = checkNull( EnumUtils.getEnumIgnoreCase( Type.class, message.getType() ), payload );
 
 		log.info( "State: " + message.getState() ); // 目前是dialog有設state就會收到
 
