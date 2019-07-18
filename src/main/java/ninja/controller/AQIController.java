@@ -39,7 +39,7 @@ public class AQIController extends BaseController {
 	}
 
 	@Autowired
-	private AQI aqi;
+	private AQI AQI;
 
 	@PostMapping( "/aqi" )
 	public String aqi( @RequestParam String command, @RequestParam String text ) {
@@ -50,7 +50,7 @@ public class AQIController extends BaseController {
 
 			String filter = Filter.and( Filter.COUNTY.eq( params[ 0 ] ), Filter.SITE_NAME.eq( params[ 1 ] ) );
 
-			Map<String, ?> info = checkNull( aqi.call( filter ).stream().findFirst().orElse( null ), "測站有誤: " + text );
+			Map<String, ?> info = checkNull( AQI.call( filter ).stream().findFirst().orElse( null ), "測站有誤: " + text );
 
 			String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA ), status = Cast.string( info, "Status" ), color;
 
