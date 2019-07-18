@@ -68,7 +68,7 @@ public class THSRController extends DialogController {
 
 			String start = id( params[ 0 ] ), end = id( params[ 1 ] ), date = params[ 2 ], time = params[ 3 ];
 
-			check( !start.equals( end ), "起訖站不得重複: " + text );
+			check( !start.equals( end ), "起訖站不得相同: " + text );
 
 			check( dates().contains( date ) && times().contains( time ), "時間有誤: " + text );
 

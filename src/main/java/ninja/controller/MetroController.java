@@ -2,8 +2,6 @@ package ninja.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
@@ -71,15 +69,7 @@ public class MetroController extends BaseController {
 	}
 
 	private String find( String name ) {
-		Optional<String> station = STATIONS.entrySet().stream().filter( i -> check( i.getKey(), name ) ).map( Entry::getValue ).findFirst();
-
-		check( station.isPresent(), "查無此站: " + name );
-
-		return station.get();
-	}
-
-	private boolean check( String key, String name ) {
-		return StringUtils.equalsAny( StringUtils.split( key )[ 1 ], name, StringUtils.removeEnd( name, "站" ) );
+		return checkNull( STATIONS.get( StringUtils.removeEnd( name, "站" ) ), "查無此站: " + name );
 	}
 
 	private Element row( Element table, int index ) {
@@ -88,6 +78,6 @@ public class MetroController extends BaseController {
 
 	@PostConstruct
 	private void init() {
-		Jsoup.select( URL, "select#sstation option", i -> STATIONS.put( i.text(), i.val() ) );
+		Jsoup.select( URL, "select#sstation option", i -> STATIONS.put( StringUtils.split( i.text() )[ 1 ], i.val() ) );
 	}
 }
