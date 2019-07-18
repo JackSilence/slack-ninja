@@ -42,6 +42,7 @@ public class OptionController extends BaseController {
 			Filter county = Filter.COUNTY, site = Filter.SITE_NAME;
 
 			return options( AQI.call( county.eq( value ) ).stream().map( i -> {
+				log.info( option( String.join( StringUtils.SPACE, Cast.string( i, county.toString() ), Cast.string( i, site.toString() ) ) ).toString() );
 				return option( String.join( StringUtils.SPACE, Cast.string( i, county.toString() ), Cast.string( i, site.toString() ) ) );
 			} ) );
 		}
