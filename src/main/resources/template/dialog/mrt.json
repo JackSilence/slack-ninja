@@ -8,7 +8,12 @@
 			"name": "start",
 			"placeholder": "輸入車站關鍵字",
 			"data_source": "external",
-			"min_query_length": 1
+			"min_query_length": 1,
+			"selected_options": [
+				{
+					"value": "葫洲"
+				}
+			]
 		},
 		{
 			"label": "訖站名稱",
