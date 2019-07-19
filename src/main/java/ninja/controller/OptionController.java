@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableMap;
 import ninja.consts.Dialog;
 import ninja.consts.Filter;
 import ninja.service.Bus;
+import ninja.service.Metro;
 import ninja.slack.Payload;
 import ninja.util.AQI;
 import ninja.util.Cast;
@@ -24,6 +25,9 @@ import ninja.util.Gson;
 public class OptionController extends BaseController {
 	@Autowired
 	private Bus bus;
+
+	@Autowired
+	private Metro metro;
 
 	@PostMapping( "/options" )
 	public Map<String, List<?>> options( String payload ) {
@@ -51,6 +55,9 @@ public class OptionController extends BaseController {
 			return options( AQI.call( county.eq( value ) ).stream().map( i -> {
 				return option( String.join( StringUtils.SPACE, Cast.string( i, county.toString() ), Cast.string( i, site.toString() ) ) );
 			} ) );
+
+		} else if ( equals( Dialog.MRT, id ) ) {
+			return options( metro.find( value ).map( super::option ) );
 
 		} else {
 			throw new IllegalArgumentException( payload );

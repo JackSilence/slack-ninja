@@ -1,0 +1,22 @@
+{
+	"callback_id": "MRT",
+	"title": "捷運票價及乘車時間",
+	"elements": [
+		{
+			"label": "起站名稱",
+			"type": "select",
+			"name": "start",
+			"placeholder": "輸入車站關鍵字",
+			"data_source": "external",
+			"min_query_length": 1
+		},
+		{
+			"label": "訖站名稱",
+			"type": "select",
+			"name": "end",
+			"placeholder": "輸入車站關鍵字",
+			"data_source": "external",
+			"min_query_length": 1
+		}
+	]
+}

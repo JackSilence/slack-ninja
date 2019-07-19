@@ -41,10 +41,6 @@ public class Bus extends PTX {
 	}
 
 	public boolean check( String route ) {
-		if ( ROUTES.isEmpty() ) {
-			init();
-		}
-
 		return ROUTES.containsKey( route );
 	}
 
