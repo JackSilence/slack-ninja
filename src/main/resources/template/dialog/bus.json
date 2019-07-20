@@ -8,7 +8,13 @@
 			"name": "stop",
 			"placeholder": "輸入路線選擇站牌",
 			"data_source": "external",
-			"min_query_length": 1
+			"min_query_length": 1,
+			"selected_options": [
+				{
+					"label": "內湖幹線",
+					"value": "內湖幹線"
+				}
+			]
 		}
 	]
 }

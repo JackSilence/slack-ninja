@@ -6,6 +6,7 @@
 			"label": "出發站",
 			"type": "select",
 			"name": "start",
+			"value": "南港",
 			"placeholder": "請選擇出發站",
 			"options": %2$s
 		},

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +36,11 @@ public class AQIController extends DialogController {
 		UNITS.put( "CO", "ppm" );
 		UNITS.put( "SO2", "ppb" );
 		UNITS.put( "NO2", "ppb" );
+	}
+
+	@Override
+	protected Object[] args() {
+		return ArrayUtils.toArray( DEFAULT );
 	}
 
 	@PostMapping( "/aqi" )

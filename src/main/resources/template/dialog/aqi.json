@@ -8,7 +8,13 @@
 			"name": "site",
 			"placeholder": "輸入縣市選擇測站",
 			"data_source": "external",
-			"min_query_length": 3
+			"min_query_length": 3,
+			"selected_options": [
+				{
+					"label": "%1$s",
+					"value": "%1$s"
+				}
+			]
 		}
 	]
 }

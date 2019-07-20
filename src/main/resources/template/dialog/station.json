@@ -8,7 +8,13 @@
 			"name": "start",
 			"placeholder": "輸入站牌關鍵字",
 			"data_source": "external",
-			"min_query_length": 2
+			"min_query_length": 2,
+			"selected_options": [
+				{
+					"label": "捷運葫洲站(康寧專校)",
+					"value": "捷運葫洲站(康寧專校)"
+				}
+			]
 		},
 		{
 			"label": "訖站名稱",
