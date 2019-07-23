@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import ninja.consts.Zone;
 import ninja.controller.WeatherController;
 
 @Service
@@ -12,7 +13,7 @@ public class Weather extends Task {
 	@Autowired
 	private WeatherController weather;
 
-	@Scheduled( cron = "0 0 4,10,16,22 * * *" )
+	@Scheduled( cron = "0 0 0,6,12,18 * * *", zone = Zone.TAIPEI )
 	@Override
 	public void exec() {
 		exec( weather.weather( COMMAND, StringUtils.EMPTY ) );

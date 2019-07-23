@@ -29,6 +29,7 @@ import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
+import ninja.consts.Zone;
 import ninja.util.Gson;
 import ninja.util.Signature;
 import ninja.util.Slack;
@@ -38,7 +39,7 @@ public abstract class BaseController {
 
 	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id", QUOTE = "\"";
 
-	protected static final ZoneId ZONE_ID = ZoneId.of( "Asia/Taipei" );
+	protected static final ZoneId ZONE_ID = ZoneId.of( Zone.TAIPEI );
 
 	private static final String HEADER_TIMESTAMP = "X-Slack-Request-Timestamp", HEADER_SIGNATURE = "X-Slack-Signature";
 
