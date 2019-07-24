@@ -6,9 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import ninja.controller.DelController;
 import ninja.controller.DialogController;
 
-@RestControllerAdvice( assignableTypes = DialogController.class )
+@RestControllerAdvice( assignableTypes = { DialogController.class, DelController.class } )
 public class Advice {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
