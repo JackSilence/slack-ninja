@@ -30,16 +30,14 @@ public abstract class DialogController extends BaseController {
 	@Override
 	protected void preHandle( HttpServletRequest request ) {
 		if ( request.getParameter( "text" ).isEmpty() ) {
-			dialog( request.getParameter( TRIGGER_ID ), EnumUtils.getEnumIgnoreCase( Dialog.class, StringUtils.remove( request.getRequestURI(), "/" ) ) );
+			Dialog dialog = EnumUtils.getEnumIgnoreCase( Dialog.class, StringUtils.remove( request.getRequestURI(), "/" ) );
+
+			String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
+
+			log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, request.getParameter( TRIGGER_ID ), "dialog", String.format( template, args() ) ) ) );
 
 			throw new SlackException( null );
 		}
-	}
-
-	protected void dialog( String id, Dialog dialog ) {
-		String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
-
-		log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, id, "dialog", String.format( template, args() ) ) ) );
 	}
 
 	protected String options( Collection<String> collection ) {
