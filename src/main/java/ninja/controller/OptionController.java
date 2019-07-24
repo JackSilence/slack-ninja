@@ -37,35 +37,32 @@ public class OptionController extends BaseController {
 
 		check( "dialog_suggestion", message.getType(), payload );
 
-		if ( equals( Dialog.BUS, id ) ) {
-			if ( !bus.check( value ) ) {
-				return options( Stream.empty() );
-			}
+		switch ( Dialog.valueOf( id ) ) {
+			case BUS:
+				if ( !bus.check( value ) ) {
+					return options( Stream.empty() );
+				}
 
-			List<Map<String, ?>> info = bus.call( "DisplayStopOfRoute", Filter.and( Filter.ROUTE.eq( value ), Filter.DIRECTION.eq( "0" ) ) );
+				List<Map<String, ?>> info = bus.call( "DisplayStopOfRoute", Filter.and( Filter.ROUTE.eq( value ), Filter.DIRECTION.eq( "0" ) ) );
 
-			return options( info.isEmpty() ? Stream.empty() : bus.stops( info.get( 0 ), bus::stop ).map( i -> option( i, text( value, i ) ) ) );
+				return options( info.isEmpty() ? Stream.empty() : bus.stops( info.get( 0 ), bus::stop ).map( i -> option( i, text( value, i ) ) ) );
 
-		} else if ( equals( Dialog.STATION, id ) ) {
-			return options( bus.call( "Station", Filter.STATION.contains( value ), "$select=StationName" ).stream().map( bus::station ).distinct().map( super::option ) );
+			case STATION:
+				return options( bus.call( "Station", Filter.STATION.contains( value ), "$select=StationName" ).stream().map( bus::station ).distinct().map( super::option ) );
 
-		} else if ( equals( Dialog.AQI, id ) ) {
-			Filter county = Filter.COUNTY, site = Filter.SITE_NAME;
+			case AQI:
+				Filter county = Filter.COUNTY, site = Filter.SITE_NAME;
 
-			return options( AQI.call( county.eq( value ) ).stream().map( i -> {
-				return option( String.join( StringUtils.SPACE, Cast.string( i, county.toString() ), Cast.string( i, site.toString() ) ) );
-			} ) );
+				return options( AQI.call( county.eq( value ) ).stream().map( i -> {
+					return option( String.join( StringUtils.SPACE, Cast.string( i, county.toString() ), Cast.string( i, site.toString() ) ) );
+				} ) );
 
-		} else if ( equals( Dialog.MRT, id ) ) {
-			return options( metro.find( value ).map( super::option ) );
+			case MRT:
+				return options( metro.find( value ).map( super::option ) );
 
-		} else {
-			throw new IllegalArgumentException( payload );
+			default:
+				throw new IllegalArgumentException( payload );
 		}
-	}
-
-	private boolean equals( Dialog dialog, String id ) {
-		return dialog.name().equals( id );
 	}
 
 	private Map<String, List<?>> options( Stream<?> options ) {
