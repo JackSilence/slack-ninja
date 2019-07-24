@@ -22,37 +22,27 @@ public class MetroController extends DialogController {
 
 	@PostMapping( "/mrt" )
 	public String mrt( @RequestParam String command, @RequestParam String text ) {
-		log.info( "Text: {}", text );
+		String[] params = StringUtils.split( text );
 
-		try {
-			String[] params = StringUtils.split( text );
+		check( params.length == 2, "參數個數有誤: " + text );
 
-			check( params.length == 2, "參數個數有誤: " + text );
+		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), url, txt;
 
-			String start = id( params[ 0 ] ), end = id( params[ 1 ] ), url, txt;
+		check( !start.equals( end ), "起訖站不得相同: " + text );
 
-			check( !start.equals( end ), "起訖站不得相同: " + text );
+		log.info( "Start: {}, end: {}", start, end );
 
-			log.info( "Start: {}, end: {}", start, end );
+		Elements tables = Jsoup.get( url = Metro.URL.concat( String.format( QUERY, start, end ) ) ).select( "form table" );
 
-			Elements tables = Jsoup.get( url = Metro.URL.concat( String.format( QUERY, start, end ) ) ).select( "form table" );
+		Element table = tables.first(), row = row( table, 2 );
 
-			Element table = tables.first(), row = row( table, 2 );
+		SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( url );
 
-			SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( url );
+		row( table, 1 ).select( "td:lt(3)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
 
-			row( table, 1 ).select( "td:lt(3)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
+		attach.setText( txt = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
 
-			attach.setText( txt = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
-
-			return message( attach.setFallback( txt ), command, text );
-
-		} catch ( RuntimeException e ) {
-			log.error( "", e );
-
-			return e.getMessage();
-
-		}
+		return message( attach.setFallback( txt ), command, text );
 	}
 
 	@Override

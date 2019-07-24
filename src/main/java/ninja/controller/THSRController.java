@@ -61,43 +61,35 @@ public class THSRController extends DialogController {
 
 	@PostMapping( "/thsr" )
 	public String thsr( @RequestParam String command, @RequestParam String text ) {
-		try {
-			String[] params = StringUtils.split( text );
+		String[] params = StringUtils.split( text );
 
-			check( params.length == 5, "參數個數有誤: " + text );
+		check( params.length == 5, "參數個數有誤: " + text );
 
-			String start = id( params[ 0 ] ), end = id( params[ 1 ] ), date = params[ 2 ], time = params[ 3 ];
+		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), date = params[ 2 ], time = params[ 3 ];
 
-			check( !start.equals( end ), "起訖站不得相同: " + text );
+		check( !start.equals( end ), "起訖站不得相同: " + text );
 
-			check( dates().contains( date ) && times().contains( time ), "時間有誤: " + text );
+		check( dates().contains( date ) && times().contains( time ), "時間有誤: " + text );
 
-			Way way = check( Way.class, params[ 4 ], "行程有誤: " + text );
+		Way way = check( Way.class, params[ 4 ], "行程有誤: " + text );
 
-			SlackAttachment attach1 = Slack.attachment().setTitle( TITLE ).setTitleLink( LINK ), attach2 = Slack.attachment( "good" );
+		SlackAttachment attach1 = Slack.attachment().setTitle( TITLE ).setTitleLink( LINK ), attach2 = Slack.attachment( "good" );
 
-			List<?> fares = Cast.list( thsr.call( String.format( FARE, start, end ) ).get( 0 ), "Fares" );
+		List<?> fares = Cast.list( thsr.call( String.format( FARE, start, end ) ).get( 0 ), "Fares" );
 
-			fares.stream().map( Cast::map ).sorted( ( i, j ) -> price( i ).compareTo( price( j ) ) ).limit( 2 ).forEach( i -> {
-				attach1.addFields( field( Cast.string( i, "TicketType" ), "$" + price( i ).intValue() ) );
-			} );
+		fares.stream().map( Cast::map ).sorted( ( i, j ) -> price( i ).compareTo( price( j ) ) ).limit( 2 ).forEach( i -> {
+			attach1.addFields( field( Cast.string( i, "TicketType" ), "$" + price( i ).intValue() ) );
+		} );
 
-			String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
+		String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
 
-			thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" ).forEach( i -> {
-				attach2.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
+		thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" ).forEach( i -> {
+			attach2.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
-				attach2.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
-			} );
+			attach2.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
+		} );
 
-			return message( Slack.message( attach1, command, text ).addAttachments( attach2 ) );
-
-		} catch ( RuntimeException e ) {
-			log.error( "", e );
-
-			return e.getMessage();
-
-		}
+		return message( Slack.message( attach1, command, text ).addAttachments( attach2 ) );
 	}
 
 	private String id( String station ) {

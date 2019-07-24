@@ -45,33 +45,25 @@ public class AQIController extends DialogController {
 
 	@PostMapping( "/aqi" )
 	public String aqi( @RequestParam String command, @RequestParam String text ) {
-		try {
-			String[] params = StringUtils.split( StringUtils.defaultIfEmpty( text, DEFAULT ) );
+		String[] params = StringUtils.split( StringUtils.defaultIfEmpty( text, DEFAULT ) );
 
-			check( params.length == 2, "參數個數有誤: " + text );
+		check( params.length == 2, "參數個數有誤: " + text );
 
-			String county = params[ 0 ], site = params[ 1 ], filter = Filter.and( Filter.COUNTY.eq( county ), Filter.SITE_NAME.eq( site ) );
+		String county = params[ 0 ], site = params[ 1 ], filter = Filter.and( Filter.COUNTY.eq( county ), Filter.SITE_NAME.eq( site ) );
 
-			Map<String, ?> info = checkNull( AQI.call( filter ).stream().findFirst().orElse( null ), "測站有誤: " + text );
+		Map<String, ?> info = checkNull( AQI.call( filter ).stream().findFirst().orElse( null ), "測站有誤: " + text );
 
-			String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA ), status = Cast.string( info, "Status" ), color;
+		String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA ), status = Cast.string( info, "Status" ), color;
 
-			color = "良好".equals( status ) ? "good" : "普通".equals( status ) ? "warning" : "設備維護".equals( status ) ? "#3AA3E3" : "danger";
+		color = "良好".equals( status ) ? "good" : "普通".equals( status ) ? "warning" : "設備維護".equals( status ) ? "#3AA3E3" : "danger";
 
-			SlackAttachment attach = Slack.attachment( color ).setTitle( TITLE ).setTitleLink( LINK );
+		SlackAttachment attach = Slack.attachment( color ).setTitle( TITLE ).setTitleLink( LINK );
 
-			attach.addFields( field( "AQI指標", aqi ) ).addFields( field( "狀態", Cast.string( info, "Status" ) ) );
+		attach.addFields( field( "AQI指標", aqi ) ).addFields( field( "狀態", Cast.string( info, "Status" ) ) );
 
-			TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
+		TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
 
-			return message( Slack.message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text ) );
-
-		} catch ( RuntimeException e ) {
-			log.error( "", e );
-
-			return e.getMessage();
-
-		}
+		return message( Slack.message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text ) );
 	}
 
 	private String value( String value, String unit ) {

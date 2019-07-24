@@ -28,37 +28,31 @@ public class DelController extends BaseController {
 
 	@PostMapping( value = "/delete" )
 	public String delete( @RequestParam( CHANNEL_ID ) String channel, @RequestParam String command, @RequestParam String text ) {
-		try {
-			Long days = DAYS_AGO.get( text ), success = 0L;
+		Long days = DAYS_AGO.get( text ), success = 0L;
 
-			LocalDate date = days == null ? LocalDate.parse( text ) : LocalDate.now( ZONE_ID ).minusDays( days );
+		LocalDate date = days == null ? LocalDate.parse( text ) : LocalDate.now( ZONE_ID ).minusDays( days );
 
-			String title = date.toString(), query = String.format( QUERY, epochSecond( date ), epochSecond( date.plusDays( 1 ) ) );
+		String title = date.toString(), query = String.format( QUERY, epochSecond( date ), epochSecond( date.plusDays( 1 ) ) );
 
-			log.info( "Date: {}, query: {}", date, query );
+		log.info( "Date: {}, query: {}", date, query );
 
-			History history = Gson.from( get( HISTORY_METHOD, channel, query ), History.class );
+		History history = Gson.from( get( HISTORY_METHOD, channel, query ), History.class );
 
-			List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
+		List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
 
-			for ( Event i : message ) {
-				i.setChannel( channel );
+		for ( Event i : message ) {
+			i.setChannel( channel );
 
-				String response = post( DEL_METHOD, i );
+			String response = post( DEL_METHOD, i );
 
-				success += response.contains( "\"ok\":true" ) ? 1 : 0;
+			success += response.contains( "\"ok\":true" ) ? 1 : 0;
 
-				log.info( response );
-			}
-
-			String txt = String.format( TEXT, message.size(), success );
-
-			return message( new SlackAttachment( title + "\n" + txt ).setTitle( title ).setText( txt ), command, text );
-
-		} catch ( RuntimeException e ) {
-			return e.getMessage();
-
+			log.info( response );
 		}
+
+		String txt = String.format( TEXT, message.size(), success );
+
+		return message( new SlackAttachment( title + "\n" + txt ).setTitle( title ).setText( txt ), command, text );
 	}
 
 	private long epochSecond( LocalDate date ) {

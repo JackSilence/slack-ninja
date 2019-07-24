@@ -78,72 +78,64 @@ public class WeatherController extends DialogController {
 
 	@PostMapping
 	public String weather( @RequestParam String command, @RequestParam String text ) {
-		try {
-			String[] params = ( params = StringUtils.split( text ) ).length == 0 ? new String[] { DEFAULT_DIST, DEFAULT_HOURS } : params;
+		String[] params = ( params = StringUtils.split( text ) ).length == 0 ? new String[] { DEFAULT_DIST, DEFAULT_HOURS } : params;
 
-			check( params.length <= 2, "參數個數有誤: " + text );
+		check( params.length <= 2, "參數個數有誤: " + text );
 
-			params = params.length == 1 ? Ints.tryParse( params[ 0 ] ) != null ? ObjectArrays.concat( DEFAULT_DIST, params ) : ArrayUtils.add( params, DEFAULT_HOURS ) : params;
+		params = params.length == 1 ? Ints.tryParse( params[ 0 ] ) != null ? ObjectArrays.concat( DEFAULT_DIST, params ) : ArrayUtils.add( params, DEFAULT_HOURS ) : params;
 
-			String district = StringUtils.appendIfMissing( params[ 0 ], "區" );
+		String district = StringUtils.appendIfMissing( params[ 0 ], "區" );
 
-			ZonedDateTime time = ZonedDateTime.now( ZONE_ID );
+		ZonedDateTime time = ZonedDateTime.now( ZONE_ID );
 
-			Integer hour = time.getHour(), plus = Arrays.asList( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6, town, hours;
+		Integer hour = time.getHour(), plus = Arrays.asList( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6, town, hours;
 
-			check( ObjectUtils.allNotNull( town = DISTRICTS.get( district ), hours = Ints.tryParse( params[ 1 ] ) ) && hours >= -12 && hours <= 48, "參數有誤: " + text );
+		check( ObjectUtils.allNotNull( town = DISTRICTS.get( district ), hours = Ints.tryParse( params[ 1 ] ) ) && hours >= -12 && hours <= 48, "參數有誤: " + text );
 
-			// 氣象局於5, 11, 17, 23時左右會刷新資料, 但詳細時間不確定; 所以在這些時間多往後抓一個區間再設定limit
-			String from = time( time = time.with( LocalTime.of( hour / 3 * 3, 0 ) ).plusHours( hours ) ), to = time( time.plusHours( plus ) );
+		// 氣象局於5, 11, 17, 23時左右會刷新資料, 但詳細時間不確定; 所以在這些時間多往後抓一個區間再設定limit
+		String from = time( time = time.with( LocalTime.of( hour / 3 * 3, 0 ) ).plusHours( hours ) ), to = time( time.plusHours( plus ) );
 
-			log.info( "From: {}, to: {}", from, to );
+		log.info( "From: {}, to: {}", from, to );
 
-			Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( API_URL + String.format( QUERY, key, district, from, to ) ) ), Map.class );
+		Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( API_URL + String.format( QUERY, key, district, from, to ) ) ), Map.class );
 
-			SlackMessage message = Slack.message( attachment( String.format( TITLE, district ), WEB_URL + town ), command, text );
+		SlackMessage message = Slack.message( attachment( String.format( TITLE, district ), WEB_URL + town ), command, text );
 
-			List<?> elements = Cast.list( first( first( Cast.map( result, "records" ), "locations" ), "location" ), "weatherElement" );
+		List<?> elements = Cast.list( first( first( Cast.map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
-			Map<String, String> image = new HashMap<>(), at = new HashMap<>();
+		Map<String, String> image = new HashMap<>(), at = new HashMap<>();
 
-			each( elements, "Wx", j -> {
-				String start = Cast.string( j, "startTime" ), when = Range.closedOpen( 6, 18 ).contains( hour( start ) ) ? "day" : "night";
+		each( elements, "Wx", j -> {
+			String start = Cast.string( j, "startTime" ), when = Range.closedOpen( 6, 18 ).contains( hour( start ) ) ? "day" : "night";
 
-				image.put( start, String.format( url, when, Cast.string( Cast.map( Cast.list( j, "elementValue" ).get( 1 ) ), "value" ) ) );
-			} );
+			image.put( start, String.format( url, when, Cast.string( Cast.map( Cast.list( j, "elementValue" ).get( 1 ) ), "value" ) ) );
+		} );
 
-			each( elements, "AT", j -> at.put( Cast.string( j, "dataTime" ), Cast.string( first( j, "elementValue" ), "value" ) ) );
+		each( elements, "AT", j -> at.put( Cast.string( j, "dataTime" ), Cast.string( first( j, "elementValue" ), "value" ) ) );
 
-			each( elements, "WeatherDescription", j -> {
-				String[] data = Cast.string( first( j, "elementValue" ), "value" ).split( DELIMITER );
+		each( elements, "WeatherDescription", j -> {
+			String[] data = Cast.string( first( j, "elementValue" ), "value" ).split( DELIMITER );
 
-				String ci = data[ 3 ], color = "舒適".equals( ci ) ? "good" : "悶熱".equals( ci ) ? "warning" : "易中暑".equals( ci ) ? "danger" : "#3AA3E3";
+			String ci = data[ 3 ], color = "舒適".equals( ci ) ? "good" : "悶熱".equals( ci ) ? "warning" : "易中暑".equals( ci ) ? "danger" : "#3AA3E3";
 
-				String wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
+			String wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
 
-				int hr = hour( start = Cast.string( j, "startTime" ) );
+			int hr = hour( start = Cast.string( j, "startTime" ) );
 
-				String period = hr == 12 ? "中午" : hr >= 0 && hr < 6 ? "凌晨" : hr >= 6 && hr < 12 ? "早上" : hr >= 13 && hr < 18 ? "下午" : "晚上";
+			String period = hr == 12 ? "中午" : hr >= 0 && hr < 6 ? "凌晨" : hr >= 6 && hr < 12 ? "早上" : hr >= 13 && hr < 18 ? "下午" : "晚上";
 
-				String title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點";
+			String title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點";
 
-				SlackAttachment attach = Slack.attachment( color ).setAuthorName( title ).setAuthorIcon( image.get( start ) );
+			SlackAttachment attach = Slack.attachment( color ).setAuthorName( title ).setAuthorIcon( image.get( start ) );
 
-				attach.addFields( super.field( "溫度 / 體感", data[ 2 ].substring( 4, 6 ) + " / " + at.get( start ) + "˚C" ) );
+			attach.addFields( super.field( "溫度 / 體感", data[ 2 ].substring( 4, 6 ) + " / " + at.get( start ) + "˚C" ) );
 
-				attach.addFields( super.field( "舒適度", ci ) ).addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
+			attach.addFields( super.field( "舒適度", ci ) ).addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );
 
-				message.addAttachments( attach.setText( data[ 0 ] + DELIMITER + wind ) );
-			} );
+			message.addAttachments( attach.setText( data[ 0 ] + DELIMITER + wind ) );
+		} );
 
-			return message( message );
-
-		} catch ( RuntimeException e ) {
-			log.error( "", e );
-
-			return e.getMessage();
-
-		}
+		return message( message );
 	}
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {

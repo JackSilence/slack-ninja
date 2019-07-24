@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -22,10 +21,6 @@ import ninja.util.Gson;
 
 public abstract class DialogController extends BaseController {
 	private static final String DIALOG_TEMPLATE = "/template/dialog/%s.json";
-
-	@ExceptionHandler( SlackException.class )
-	public void ex() {
-	}
 
 	@Override
 	protected void preHandle( HttpServletRequest request ) {
