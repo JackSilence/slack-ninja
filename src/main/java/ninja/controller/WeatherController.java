@@ -42,7 +42,7 @@ public class WeatherController extends DialogController {
 
 	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s&elementName=Wx,AT,WeatherDescription";
 
-	private static final String DEFAULT_DIST = "內湖區", DEFAULT_HOURS = "0";
+	private static final String START_TIME = "startTime", ELEMENT_VALUE = "elementValue", DEFAULT_DIST = "內湖區", DEFAULT_HOURS = "0";
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
 
@@ -106,21 +106,21 @@ public class WeatherController extends DialogController {
 		Map<String, String> image = new HashMap<>(), at = new HashMap<>();
 
 		each( elements, "Wx", j -> {
-			String start = Cast.string( j, "startTime" ), when = Range.closedOpen( 6, 18 ).contains( hour( start ) ) ? "day" : "night";
+			String start = Cast.string( j, START_TIME ), when = Range.closedOpen( 6, 18 ).contains( hour( start ) ) ? "day" : "night";
 
-			image.put( start, String.format( url, when, Cast.string( Cast.map( Cast.list( j, "elementValue" ).get( 1 ) ), "value" ) ) );
+			image.put( start, String.format( url, when, Cast.string( Cast.map( Cast.list( j, ELEMENT_VALUE ).get( 1 ) ), VALUE ) ) );
 		} );
 
-		each( elements, "AT", j -> at.put( Cast.string( j, "dataTime" ), Cast.string( first( j, "elementValue" ), "value" ) ) );
+		each( elements, "AT", j -> at.put( Cast.string( j, "dataTime" ), Cast.string( first( j, ELEMENT_VALUE ), VALUE ) ) );
 
 		each( elements, "WeatherDescription", j -> {
-			String[] data = Cast.string( first( j, "elementValue" ), "value" ).split( DELIMITER );
+			String[] data = Cast.string( first( j, ELEMENT_VALUE ), VALUE ).split( DELIMITER );
 
 			String ci = data[ 3 ], color = "舒適".equals( ci ) ? "good" : "悶熱".equals( ci ) ? "warning" : "易中暑".equals( ci ) ? "danger" : "#3AA3E3";
 
 			String wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
 
-			int hr = hour( start = Cast.string( j, "startTime" ) );
+			int hr = hour( start = Cast.string( j, START_TIME ) );
 
 			String period = hr == 12 ? "中午" : hr >= 0 && hr < 6 ? "凌晨" : hr >= 6 && hr < 12 ? "早上" : hr >= 13 && hr < 18 ? "下午" : "晚上";
 

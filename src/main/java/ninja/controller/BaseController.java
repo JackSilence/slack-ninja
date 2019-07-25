@@ -37,7 +37,9 @@ import ninja.util.Slack;
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id", QUOTE = "\"";
+	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id";
+
+	protected static final String LABEL = "label", VALUE = "value", QUOTE = "\"";
 
 	protected static final ZoneId ZONE_ID = ZoneId.of( Zone.TAIPEI );
 
@@ -73,7 +75,7 @@ public abstract class BaseController {
 	}
 
 	protected Map<String, String> option( String label, Object value ) {
-		return ImmutableMap.of( "label", label, "value", value.toString() );
+		return ImmutableMap.of( LABEL, label, VALUE, value.toString() );
 	}
 
 	protected String message( SlackAttachment attach, String command, String text ) {
