@@ -83,13 +83,15 @@ public class THSRController extends DialogController {
 
 		String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
 
-		thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" ).forEach( i -> {
+		List<Map<String, ?>> info = thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" );
+
+		info.forEach( i -> {
 			attach2.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
 
 			attach2.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
 		} );
 
-		return message( Slack.message( attach1, command, text ).addAttachments( attach2 ) );
+		return message( Slack.message( attach1, command, text ).addAttachments( info.size() > 0 ? attach2 : null ) );
 	}
 
 	private String id( String station ) {
