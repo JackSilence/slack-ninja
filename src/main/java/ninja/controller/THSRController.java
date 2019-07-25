@@ -91,7 +91,7 @@ public class THSRController extends DialogController {
 			attach2.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
 		} );
 
-		return message( Slack.message( attach1, command, text ).addAttachments( info.size() > 0 ? attach2 : attach2.setText( "查無車次" ) ) );
+		return message( Slack.message( attach1, command, text ).addAttachments( info.size() > 0 ? attach2 : Slack.attachment() ) );
 	}
 
 	private String id( String station ) {
