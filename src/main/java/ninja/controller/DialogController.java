@@ -30,14 +30,16 @@ public abstract class DialogController extends BaseController {
 	@Override
 	protected void preHandle( HttpServletRequest request ) {
 		if ( request.getParameter( "text" ).isEmpty() ) {
-			Dialog dialog = EnumUtils.getEnumIgnoreCase( Dialog.class, StringUtils.remove( request.getRequestURI(), "/" ) );
-
-			String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
-
-			log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, request.getParameter( TRIGGER_ID ), "dialog", String.format( template, args() ) ) ) );
+			dialog( request.getParameter( TRIGGER_ID ), EnumUtils.getEnumIgnoreCase( Dialog.class, StringUtils.remove( request.getRequestURI(), "/" ) ) );
 
 			throw new SlackException( null );
 		}
+	}
+
+	protected void dialog( String id, Dialog dialog, Object... args ) {
+		String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
+
+		log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, id, "dialog", String.format( template, args ) ) ) );
 	}
 
 	protected String options( Collection<String> collection ) {
@@ -54,5 +56,9 @@ public abstract class DialogController extends BaseController {
 
 	protected Object[] args() {
 		return ArrayUtils.EMPTY_OBJECT_ARRAY;
+	}
+
+	private void dialog( String id, Dialog dialog ) {
+		dialog( id, dialog, args() );
 	}
 }

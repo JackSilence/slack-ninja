@@ -1,7 +1,10 @@
 package ninja.controller;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 
+import ninja.consts.Dialog;
 import ninja.util.Jsoup;
 
 @RestController
@@ -32,8 +36,16 @@ public class MovieController extends DialogController {
 	}
 
 	@PostMapping( "/theater" )
-	public String theater( @RequestParam String command, @RequestParam String text ) {
-		return null;
+	public void theater( @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
+		List<String> films = new ArrayList<>();
+
+		Jsoup.select( URL + checkNull( THEATERS.values().stream().flatMap( i -> i.entrySet().stream() ).filter( i -> {
+			return i.getKey().equals( text );
+		} ).map( Entry::getValue ).findFirst().orElse( null ), "查無影院: " + text ), "div#theaterShowtimeBlock ul", i -> {
+			films.add( i.selectFirst( "li.filmTitle" ).text() );
+		} );
+
+		dialog( id, Dialog.MOVIE, options( films ) );
 	}
 
 	@PostConstruct

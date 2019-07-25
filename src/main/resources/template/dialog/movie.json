@@ -1,0 +1,13 @@
+{
+	"callback_id": "MOVIE",
+	"title": "雙北電影時刻查詢",
+	"elements": [
+		{
+			"label": "電影",
+			"type": "select",
+			"name": "film",
+			"placeholder": "請選擇電影",
+			"options": %s
+		}
+	]
+}
