@@ -51,10 +51,8 @@ public class OptionController extends BaseController {
 				return options( bus.call( "Station", Filter.STATION.contains( value ), "$select=StationName" ).stream().map( bus::station ).distinct().map( super::option ) );
 
 			case AQI:
-				Filter county = Filter.COUNTY, site = Filter.SITE_NAME;
-
-				return options( AQI.call( county.eq( value ) ).stream().map( i -> {
-					return option( String.join( StringUtils.SPACE, Cast.string( i, county.toString() ), Cast.string( i, site.toString() ) ) );
+				return options( AQI.call( Filter.COUNTY.eq( value ) ).stream().map( i -> {
+					return option( String.join( StringUtils.SPACE, value, Cast.string( i, Filter.SITE_NAME.toString() ) ) );
 				} ) );
 
 			case MRT:
