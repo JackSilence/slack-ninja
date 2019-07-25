@@ -64,6 +64,6 @@ public class OptionController extends BaseController {
 	}
 
 	private Map<String, List<?>> options( Stream<?> options ) {
-		return ImmutableMap.of( "options", options.collect( Collectors.toList() ) );
+		return ImmutableMap.of( OPTIONS, options.collect( Collectors.toList() ) );
 	}
 }

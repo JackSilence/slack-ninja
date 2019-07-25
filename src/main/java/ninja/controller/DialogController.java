@@ -44,7 +44,7 @@ public abstract class DialogController extends BaseController {
 		return json( collection.stream().map( super::option ) );
 	}
 
-	protected String json( Stream<Map<String, String>> stream ) {
+	protected String json( Stream<Map<String, ?>> stream ) {
 		return Gson.json( stream.collect( Collectors.toList() ) );
 	}
 

@@ -1,0 +1,13 @@
+{
+	"callback_id": "THEATER",
+	"title": "雙北上映影片查詢",
+	"elements": [
+		{
+			"label": "電影院",
+			"type": "select",
+			"name": "theater",
+			"placeholder": "請選擇電影院",
+			"option_groups": %s
+		}
+	]
+}
