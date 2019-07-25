@@ -1,10 +1,8 @@
 package ninja.controller;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -24,31 +22,29 @@ import ninja.util.Jsoup;
 public class MovieController extends DialogController {
 	private static final String URL = "http://www.atmovies.com.tw", PATH = "/showtime/a02/";
 
-	private static final Map<String, List<Map<String, String>>> THEATERS = new LinkedHashMap<>();
+	private static final Map<String, Map<String, String>> THEATERS = new LinkedHashMap<>();
 
 	@Override
 	protected Object[] args() {
-		return ArrayUtils.toArray( json( THEATERS.entrySet().stream().map( this::group ) ) );
+		return ArrayUtils.toArray( json( THEATERS.entrySet().stream().map( i -> {
+			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, i.getValue().keySet().stream().map( super::option ).collect( Collectors.toList() ) );
+		} ) ) );
 	}
 
 	@PostMapping( "/theater" )
-	public String theater( @RequestParam String text ) {
+	public String theater( @RequestParam String command, @RequestParam String text ) {
 		return null;
-	}
-
-	private Map<String, Object> group( Entry<String, List<Map<String, String>>> entry ) {
-		return ImmutableMap.of( LABEL, entry.getKey(), OPTIONS, entry.getValue() );
 	}
 
 	@PostConstruct
 	private void init() {
 		Jsoup.select( URL + PATH, "ul#theaterList > li", i -> {
 			if ( i.hasClass( "type0" ) ) {
-				THEATERS.put( StringUtils.remove( i.text(), "▼" ), new ArrayList<>() );
+				THEATERS.put( StringUtils.remove( i.text(), "▼" ), new LinkedHashMap<>() );
 			} else {
 				Element element = i.selectFirst( "a" );
 
-				THEATERS.get( Iterables.getLast( THEATERS.keySet() ) ).add( option( element.text(), element.attr( "href" ) ) );
+				THEATERS.get( Iterables.getLast( THEATERS.keySet() ) ).put( element.text(), element.attr( "href" ) );
 			}
 		} );
 	}
