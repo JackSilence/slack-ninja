@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.service.THSR;
 import ninja.util.Cast;
 import ninja.util.Slack;
@@ -91,7 +92,9 @@ public class THSRController extends DialogController {
 			attach2.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
 		} );
 
-		return message( Slack.message( attach1, command, text ).addAttachments( info.size() > 0 ? attach2 : Slack.attachment() ) );
+		SlackMessage message = Slack.message( attach1, command, text );
+
+		return message( info.size() > 0 ? message.addAttachments( attach2 ) : message );
 	}
 
 	private String id( String station ) {

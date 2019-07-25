@@ -41,7 +41,7 @@ public class MovieController extends DialogController {
 
 		Jsoup.select( URL + checkNull( THEATERS.values().stream().flatMap( i -> i.entrySet().stream() ).filter( i -> {
 			return i.getKey().equals( text );
-		} ).map( Entry::getValue ).findFirst().orElse( null ), "查無影院: " + text ), "div#theaterShowtimeBlock > ul", i -> {
+		} ).map( Entry::getValue ).findFirst().orElse( null ), "查無影院: " + text ), "div#theaterShowtimeBlock > ul#theaterShowtimeTable", i -> {
 			films.add( i.selectFirst( "li.filmTitle" ).text() );
 		} );
 
