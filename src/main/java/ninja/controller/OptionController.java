@@ -14,20 +14,17 @@ import com.google.common.collect.ImmutableMap;
 import ninja.consts.Dialog;
 import ninja.consts.Filter;
 import ninja.service.Bus;
-import ninja.service.Metro;
 import ninja.slack.Payload;
 import ninja.util.AQI;
 import ninja.util.Cast;
 import ninja.util.Gson;
+import ninja.util.Metro;
 import ninja.util.Utils;
 
 @RestController
 public class OptionController extends BaseController {
 	@Autowired
 	private Bus bus;
-
-	@Autowired
-	private Metro metro;
 
 	@PostMapping( "/options" )
 	public Map<String, List<?>> options( String payload ) {
@@ -56,7 +53,7 @@ public class OptionController extends BaseController {
 				} ) );
 
 			case MRT:
-				return options( metro.find( value ).map( super::option ) );
+				return options( Metro.find( value ).map( super::option ) );
 
 			default:
 				throw new IllegalArgumentException( payload );

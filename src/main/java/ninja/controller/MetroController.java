@@ -3,22 +3,18 @@ package ninja.controller;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
-import ninja.service.Metro;
 import ninja.util.Jsoup;
+import ninja.util.Metro;
 
 @RestController
 public class MetroController extends DialogController {
 	private static final String QUERY = "?s1elect=%s&s2elect=%s&action=query", TITLE = "捷運票價及乘車時間";
-
-	@Autowired
-	private Metro metro;
 
 	@PostMapping( "/mrt" )
 	public String mrt( @RequestParam String command, @RequestParam String text ) {
@@ -51,7 +47,7 @@ public class MetroController extends DialogController {
 	}
 
 	private String id( String station ) {
-		return checkNull( metro.get( station ), "查無此站: " + station );
+		return checkNull( Metro.get( station ), "查無此站: " + station );
 	}
 
 	private Element row( Element table, int index ) {
