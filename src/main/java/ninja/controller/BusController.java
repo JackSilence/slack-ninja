@@ -36,7 +36,7 @@ public class BusController extends DialogController {
 
 		check( params.length == 2, "參數個數有誤: " + text );
 
-		String route = params[ 0 ], stop = params[ 1 ], unwrap = StringUtils.unwrap( stop, QUOTE ), filter;
+		String route = params[ 0 ], stop = params[ 1 ], unwrap = bus.unwrap( stop ), filter;
 
 		check( bus.check( route ), "查無路線: " + route );
 
@@ -83,7 +83,7 @@ public class BusController extends DialogController {
 
 		check( info.keySet().size() == 2, "查無起站或訖站: " + text );
 
-		Sets.intersection( info.get( start ), info.get( end ) ).parallelStream().forEach( i -> command( user, channel, "bus", text( i, start ) ) );
+		Sets.intersection( info.get( start ), info.get( end ) ).parallelStream().forEach( i -> command( user, channel, "bus", bus.text( i, start ) ) );
 
 		return message( Slack.message( Slack.attachment(), command, text ) );
 	}

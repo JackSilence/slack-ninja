@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -39,7 +38,7 @@ public abstract class BaseController {
 
 	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id";
 
-	protected static final String LABEL = "label", VALUE = "value", OPTIONS = "options", QUOTE = "\"";
+	protected static final String LABEL = "label", VALUE = "value", OPTIONS = "options";
 
 	protected static final ZoneId ZONE_ID = ZoneId.of( Zone.TAIPEI );
 
@@ -102,10 +101,6 @@ public abstract class BaseController {
 		Request request = Request.Post( uri( method ) ).setHeader( "Authorization", "Bearer " + token );
 
 		return call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
-	}
-
-	protected String text( String route, String stop ) {
-		return String.join( StringUtils.SPACE, route, StringUtils.wrap( stop, QUOTE ) );
 	}
 
 	protected SlackField field( String title, String value ) {

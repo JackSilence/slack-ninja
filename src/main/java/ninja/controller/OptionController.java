@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +19,7 @@ import ninja.slack.Payload;
 import ninja.util.AQI;
 import ninja.util.Cast;
 import ninja.util.Gson;
+import ninja.util.Utils;
 
 @RestController
 public class OptionController extends BaseController {
@@ -45,14 +45,14 @@ public class OptionController extends BaseController {
 
 				List<Map<String, ?>> info = bus.call( "DisplayStopOfRoute", Filter.and( Filter.ROUTE.eq( value ), Filter.DIRECTION.eq( "0" ) ) );
 
-				return options( info.isEmpty() ? Stream.empty() : bus.stops( info.get( 0 ), bus::stop ).map( i -> option( i, text( value, i ) ) ) );
+				return options( info.isEmpty() ? Stream.empty() : bus.stops( info.get( 0 ), bus::stop ).map( i -> option( i, bus.text( value, i ) ) ) );
 
 			case STATION:
 				return options( bus.call( "Station", Filter.STATION.contains( value ), "$select=StationName" ).stream().map( bus::station ).distinct().map( super::option ) );
 
 			case AQI:
 				return options( AQI.call( Filter.COUNTY.eq( value ) ).stream().map( i -> {
-					return option( String.join( StringUtils.SPACE, value, Cast.string( i, Filter.SITE_NAME.toString() ) ) );
+					return option( Utils.spacer( value, Cast.string( i, Filter.SITE_NAME.toString() ) ) );
 				} ) );
 
 			case MRT:

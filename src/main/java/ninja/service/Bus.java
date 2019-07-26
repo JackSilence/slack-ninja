@@ -10,14 +10,16 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import ninja.util.Cast;
 import ninja.util.Jsoup;
+import ninja.util.Utils;
 
 @Service
 public class Bus extends PTX {
-	private static final String ROUTES_URL = "https://ebus.gov.taipei/EBus/RouteList?ct=tpc";
+	private static final String ROUTES_URL = "https://ebus.gov.taipei/EBus/RouteList?ct=tpc", QUOTE = "\"";
 
 	private static final String ROUTE_ID_REGEX = "javascript:go\\('(.+?)'\\)", PATH = "Bus/%s/City/Taipei";
 
@@ -34,6 +36,14 @@ public class Bus extends PTX {
 
 	public String stop( Map<?, ?> map ) {
 		return name( map, "StopName" );
+	}
+
+	public String text( String route, String stop ) {
+		return Utils.spacer( route, StringUtils.wrap( stop, QUOTE ) );
+	}
+
+	public String unwrap( String stop ) {
+		return StringUtils.unwrap( stop, QUOTE );
 	}
 
 	public String id( String route ) {

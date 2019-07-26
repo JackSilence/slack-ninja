@@ -26,6 +26,7 @@ import net.gpedro.integrations.slack.SlackMessage;
 import ninja.service.THSR;
 import ninja.util.Cast;
 import ninja.util.Slack;
+import ninja.util.Utils;
 
 @RestController
 public class THSRController extends DialogController {
@@ -82,7 +83,7 @@ public class THSRController extends DialogController {
 			attach1.addFields( field( Cast.string( i, "TicketType" ), "$" + price( i ).intValue() ) );
 		} );
 
-		String filter = join( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + join( way.field, way.order );
+		String filter = Utils.spacer( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + Utils.spacer( way.field, way.order );
 
 		List<Map<String, ?>> info = thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" );
 
@@ -99,10 +100,6 @@ public class THSRController extends DialogController {
 
 	private String id( String station ) {
 		return checkNull( STATIONS.get( station ), "查無此站: " + station );
-	}
-
-	private String join( String... elements ) {
-		return String.join( StringUtils.SPACE, elements );
 	}
 
 	private String time( Map<String, ?> map, Way way ) {
