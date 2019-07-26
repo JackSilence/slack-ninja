@@ -1,5 +1,6 @@
 package ninja.util;
 
+import java.util.Collections;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +12,6 @@ import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Task;
 import ninja.slack.Action;
-import ninja.slack.Confirm;
 
 public class Heroku {
 	public static final String TASK_ID = "heroku_task";
@@ -29,6 +29,6 @@ public class Heroku {
 	}
 
 	private static Action action( Task task ) { // "confirm": {} -> 會出現預設的確認視窗
-		return new Action( TASK_ID, task.desc(), SlackActionType.BUTTON, task.name() ).setConfirm( new Confirm() );
+		return new Action( TASK_ID, task.desc(), SlackActionType.BUTTON, task.name() ).setConfirm( Collections.EMPTY_MAP );
 	}
 }
