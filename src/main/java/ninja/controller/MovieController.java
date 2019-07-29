@@ -66,9 +66,9 @@ public class MovieController extends DialogController {
 			Element element = link( i );
 
 			if ( film.equals( element.text() ) ) {
-				SlackAttachment attach = Slack.attachment( "good" ).setTitle( film ).setTitleLink( Jsoup.href( element ) );
+				SlackAttachment attach = Slack.attachment( "good" ).setTitle( film ).setTitleLink( URL + Jsoup.href( element ) );
 
-				attach.setAuthorIcon( i.selectFirst( "ul:eq(0)" ).select( "img" ).get( 0 ).attr( "src" ) );
+				attach.setAuthorIcon( URL + i.selectFirst( "ul:eq(0)" ).select( "img" ).get( 0 ).attr( "src" ) );
 				attach.setThumbUrl( i.selectFirst( "ul:eq(0)" ).select( "img" ).get( 1 ).attr( "src" ) );
 
 				message.addAttachments( attach );
