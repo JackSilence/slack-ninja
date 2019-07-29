@@ -60,12 +60,12 @@ public class MovieController extends DialogController {
 
 		SlackMessage message = Slack.message( Slack.attachment().setTitle( theater ).setTitleLink( theater( theater, i -> {
 			Element element = link( i );
-			log.info( i.text() );
-			if ( film.equals( i.text() ) ) {
+
+			if ( film.equals( element.text() ) ) {
 				SlackAttachment attach = Slack.attachment( "good" ).setTitle( film ).setTitleLink( Jsoup.href( element ) );
 
-				attach.setAuthorIcon( i.selectFirst( "ul:eq(0)" ).select( "img" ).get( 0 ).attr( "src" ) );
-				attach.setThumbUrl( i.selectFirst( "ul:eq(0)" ).select( "img" ).get( 1 ).attr( "src" ) );
+				attach.setAuthorIcon( element.selectFirst( "ul:eq(0)" ).select( "img" ).get( 0 ).attr( "src" ) );
+				attach.setThumbUrl( element.selectFirst( "ul:eq(0)" ).select( "img" ).get( 1 ).attr( "src" ) );
 
 			}
 
