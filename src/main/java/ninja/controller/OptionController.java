@@ -62,8 +62,8 @@ public class OptionController extends BaseController {
 
 	private Map<String, List<Map<String, String>>> options( Stream<Map<String, String>> options ) {
 		List<Map<String, String>> list = options.collect( Collectors.toList() );
-		list.add( option( "請選擇", "" ) );
-
+		list.add( option( "請選擇", "請選擇" ) );
+log.info( list.toString() );
 		return ImmutableMap.of( OPTIONS, list );
 	}
 }
