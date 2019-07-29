@@ -5,8 +5,6 @@ import java.util.Map;
 
 import com.google.gson.annotations.SerializedName;
 
-import net.gpedro.integrations.slack.SlackAction;
-
 public class Payload {
 	private String type, name, value, state;
 
@@ -22,7 +20,7 @@ public class Payload {
 
 	private Map<String, String> submission;
 
-	private List<SlackAction> actions;
+	private List<Action> actions;
 
 	public String getType() {
 		return type;
@@ -96,11 +94,11 @@ public class Payload {
 		this.submission = submission;
 	}
 
-	public List<SlackAction> getActions() {
+	public List<Action> getActions() {
 		return actions;
 	}
 
-	public void setActions( List<SlackAction> actions ) {
+	public void setActions( List<Action> actions ) {
 		this.actions = actions;
 	}
 }

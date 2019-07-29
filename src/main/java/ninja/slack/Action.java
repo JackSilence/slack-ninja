@@ -9,6 +9,7 @@ import com.google.gson.annotations.SerializedName;
 
 import net.gpedro.integrations.slack.SlackAction;
 import net.gpedro.integrations.slack.SlackActionType;
+import ninja.consts.Act;
 import ninja.util.Gson;
 
 public class Action extends SlackAction {
@@ -19,8 +20,8 @@ public class Action extends SlackAction {
 	@SerializedName( "selected_options" )
 	private List<Map<String, String>> selected;
 
-	public Action( String name, String text, SlackActionType type, String value ) {
-		super( name, text, type, value );
+	public Action( Act act, String text, SlackActionType type, String value ) {
+		super( act.name(), text, type, value );
 	}
 
 	public Confirm getConfirm() {

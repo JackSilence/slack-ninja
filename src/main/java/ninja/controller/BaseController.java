@@ -38,7 +38,7 @@ public abstract class BaseController {
 
 	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id";
 
-	protected static final String LABEL = "label", VALUE = "value", OPTIONS = "options";
+	protected static final String TEXT = "text", LABEL = "label", VALUE = "value", OPTIONS = "options";
 
 	protected static final ZoneId ZONE_ID = ZoneId.of( Zone.TAIPEI );
 

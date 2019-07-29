@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.gpedro.integrations.slack.SlackAction;
+import ninja.consts.Act;
 import ninja.consts.Dialog;
 import ninja.consts.Task;
+import ninja.slack.Action;
 import ninja.slack.Payload;
 import ninja.util.Gson;
 import ninja.util.Heroku;
@@ -38,29 +39,37 @@ public class TaskController extends BaseController {
 
 		log.info( "State: " + message.getState() ); // 目前是dialog有設state就會收到
 
-		String id = message.getId(), command, text = StringUtils.EMPTY;
+		String command = message.getId(), text = StringUtils.EMPTY;
 
 		if ( Type.INTERACTIVE_MESSAGE.equals( type ) ) {
-			check( Heroku.TASK_ID, id, payload );
+			Act act = check( Act.class, command, payload );
 
-			List<SlackAction> actions = message.getActions();
+			Action action = check( message.getActions(), payload );
 
-			check( CollectionUtils.isNotEmpty( actions ) && actions.size() == 1, payload );
+			check( command, action.getName(), payload );
 
-			SlackAction action = actions.get( 0 );
+			if ( Act.HEROKU_TASK.equals( act ) ) {
+				check( Task.class, command = action.getValue(), payload );
 
-			check( Heroku.TASK_ID, action.getName(), payload );
+			} else {
+				text = check( action.getSelected(), payload ).get( VALUE );
 
-			check( Task.class, command = action.getValue(), payload );
+			}
 
 		} else {
 			Map<String, String> submission = message.getSubmission();
 
 			Assert.notEmpty( submission, payload );
 
-			text = check( Dialog.class, command = id, payload ).text( submission );
+			text = check( Dialog.class, command, payload ).text( submission );
 		}
 
 		command( message.getUser().getName(), message.getChannel().getId(), command.toLowerCase(), text );
+	}
+
+	private <T> T check( List<T> list, String payload ) {
+		check( CollectionUtils.isNotEmpty( list ) && list.size() == 1, payload );
+
+		return list.get( 0 );
 	}
 }
