@@ -3,7 +3,7 @@ package ninja.util;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class Gson {
@@ -26,7 +26,7 @@ public class Gson {
 		return GSON.toJson( src );
 	}
 
-	public static JsonElement element( Object src ) {
-		return GSON.toJsonTree( src );
+	public static JsonObject object( Object src ) {
+		return GSON.toJsonTree( src ).getAsJsonObject();
 	}
 }
