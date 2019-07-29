@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 
 import net.gpedro.integrations.slack.SlackActionType;
-import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Act;
 import ninja.slack.Action;
 import ninja.slack.Confirm;
@@ -52,15 +51,11 @@ public class MovieController extends DialogController {
 
 	@PostMapping( "/theater" )
 	public String theater( @RequestParam String command, @RequestParam String text, @RequestParam( TRIGGER_ID ) String id ) {
-		Action action = new Action( Act.MOVIE, "請選擇要觀看的電影", SlackActionType.SELECT, null );
-
-		action.setConfirm( new Confirm( "確認送出嗎", "選擇以查詢時刻", "確認", "取消" ) );
+		Action action = new Action( Act.MOVIE, "請選擇要觀看的電影", SlackActionType.SELECT, null ).setConfirm( new Confirm() );
 
 		theater( text, i -> action.addOption( option( i.selectFirst( "li.filmTitle" ).text(), text ) ) );
 
-		SlackAttachment attach = Slack.attachment( "#3AA3E3" ).setCallbackId( Act.MOVIE.name() ).addAction( action );
-
-		return message( Slack.message( attach, command, text ) );
+		return message( Slack.message().addAttachments( Slack.attachment( Act.MOVIE ).addAction( action ) ) );
 	}
 
 	private Map<String, String> option( String film, String theater ) {

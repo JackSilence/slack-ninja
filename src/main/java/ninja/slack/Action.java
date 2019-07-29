@@ -1,8 +1,9 @@
 package ninja.slack;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
@@ -15,7 +16,7 @@ import ninja.util.Gson;
 public class Action extends SlackAction {
 	private Confirm confirm;
 
-	private List<Map<String, String>> options = new ArrayList<>();
+	private Set<Map<String, String>> options = new LinkedHashSet<>();
 
 	@SerializedName( "selected_options" )
 	private List<Map<String, String>> selected;
