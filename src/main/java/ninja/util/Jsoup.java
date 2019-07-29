@@ -21,6 +21,10 @@ public class Jsoup {
 		}
 	}
 
+	public static String href( Element element ) {
+		return element.attr( "href" );
+	}
+
 	public static void select( String url, String selector, Consumer<? super Element> action ) {
 		try {
 			get( url ).select( selector ).forEach( action );

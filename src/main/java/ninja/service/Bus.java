@@ -25,7 +25,7 @@ public class Bus extends PTX {
 
 	static {
 		Jsoup.select( ROUTES_URL, "section.busline li > a", i -> {
-			Matcher matcher = Pattern.compile( ROUTE_ID_REGEX ).matcher( i.attr( "href" ) );
+			Matcher matcher = Pattern.compile( ROUTE_ID_REGEX ).matcher( Jsoup.href( i ) );
 
 			if ( matcher.find() ) {
 				ROUTES.put( i.text(), matcher.group( 1 ) );
