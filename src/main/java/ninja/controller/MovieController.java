@@ -58,10 +58,12 @@ public class MovieController extends DialogController {
 
 		String theater = params[ 0 ], film = params[ 1 ];
 
-		SlackMessage message = Slack.message( Slack.attachment().setTitle( theater ).setTitleLink( theater( theater, i -> {
+		SlackAttachment attachment = Slack.attachment().setTitle( theater );
+
+		SlackMessage message = Slack.message( attachment, command, text );
+
+		attachment.setTitleLink( theater( theater, i -> {
 			Element element = link( i );
-			log.info( "film: {}, text: {}", film, element.text() );
-			log.info( "film: {}, text: {}", film.length(), element.text().length() );
 
 			if ( film.equals( element.text() ) ) {
 				SlackAttachment attach = Slack.attachment( "good" ).setTitle( film ).setTitleLink( Jsoup.href( element ) );
@@ -69,9 +71,9 @@ public class MovieController extends DialogController {
 				attach.setAuthorIcon( i.selectFirst( "ul:eq(0)" ).select( "img" ).get( 0 ).attr( "src" ) );
 				attach.setThumbUrl( i.selectFirst( "ul:eq(0)" ).select( "img" ).get( 1 ).attr( "src" ) );
 
+				message.addAttachments( attach );
 			}
-
-		} ) ), command, text );
+		} ) );
 
 		return message( message );
 	}
