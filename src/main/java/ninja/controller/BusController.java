@@ -85,7 +85,7 @@ public class BusController extends DialogController {
 
 		Sets.intersection( info.get( start ), info.get( end ) ).parallelStream().forEach( i -> command( user, channel, "bus", bus.text( i, start ) ) );
 
-		return message( Slack.message( Slack.attachment(), command, text ) );
+		return message( Slack.attachment(), command, text );
 	}
 
 	private String time( Double time ) {
