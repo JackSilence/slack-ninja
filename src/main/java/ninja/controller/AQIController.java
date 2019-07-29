@@ -64,7 +64,7 @@ public class AQIController extends DialogController {
 
 		TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
 
-		return message( Slack.message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text ) );
+		return message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text );
 	}
 
 	private String value( String value, String unit ) {

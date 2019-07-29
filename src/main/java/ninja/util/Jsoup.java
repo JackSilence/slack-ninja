@@ -21,9 +21,9 @@ public class Jsoup {
 		}
 	}
 
-	public static void select( String url, String css, Consumer<? super Element> action ) {
+	public static void select( String url, String selector, Consumer<? super Element> action ) {
 		try {
-			get( url ).select( css ).forEach( action );
+			get( url ).select( selector ).forEach( action );
 
 		} catch ( RuntimeException e ) {
 			log.error( "", e );
