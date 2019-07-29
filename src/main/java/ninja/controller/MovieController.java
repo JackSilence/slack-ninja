@@ -60,6 +60,8 @@ public class MovieController extends DialogController {
 
 		SlackMessage message = Slack.message( Slack.attachment().setTitle( theater ).setTitleLink( theater( theater, i -> {
 			Element element = link( i );
+			log.info( "film: {}, text: {}", film, element.text() );
+			log.info( "film: {}, text: {}", film.length(), element.text().length() );
 
 			if ( film.equals( element.text() ) ) {
 				SlackAttachment attach = Slack.attachment( "good" ).setTitle( film ).setTitleLink( Jsoup.href( element ) );
