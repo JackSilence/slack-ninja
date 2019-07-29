@@ -27,7 +27,7 @@ public class OptionController extends BaseController {
 	private Bus bus;
 
 	@PostMapping( "/options" )
-	public Map<String, List<Map<String, String>>> options( String payload ) {
+	public Map<String, List<?>> options( String payload ) {
 		Payload message = Gson.from( payload, Payload.class );
 
 		String id = message.getId(), value = message.getValue();
@@ -60,10 +60,7 @@ public class OptionController extends BaseController {
 		}
 	}
 
-	private Map<String, List<Map<String, String>>> options( Stream<Map<String, String>> options ) {
-		List<Map<String, String>> list = options.collect( Collectors.toList() );
-		list.add( option( "請選擇", "請選擇" ) );
-log.info( list.toString() );
-		return ImmutableMap.of( OPTIONS, list );
+	private Map<String, List<?>> options( Stream<?> options ) {
+		return ImmutableMap.of( OPTIONS, options.collect( Collectors.toList() ) );
 	}
 }
