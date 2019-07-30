@@ -29,7 +29,7 @@ public abstract class DialogController extends BaseController {
 
 	@Override
 	protected void preHandle( HttpServletRequest request ) {
-		if ( request.getParameter( "text" ).isEmpty() ) {
+		if ( request.getParameter( TEXT ).isEmpty() && !ArrayUtils.contains( skip(), request.getRequestURI() ) ) {
 			dialog( request.getParameter( TRIGGER_ID ), EnumUtils.getEnumIgnoreCase( Dialog.class, StringUtils.remove( request.getRequestURI(), "/" ) ) );
 
 			throw new SlackException( null );
@@ -52,6 +52,10 @@ public abstract class DialogController extends BaseController {
 
 	protected <T> Stream<T> iterate( T seed, UnaryOperator<T> f, long size ) {
 		return Stream.iterate( seed, f ).limit( size );
+	}
+
+	protected String[] skip() {
+		return ArrayUtils.EMPTY_STRING_ARRAY;
 	}
 
 	protected Object[] args() {

@@ -35,7 +35,9 @@ import ninja.util.Utils;
 
 @RestController
 public class MovieController extends DialogController {
-	private static final String URL = "http://www.atmovies.com.tw", PATH = "/showtime/a02/", RATING_REGEX = "/images/cer_(.+?).gif";
+	private static final String URL = "http://www.atmovies.com.tw", PATH = "/showtime/a02/";
+
+	private static final String MOVIE_PATH = "/movie", IMG = "img", RATING_REGEX = "/images/cer_(.+?).gif";
 
 	private static final Map<String, Map<String, String>> THEATERS = new LinkedHashMap<>();
 
@@ -54,6 +56,11 @@ public class MovieController extends DialogController {
 	private String url;
 
 	@Override
+	protected String[] skip() {
+		return ArrayUtils.toArray( MOVIE_PATH );
+	}
+
+	@Override
 	protected Object[] args() {
 		return ArrayUtils.toArray( json( THEATERS.entrySet().stream().map( i -> {
 			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, i.getValue().keySet().stream().map( super::option ).collect( Collectors.toList() ) );
@@ -69,7 +76,7 @@ public class MovieController extends DialogController {
 		return message( Slack.message().addAttachments( Slack.attachment( Act.MOVIE ).addAction( action ) ) );
 	}
 
-	@PostMapping( "/movie" )
+	@PostMapping( MOVIE_PATH )
 	public String movie( @RequestParam String command, @RequestParam String text ) {
 		String[] params = StringUtils.split( text );
 
@@ -133,11 +140,11 @@ public class MovieController extends DialogController {
 	}
 
 	private boolean star( Element title ) {
-		return title.child( 0 ).is( "img" );
+		return title.child( 0 ).is( IMG );
 	}
 
 	private String src( Element element ) {
-		return element.selectFirst( "img" ).attr( "src" );
+		return element.selectFirst( IMG ).attr( "src" );
 	}
 
 	private Element link( Element element ) {
