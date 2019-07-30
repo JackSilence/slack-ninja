@@ -13,6 +13,6 @@ public class Utils {
 	public static String find( String regex, String input ) {
 		Matcher matcher = Pattern.compile( regex ).matcher( input );
 
-		return matcher.find() ? matcher.group( 1 ) : StringUtils.EMPTY;
+		return matcher.find() ? matcher.group( 1 ) : null;
 	}
 }

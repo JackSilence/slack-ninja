@@ -25,7 +25,7 @@ public class Bus extends PTX {
 		Jsoup.select( ROUTES_URL, "section.busline li > a", i -> {
 			String id = Utils.find( ROUTE_ID_REGEX, Jsoup.href( i ) );
 
-			if ( !id.isEmpty() ) {
+			if ( id != null ) {
 				ROUTES.put( i.text(), id );
 			}
 		} );
