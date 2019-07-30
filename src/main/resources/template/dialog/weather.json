@@ -15,7 +15,7 @@
 			"label": "預報時間",
 			"type": "select",
 			"name": "hours",
-			"value": "0",
+			"value": "%s",
 			"placeholder": "請選擇預報時間",
 			"options": %s
 		}

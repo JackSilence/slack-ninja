@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 
@@ -73,16 +72,14 @@ public class WeatherController extends DialogController {
 	protected Object[] args() {
 		String hours = json( iterate( 0, i -> i + 6, 9 ).map( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
 
-		return ArrayUtils.toArray( DEFAULT_DIST, options( DISTRICTS.keySet() ), hours );
+		return ArrayUtils.toArray( DEFAULT_DIST, options( DISTRICTS.keySet() ), DEFAULT_HOURS, hours );
 	}
 
 	@PostMapping
 	public String weather( @RequestParam String command, @RequestParam String text ) {
-		String[] params = ( params = StringUtils.split( text ) ).length == 0 ? new String[] { DEFAULT_DIST, DEFAULT_HOURS } : params;
+		String[] params = StringUtils.split( StringUtils.defaultIfEmpty( text, ninja.util.Utils.spacer( DEFAULT_DIST, DEFAULT_HOURS ) ) );
 
-		check( params.length <= 2, "參數個數有誤: " + text );
-
-		params = params.length == 1 ? Ints.tryParse( params[ 0 ] ) != null ? ObjectArrays.concat( DEFAULT_DIST, params ) : ArrayUtils.add( params, DEFAULT_HOURS ) : params;
+		check( params.length == 2, "參數個數有誤: " + text );
 
 		String district = StringUtils.appendIfMissing( params[ 0 ], "區" );
 
