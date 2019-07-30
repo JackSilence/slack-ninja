@@ -133,7 +133,7 @@ public class MovieController extends DialogController {
 	}
 
 	private boolean star( Element title ) {
-		return src( title ).contains( "star" );
+		return title.child( 0 ).is( "img" );
 	}
 
 	private String src( Element element ) {
