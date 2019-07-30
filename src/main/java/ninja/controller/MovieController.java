@@ -71,9 +71,15 @@ public class MovieController extends DialogController {
 	public String theater( @RequestParam String text ) {
 		Action action = new Action( Act.MOVIE, "請選擇要觀看的電影", SlackActionType.SELECT, null ).setConfirm( new Confirm() );
 
-		theater( text, i -> action.addOption( option( title( i ), text ) ) );
+		SlackAttachment attach = Slack.attachment( Act.MOVIE ).setAuthorName( text ).setAuthorIcon( url ).addAction( action );
 
-		return message( Slack.message().addAttachments( Slack.attachment( Act.MOVIE ).addAction( action ) ) );
+		theater( text, i -> {
+			attach.setAuthorLink( i.baseUri() );
+
+			action.addOption( option( title( i ), text ) );
+		} );
+
+		return message( Slack.message().addAttachments( attach ) );
 	}
 
 	@PostMapping( MOVIE_PATH )
