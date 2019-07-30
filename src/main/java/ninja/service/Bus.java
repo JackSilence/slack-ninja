@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -25,10 +23,10 @@ public class Bus extends PTX {
 
 	static {
 		Jsoup.select( ROUTES_URL, "section.busline li > a", i -> {
-			Matcher matcher = Pattern.compile( ROUTE_ID_REGEX ).matcher( Jsoup.href( i ) );
+			String id = Utils.find( ROUTE_ID_REGEX, Jsoup.href( i ) );
 
-			if ( matcher.find() ) {
-				ROUTES.put( i.text(), matcher.group( 1 ) );
+			if ( !id.isEmpty() ) {
+				ROUTES.put( i.text(), id );
 			}
 		} );
 	}
