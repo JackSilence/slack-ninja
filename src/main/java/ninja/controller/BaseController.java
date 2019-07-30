@@ -3,6 +3,7 @@ package ninja.controller;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -101,6 +103,10 @@ public abstract class BaseController {
 		Request request = Request.Post( uri( method ) ).setHeader( "Authorization", "Bearer " + token );
 
 		return call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
+	}
+
+	protected String tag( String... tag ) {
+		return ninja.util.Utils.spacer( Arrays.stream( tag ).map( i -> StringUtils.wrap( i, "`" ) ).toArray( String[]::new ) );
 	}
 
 	protected SlackField field( String title, String value ) {

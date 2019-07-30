@@ -120,7 +120,7 @@ public class MovieController extends DialogController {
 
 					String rating = RATINGS.get( Utils.find( RATING_REGEX, src( li = li.nextElementSibling() ) ) );
 
-					attach.setText( String.format( "`%s` `%s`", rating, StringUtils.remove( li.text(), "片長：" ) ) );
+					attach.setText( tag( rating, StringUtils.remove( li.text(), "片長：" ) ) );
 				}
 
 				fields.add( field( version, time ) );
