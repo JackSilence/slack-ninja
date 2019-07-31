@@ -4,8 +4,11 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -134,8 +137,16 @@ public abstract class BaseController {
 		return checkNull( EnumUtils.getEnum( type, name ), message );
 	}
 
+	protected <T> T checkFirst( Stream<T> stream, String message ) {
+		return checkNull( stream.findFirst().orElse( null ), message );
+	}
+
 	protected <T> T checkNull( T value, String message ) {
 		return Optional.ofNullable( value ).orElseThrow( () -> new IllegalArgumentException( message ) );
+	}
+
+	protected <T> List<T> list( Stream<T> stream ) {
+		return stream.collect( Collectors.toList() );
 	}
 
 	private String digest( String content ) {

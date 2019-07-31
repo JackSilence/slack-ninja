@@ -9,7 +9,6 @@ import java.time.temporal.TemporalUnit;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -121,7 +120,7 @@ public class THSRController extends DialogController {
 	}
 
 	private List<String> iterate( Temporal temporal, long amount, TemporalUnit unit, long size ) {
-		return iterate( temporal, i -> i.plus( amount, unit ), size ).map( Temporal::toString ).collect( Collectors.toList() );
+		return list( iterate( temporal, i -> i.plus( amount, unit ), size ).map( Temporal::toString ) );
 	}
 
 	@PostConstruct

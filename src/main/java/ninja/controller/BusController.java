@@ -55,12 +55,12 @@ public class BusController extends DialogController {
 		filter = Filter.and( filter, stop.equals( unwrap ) ? Filter.STOP.contains( stop ) : Filter.STOP.eq( unwrap ), Filter.DIRECTION.le( "1" ) );
 
 		bus.call( "EstimatedTimeOfArrival", filter, "$orderby=Direction" ).stream().collect( Collectors.groupingBy( bus::stop, Collectors.toList() ) ).forEach( ( k, v ) -> {
-			message.addAttachments( Slack.attachment( "good" ).setText( ":busstop:" + k ).setFields( v.stream().map( i -> {
+			message.addAttachments( Slack.attachment( "good" ).setText( ":busstop:" + k ).setFields( list( v.stream().map( i -> {
 				Double direction = ( Double ) i.get( "Direction" ), time = ( Double ) i.get( "EstimateTime" ), status = ( Double ) i.get( "StopStatus" );
 
 				return field( "往".concat( direction.equals( 0d ) ? destination : departure ), time == null ? STATUS.get( status ) : time( time ) );
 
-			} ).collect( Collectors.toList() ) ) );
+			} ) ) ) );
 		} );
 
 		return message( message );

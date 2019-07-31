@@ -3,7 +3,6 @@ package ninja.controller;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +46,7 @@ public abstract class DialogController extends BaseController {
 	}
 
 	protected String json( Stream<Map<String, ?>> stream ) {
-		return Gson.json( stream.collect( Collectors.toList() ) );
+		return Gson.json( list( stream ) );
 	}
 
 	protected <T> Stream<T> iterate( T seed, UnaryOperator<T> f, long size ) {

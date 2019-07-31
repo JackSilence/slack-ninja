@@ -2,7 +2,6 @@ package ninja.controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +60,6 @@ public class OptionController extends BaseController {
 	}
 
 	private Map<String, List<?>> options( Stream<?> options ) {
-		return ImmutableMap.of( OPTIONS, options.collect( Collectors.toList() ) );
+		return ImmutableMap.of( OPTIONS, list( options ) );
 	}
 }

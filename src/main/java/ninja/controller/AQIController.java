@@ -46,7 +46,7 @@ public class AQIController extends DialogController {
 
 		String county = params[ 0 ], site = params[ 1 ], filter = Filter.and( Filter.COUNTY.eq( county ), Filter.SITE_NAME.eq( site ) );
 
-		Map<String, ?> info = checkNull( AQI.call( filter ).stream().findFirst().orElse( null ), "測站有誤: " + text );
+		Map<String, ?> info = checkFirst( AQI.call( filter ).stream(), "測站有誤: " + text );
 
 		String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA ), status = Cast.string( info, "Status" ), color;
 

@@ -5,9 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -63,7 +62,7 @@ public class MovieController extends DialogController {
 	@Override
 	protected Object[] args() {
 		return ArrayUtils.toArray( json( THEATERS.entrySet().stream().map( i -> {
-			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, i.getValue().keySet().stream().map( super::option ).collect( Collectors.toList() ) );
+			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, list( i.getValue().keySet().stream().map( super::option ) ) );
 		} ) ) );
 	}
 
@@ -133,10 +132,9 @@ public class MovieController extends DialogController {
 	}
 
 	private void theater( String theater, Consumer<? super Element> action ) {
-		Jsoup.select( URL + checkNull( THEATERS.values().stream().flatMap( i -> i.entrySet().stream() ).filter( i -> {
-			return i.getKey().equals( theater );
+		String url = checkFirst( THEATERS.values().stream().map( i -> i.get( theater ) ).filter( Objects::nonNull ), "查無影院: " + theater );
 
-		} ).map( Entry::getValue ).findFirst().orElse( null ), "查無影院: " + theater ), "ul#theaterShowtimeTable", action );
+		Jsoup.select( url = URL + url, "ul#theaterShowtimeTable", action );
 	}
 
 	private Map<String, String> option( Element title, String theater ) {
