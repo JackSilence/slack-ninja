@@ -28,7 +28,7 @@ public class MetroController extends DialogController {
 
 		log.info( "Start: {}, end: {}", start, end );
 
-		Elements tables = Jsoup.get( url = Metro.URL.concat( String.format( QUERY, start, end ) ) ).select( "form table" );
+		Elements tables = Jsoup.select( url = Metro.URL.concat( String.format( QUERY, start, end ) ), "form table" );
 
 		Element table = tables.first(), row = row( table, 2 );
 
