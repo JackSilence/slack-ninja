@@ -24,6 +24,7 @@ import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.service.THSR;
 import ninja.util.Cast;
+import ninja.util.Check;
 import ninja.util.Slack;
 import ninja.util.Utils;
 
@@ -62,17 +63,15 @@ public class THSRController extends DialogController {
 
 	@PostMapping( "/thsr" )
 	public String thsr( @RequestParam String command, @RequestParam String text ) {
-		String[] params = StringUtils.split( text );
-
-		check( params.length == 5, "參數個數有誤: " + text );
+		String[] params = Check.params( text, 5 );
 
 		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), date = params[ 2 ], time = params[ 3 ];
 
-		check( !start.equals( end ), "起訖站不得相同: " + text );
+		Check.expr( !start.equals( end ), "起訖站不得相同: " + text );
 
-		check( dates().contains( date ) && times().contains( time ), "時間有誤: " + text );
+		Check.expr( dates().contains( date ) && times().contains( time ), "時間有誤: " + text );
 
-		Way way = check( Way.class, params[ 4 ], "行程有誤: " + text );
+		Way way = Check.name( Way.class, params[ 4 ], "行程有誤: " + text );
 
 		SlackAttachment attach1 = Slack.attachment().setTitle( TITLE ).setTitleLink( LINK ), attach2 = Slack.attachment( "good" );
 
@@ -98,7 +97,7 @@ public class THSRController extends DialogController {
 	}
 
 	private String id( String station ) {
-		return checkNull( STATIONS.get( station ), "查無此站: " + station );
+		return Check.nil( STATIONS.get( station ), "查無此站: " + station );
 	}
 
 	private String time( Map<String, ?> map, Way way ) {

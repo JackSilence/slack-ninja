@@ -28,6 +28,7 @@ import net.gpedro.integrations.slack.SlackField;
 import ninja.consts.Act;
 import ninja.slack.Action;
 import ninja.slack.Confirm;
+import ninja.util.Check;
 import ninja.util.Jsoup;
 import ninja.util.Slack;
 import ninja.util.Utils;
@@ -83,9 +84,7 @@ public class MovieController extends DialogController {
 
 	@PostMapping( MOVIE_PATH )
 	public String movie( @RequestParam String command, @RequestParam String text ) {
-		String[] params = StringUtils.split( text );
-
-		check( params.length == 2, "參數個數有誤: " + text );
+		String[] params = Check.params( text );
 
 		String theater = params[ 0 ], film = params[ 1 ];
 
@@ -132,7 +131,7 @@ public class MovieController extends DialogController {
 	}
 
 	private void theater( String theater, Consumer<? super Element> action ) {
-		String url = checkFirst( THEATERS.values().stream().map( i -> i.get( theater ) ).filter( Objects::nonNull ), "查無影院: " + theater );
+		String url = Check.first( THEATERS.values().stream().map( i -> i.get( theater ) ).filter( Objects::nonNull ), "查無影院: " + theater );
 
 		Jsoup.select( url = URL + url, "ul#theaterShowtimeTable", action );
 	}

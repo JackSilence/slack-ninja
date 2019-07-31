@@ -1,6 +1,5 @@
 package ninja.controller;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
+import ninja.util.Check;
 import ninja.util.Jsoup;
 import ninja.util.Metro;
 
@@ -18,13 +18,11 @@ public class MetroController extends DialogController {
 
 	@PostMapping( "/mrt" )
 	public String mrt( @RequestParam String command, @RequestParam String text ) {
-		String[] params = StringUtils.split( text );
-
-		check( params.length == 2, "參數個數有誤: " + text );
+		String[] params = Check.params( text );
 
 		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), url, txt;
 
-		check( !start.equals( end ), "起訖站不得相同: " + text );
+		Check.expr( !start.equals( end ), "起訖站不得相同: " + text );
 
 		log.info( "Start: {}, end: {}", start, end );
 
@@ -47,7 +45,7 @@ public class MetroController extends DialogController {
 	}
 
 	private String id( String station ) {
-		return checkNull( Metro.get( station ), "查無此站: " + station );
+		return Check.nil( Metro.get( station ), "查無此站: " + station );
 	}
 
 	private Element row( Element table, int index ) {

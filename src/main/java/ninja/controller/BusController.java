@@ -19,6 +19,7 @@ import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Filter;
 import ninja.service.Bus;
 import ninja.util.Cast;
+import ninja.util.Check;
 import ninja.util.Slack;
 
 @RestController
@@ -32,13 +33,11 @@ public class BusController extends DialogController {
 
 	@PostMapping( "/bus" )
 	public String bus( @RequestParam String command, @RequestParam String text ) {
-		String[] params = ( params = StringUtils.split( text ) ).length == 1 ? ArrayUtils.add( params, StringUtils.EMPTY ) : params;
-
-		check( params.length == 2, "參數個數有誤: " + text );
+		String[] params = text.contains( StringUtils.SPACE ) ? Check.params( text ) : ArrayUtils.toArray( text, StringUtils.EMPTY );
 
 		String route = params[ 0 ], stop = params[ 1 ], unwrap = bus.unwrap( stop ), filter;
 
-		check( bus.check( route ), "查無路線: " + route );
+		Check.expr( bus.check( route ), "查無路線: " + route );
 
 		Map<String, ?> info = bus.call( "Route", filter = Filter.ROUTE.eq( route ) ).get( 0 ); // 原則上不可能拿不到
 
@@ -68,20 +67,18 @@ public class BusController extends DialogController {
 
 	@PostMapping( "/station" )
 	public String station( @RequestParam( CHANNEL_ID ) String channel, @RequestParam( "user_name" ) String user, @RequestParam String command, @RequestParam String text ) {
-		String[] params = StringUtils.split( text );
-
-		check( params.length == 2, "參數個數有誤: " + text );
+		String[] params = Check.params( text );
 
 		String start = params[ 0 ], end = params[ 1 ], filter = Filter.or( Filter.STATION.eq( start ), Filter.STATION.eq( end ) );
 
-		check( !start.equals( end ), "起訖站不得相同: " + start );
+		Check.expr( !start.equals( end ), "起訖站不得相同: " + start );
 
 		Map<String, Set<String>> info = bus.call( "Station", filter ).stream().collect( Collectors.toMap( bus::station, i -> {
 			return bus.stops( i, j -> bus.name( j, "RouteName" ) ).collect( Collectors.toSet() );
 
 		}, Sets::union ) );
 
-		check( info.keySet().size() == 2, "查無起站或訖站: " + text );
+		Check.expr( info.keySet().size() == 2, "查無起站或訖站: " + text );
 
 		Sets.intersection( info.get( start ), info.get( end ) ).parallelStream().forEach( i -> command( user, channel, "bus", bus.text( i, start ) ) );
 

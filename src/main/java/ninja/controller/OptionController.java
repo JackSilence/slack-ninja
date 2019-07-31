@@ -16,6 +16,7 @@ import ninja.service.Bus;
 import ninja.slack.Payload;
 import ninja.util.AQI;
 import ninja.util.Cast;
+import ninja.util.Check;
 import ninja.util.Gson;
 import ninja.util.Metro;
 import ninja.util.Utils;
@@ -31,7 +32,7 @@ public class OptionController extends BaseController {
 
 		String id = message.getId(), value = message.getValue();
 
-		check( "dialog_suggestion", message.getType(), payload );
+		Check.equals( "dialog_suggestion", message.getType(), payload );
 
 		switch ( Dialog.valueOf( id ) ) {
 			case BUS:

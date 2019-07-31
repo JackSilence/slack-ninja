@@ -6,7 +6,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,14 +13,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.HmacAlgorithms;
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -34,6 +31,7 @@ import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Zone;
+import ninja.util.Check;
 import ninja.util.Gson;
 import ninja.util.Signature;
 import ninja.util.Slack;
@@ -63,11 +61,11 @@ public abstract class BaseController {
 	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, @RequestBody String body, HttpServletRequest request ) {
 		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
 
-		check( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
+		Check.expr( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
 
 		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
 
-		check( signature, digest, String.join( "!=", signature, digest ) );
+		Check.equals( signature, digest, String.join( "!=", signature, digest ) );
 
 		request.setAttribute( REQ_BODY, body );
 
@@ -123,26 +121,6 @@ public abstract class BaseController {
 		String query = String.format( COMMAND_QUERY, command, UrlEscapers.urlFragmentEscaper().escape( text ) );
 
 		log.info( get( COMMAND_METHOD, System.getenv( "slack.legacy.token." + user ), channel, query ) );
-	}
-
-	protected void check( String expected, String actual, String message ) {
-		check( expected.equals( actual ), message );
-	}
-
-	protected void check( boolean expression, String message ) {
-		Assert.isTrue( expression, message );
-	}
-
-	protected <E extends Enum<E>> E check( Class<E> type, String name, String message ) {
-		return checkNull( EnumUtils.getEnum( type, name ), message );
-	}
-
-	protected <T> T checkFirst( Stream<T> stream, String message ) {
-		return checkNull( stream.findFirst().orElse( null ), message );
-	}
-
-	protected <T> T checkNull( T value, String message ) {
-		return Optional.ofNullable( value ).orElseThrow( () -> new IllegalArgumentException( message ) );
 	}
 
 	protected <T> List<T> list( Stream<T> stream ) {

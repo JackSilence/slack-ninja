@@ -13,6 +13,7 @@ import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Filter;
 import ninja.util.AQI;
 import ninja.util.Cast;
+import ninja.util.Check;
 import ninja.util.Slack;
 import ninja.util.Utils;
 
@@ -40,13 +41,11 @@ public class AQIController extends DialogController {
 
 	@PostMapping( "/aqi" )
 	public String aqi( @RequestParam String command, @RequestParam String text ) {
-		String[] params = StringUtils.split( StringUtils.defaultIfEmpty( text, DEFAULT ) );
-
-		check( params.length == 2, "參數個數有誤: " + text );
+		String[] params = Check.params( StringUtils.defaultIfEmpty( text, DEFAULT ) );
 
 		String county = params[ 0 ], site = params[ 1 ], filter = Filter.and( Filter.COUNTY.eq( county ), Filter.SITE_NAME.eq( site ) );
 
-		Map<String, ?> info = checkFirst( AQI.call( filter ).stream(), "測站有誤: " + text );
+		Map<String, ?> info = Check.first( AQI.call( filter ).stream(), "測站有誤: " + text );
 
 		String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA ), status = Cast.string( info, "Status" ), color;
 
