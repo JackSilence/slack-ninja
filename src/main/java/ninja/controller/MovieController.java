@@ -101,10 +101,10 @@ public class MovieController extends DialogController {
 		int number = films.size() == 1 ? 6 : 3;
 
 		films.forEach( i -> {
-			String[] arr = StringUtils.split( i.child( 1 ).child( 1 ).select( "li:not(.filmVersion,.theaterElse)" ).text().replace( "：", ":" ) );
+			String[] times = StringUtils.split( i.child( 1 ).child( 1 ).select( "li:not(.filmVersion,.theaterElse)" ).text().replace( "：", ":" ) );
 
-			attach.addFields( field( i.select( "li.filmVersion" ).text(), IntStream.range( 0, arr.length ).boxed().map( j -> {
-				return j % number == 0 ? arr[ j ] : j % number == number - 1 ? "|" + arr[ j ] + "\n" : "|" + arr[ j ];
+			attach.addFields( field( i.select( "li.filmVersion" ).text(), IntStream.range( 0, times.length ).boxed().map( j -> {
+				return String.format( j % number == 0 ? "%s" : j % number == number - 1 ? "|%s\n" : "|%s", times[ j ] );
 
 			} ).collect( Collectors.joining() ) ) );
 		} );
