@@ -15,7 +15,7 @@
 
 提供功能如下:
 - 電商平台點數查詢
-- 抓取PTT NBA BOX
+- [抓取PTT NBA BOX][nba]
 - Heroku Usage查詢
 - 百米家新商品通知
 - 捷運票價及乘車時間
@@ -29,6 +29,7 @@
 - 雙北上映影片查詢
 - [雙北上映影片時刻表][movie]
 
+[nba]:https://res.cloudinary.com/lethington/image/upload/v1564672810/slack/nba.png
 [weather]:https://res.cloudinary.com/lethington/image/upload/v1564668917/slack/weather.png
 [thsr]:https://res.cloudinary.com/lethington/image/upload/v1564668535/slack/thsr.png
 [aqi]:https://res.cloudinary.com/lethington/image/upload/v1564668735/slack/aqi.png
