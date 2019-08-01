@@ -1,18 +1,19 @@
 package ninja.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,6 @@ import com.google.common.collect.Iterables;
 
 import net.gpedro.integrations.slack.SlackActionType;
 import net.gpedro.integrations.slack.SlackAttachment;
-import net.gpedro.integrations.slack.SlackField;
 import ninja.consts.Act;
 import ninja.slack.Action;
 import ninja.slack.Confirm;
@@ -71,13 +71,9 @@ public class MovieController extends DialogController {
 	public String theater( @RequestParam String text ) {
 		Action action = new Action( Act.MOVIE, "請選擇要觀看的電影", SlackActionType.SELECT, null ).setConfirm( new Confirm() );
 
-		SlackAttachment attach = Slack.attachment( Act.MOVIE ).setAuthorName( text ).setAuthorIcon( url ).addAction( action );
+		SlackAttachment attach = Slack.attachment( Act.MOVIE ).addAction( action );
 
-		theater( text, i -> {
-			attach.setAuthorLink( i.baseUri() );
-
-			action.addOption( option( title( i ), text ) );
-		} );
+		films( text, attach ).forEach( i -> action.addOption( option( title( i ), text ) ) );
 
 		return message( Slack.message().addAttachments( attach ) );
 	}
@@ -88,52 +84,40 @@ public class MovieController extends DialogController {
 
 		String theater = params[ 0 ], film = params[ 1 ];
 
-		SlackAttachment attach = Slack.attachment().setAuthorName( theater ).setAuthorIcon( url ).setTitle( film );
+		SlackAttachment attach = Slack.attachment().setTitle( film );
 
-		List<SlackField> fields = new ArrayList<>();
+		List<Element> films = list( films( theater, attach ).stream().filter( i -> film.equals( title( i ).text() ) ) );
 
-		theater( theater, i -> {
-			Element title = title( i ), ul = i.child( 1 ).child( 0 ), li = ul.child( 0 );
+		Assert.notEmpty( films, "查無影片: " + film );
 
-			if ( film.equals( title.text() ) ) {
-				String txt = ul.nextElementSibling().select( "li:not(.filmVersion,.theaterElse)" ).text().replace( "：", ":" );
+		Element movie = films.get( 0 ), info = movie.child( 1 ).child( 0 ).child( 0 );
 
-				String version = i.select( "li.filmVersion" ).text(), time = StringUtils.EMPTY;
+		attach.setTitleLink( Jsoup.href( link( info ) ) ).setImageUrl( src( info ) ).setColor( star( title( movie ) ) ? "good" : null );
 
-				if ( version.isEmpty() ) {
-					time = StringUtils.replace( txt, StringUtils.SPACE, "|" );
+		String rating = RATINGS.get( Utils.find( RATING_REGEX, src( info = info.nextElementSibling() ) ) );
 
-				} else {
-					String[] arr = StringUtils.split( txt );
+		attach.setText( tag( rating, StringUtils.remove( info.text(), "片長：" ) ) );
 
-					for ( int j = 0; j < arr.length; j++ ) {
-						time += j % 3 == 1 ? "|" + arr[ j ] : j % 3 == 2 ? "|" + arr[ j ] + "\n" : arr[ j ];
-					}
-				}
+		int number = films.size() == 1 ? 6 : 3;
 
-				if ( fields.isEmpty() ) {
-					attach.setAuthorLink( i.baseUri() ).setTitleLink( Jsoup.href( link( li ) ) ).setImageUrl( src( li ) );
+		films.forEach( i -> {
+			String[] arr = StringUtils.split( i.child( 1 ).child( 1 ).select( "li:not(.filmVersion,.theaterElse)" ).text().replace( "：", ":" ) );
 
-					attach.setColor( star( title ) ? "good" : null );
+			attach.addFields( field( i.select( "li.filmVersion" ).text(), IntStream.range( 0, arr.length ).boxed().map( j -> {
+				return j % number == 0 ? arr[ j ] : j % number == number - 1 ? "|" + arr[ j ] + "\n" : "|" + arr[ j ];
 
-					String rating = RATINGS.get( Utils.find( RATING_REGEX, src( li = li.nextElementSibling() ) ) );
-
-					attach.setText( tag( rating, StringUtils.remove( li.text(), "片長：" ) ) );
-				}
-
-				fields.add( field( version, time ) );
-			}
+			} ).collect( Collectors.joining() ) ) );
 		} );
 
-		Assert.notEmpty( fields, "查無影片: " + film );
-
-		return message( attach.setFields( fields ), command, text );
+		return message( attach, command, text );
 	}
 
-	private void theater( String theater, Consumer<? super Element> action ) {
+	private Elements films( String theater, SlackAttachment attach ) {
 		String url = Check.first( THEATERS.values().stream().map( i -> i.get( theater ) ).filter( Objects::nonNull ), "查無影院: " + theater );
 
-		Jsoup.select( url = URL + url, "ul#theaterShowtimeTable", action );
+		attach.setAuthorName( theater ).setAuthorLink( url = URL + url ).setAuthorIcon( this.url );
+
+		return Jsoup.select( url, "ul#theaterShowtimeTable" );
 	}
 
 	private Map<String, String> option( Element title, String theater ) {
