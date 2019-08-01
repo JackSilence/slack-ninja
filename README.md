@@ -21,12 +21,15 @@
 - 捷運票價及乘車時間
 - 查詢可用任務
 - 刪除特定日期訊息
-- 台北市天氣查詢
+- [台北市天氣查詢][weather]
 - 台北市公車動態查詢
 - 台北市公車路線查詢
-- 高鐵時刻表與票價查詢
-- 各縣市空氣品質概況
+- [高鐵時刻表與票價查詢][thsr]
+- [各縣市空氣品質概況][aqi]
 - 雙北上映影片查詢
 - [雙北上映影片時刻表][movie]
 
+[weather]:https://res.cloudinary.com/lethington/image/upload/v1564668917/slack/weather.png
+[thsr]:https://res.cloudinary.com/lethington/image/upload/v1564668535/slack/thsr.png
+[aqi]:https://res.cloudinary.com/lethington/image/upload/v1564668735/slack/aqi.png
 [movie]:https://res.cloudinary.com/lethington/image/upload/v1564667673/slack/movie.png
