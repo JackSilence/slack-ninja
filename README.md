@@ -5,7 +5,14 @@
 - Slash Commands
 - Event Subscriptions
 - Bots
-  
+
+使用之Slack Web API:
+- channels.history
+- chat.command
+- chat.delete
+- chat.postMessage
+- dialog.open
+
 提供功能如下:
 - 電商平台點數查詢
 - 抓取PTT NBA BOX

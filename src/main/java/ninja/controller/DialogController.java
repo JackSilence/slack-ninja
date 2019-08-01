@@ -20,7 +20,7 @@ import ninja.consts.Dialog;
 import ninja.util.Gson;
 
 public abstract class DialogController extends BaseController {
-	private static final String DIALOG_TEMPLATE = "/template/dialog/%s.json";
+	private static final String DIALOG_TEMPLATE = "/template/dialog/%s.json", DIALOG_METHOD = "dialog.open";
 
 	@ExceptionHandler( SlackException.class )
 	public void ex() {
@@ -38,7 +38,7 @@ public abstract class DialogController extends BaseController {
 	protected void dialog( String id, Dialog dialog, Object... args ) {
 		String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
 
-		log.info( post( "dialog.open", ImmutableMap.of( TRIGGER_ID, id, "dialog", String.format( template, args ) ) ) );
+		log.info( post( DIALOG_METHOD, ImmutableMap.of( TRIGGER_ID, id, "dialog", String.format( template, args ) ) ) );
 	}
 
 	protected String options( Collection<String> collection ) {
