@@ -1,5 +1,6 @@
 package ninja.controller;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.HmacAlgorithms;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
@@ -20,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.google.common.collect.ImmutableMap;
@@ -58,12 +59,12 @@ public abstract class BaseController {
 	private String token;
 
 	@ModelAttribute
-	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, @RequestBody String body, HttpServletRequest request ) {
+	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, HttpServletRequest request ) throws IOException {
 		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
 
 		Check.expr( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
 
-		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
+		String body = IOUtils.toString( request.getReader() ), digest = digest( String.join( ":", VERSION, timestamp, body ) );
 
 		Check.equals( signature, digest, String.join( "!=", signature, digest ) );
 
