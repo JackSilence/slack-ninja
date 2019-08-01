@@ -1,6 +1,7 @@
 package ninja.controller;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -64,8 +65,8 @@ public abstract class BaseController {
 
 		Check.expr( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
 
-		String body = IOUtils.toString( request.getReader() ), digest = digest( String.join( ":", VERSION, timestamp, body ) );
-
+		String body = IOUtils.toString( request.getInputStream(), StandardCharsets.UTF_8.name() ), digest = digest( String.join( ":", VERSION, timestamp, body ) );
+		log.info( body );
 		Check.equals( signature, digest, String.join( "!=", signature, digest ) );
 
 		request.setAttribute( REQ_BODY, body );
