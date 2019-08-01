@@ -27,4 +27,6 @@
 - 高鐵時刻表與票價查詢
 - 各縣市空氣品質概況
 - 雙北上映影片查詢
-- 雙北上映影片時刻表
+- [雙北上映影片時刻表][movie]
+
+[movie]:https://res.cloudinary.com/lethington/image/upload/v1564667673/slack/movie.png
