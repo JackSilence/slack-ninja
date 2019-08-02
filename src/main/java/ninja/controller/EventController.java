@@ -57,7 +57,7 @@ public class EventController extends BaseController {
 		if ( Type.APP_MENTION.equals( type ) && StringUtils.contains( text, MENTION_KEYWORD ) ) {
 			post( Heroku.task( "您可選擇任務並於確認後執行", event.getChannel() ) );
 
-		} else if ( Type.MESSAGE.equals( type ) && text.matches( "[a-zA-Z]" ) ) {
+		} else if ( Type.MESSAGE.equals( type ) && text.matches( "[a-zA-Z]+" ) ) {
 			post( DICT_URL + text );
 		}
 	}
