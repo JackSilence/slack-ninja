@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.slack.Callback;
 import ninja.slack.Event;
 import ninja.util.Gson;
@@ -58,7 +59,7 @@ public class EventController extends BaseController {
 			post( Heroku.task( "您可選擇任務並於確認後執行", event.getChannel() ) );
 
 		} else if ( Type.MESSAGE.equals( type ) && text.matches( "[a-zA-Z]+" ) ) {
-			post( DICT_URL + text );
+			post( new SlackMessage( DICT_URL + text ) );
 		}
 	}
 
