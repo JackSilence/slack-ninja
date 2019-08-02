@@ -1,10 +1,5 @@
 package ninja.controller;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,28 +10,11 @@ import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import ninja.util.Check;
 import ninja.util.Jsoup;
+import ninja.util.Metro;
 
 @RestController
 public class MetroController extends DialogController {
-	private static final String URL = "https://m.metro.taipei/pda_ticket_price_time.asp";
-
 	private static final String QUERY = "?s1elect=%s&s2elect=%s&action=query", TITLE = "捷運票價及乘車時間";
-
-	private static final Map<String, Map<String, String>> STATIONS = new LinkedHashMap<>();
-
-	static {
-		Jsoup.select( URL, "select#sstation optgroup", i -> {
-			STATIONS.put( i.attr( LABEL ), i.children().stream().collect( Collectors.toMap( j -> {
-				return StringUtils.split( j.text() )[ 1 ];
-
-			}, Element::val, ( v1, v2 ) -> v1, LinkedHashMap::new ) ) );
-		} );
-	}
-
-	@Override
-	protected Object[] args() {
-		return groups( STATIONS );
-	}
 
 	@PostMapping( "/mrt" )
 	public String mrt( @RequestParam String command, @RequestParam String text ) {
@@ -48,7 +26,7 @@ public class MetroController extends DialogController {
 
 		log.info( "Start: {}, end: {}", start, end );
 
-		Elements tables = Jsoup.select( url = URL.concat( String.format( QUERY, start, end ) ), "form table" );
+		Elements tables = Jsoup.select( url = Metro.URL.concat( String.format( QUERY, start, end ) ), "form table" );
 
 		Element table = tables.first(), row = row( table, 2 );
 
@@ -67,7 +45,7 @@ public class MetroController extends DialogController {
 	}
 
 	private String id( String station ) {
-		return Check.option( STATIONS, station, "查無此站: " + station );
+		return Check.nil( Metro.get( station ), "查無此站: " + station );
 	}
 
 	private Element row( Element table, int index ) {

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -61,7 +62,9 @@ public class MovieController extends DialogController {
 
 	@Override
 	protected Object[] args() {
-		return groups( THEATERS );
+		return ArrayUtils.toArray( json( THEATERS.entrySet().stream().map( i -> {
+			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, list( i.getValue().keySet().stream().map( super::option ) ) );
+		} ) ) );
 	}
 
 	@PostMapping( "/theater" )
@@ -110,7 +113,7 @@ public class MovieController extends DialogController {
 	}
 
 	private Elements films( String theater, SlackAttachment attach ) {
-		String url = Check.option( THEATERS, theater, "查無影院: " + theater );
+		String url = Check.first( THEATERS.values().stream().map( i -> i.get( theater ) ).filter( Objects::nonNull ), "查無影院: " + theater );
 
 		attach.setAuthorName( theater ).setAuthorLink( url = URL + url ).setAuthorIcon( this.url );
 
