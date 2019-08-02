@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.slack.Callback;
 import ninja.slack.Event;
 import ninja.util.Gson;
 import ninja.util.Heroku;
+import ninja.util.Slack;
 
 @RestController
 
@@ -39,7 +39,7 @@ public class EventController extends BaseController {
 
 		Event event = callback.getEvent();
 
-		String challenge = callback.getChallenge(), text = event.getText();
+		String challenge = callback.getChallenge(), text = event.getText(), channel = event.getChannel();
 
 		if ( challenge != null ) {
 			model.addAttribute( CHALLENGE, challenge );
@@ -56,10 +56,10 @@ public class EventController extends BaseController {
 		Type type = EnumUtils.getEnumIgnoreCase( Type.class, event.getType() );
 
 		if ( Type.APP_MENTION.equals( type ) && StringUtils.contains( text, MENTION_KEYWORD ) ) {
-			post( Heroku.task( "您可選擇任務並於確認後執行", event.getChannel() ) );
+			post( Heroku.task( "您可選擇任務並於確認後執行", channel ) );
 
 		} else if ( Type.MESSAGE.equals( type ) && text.matches( "[a-zA-Z]+" ) ) {
-			post( new SlackMessage( DICT_URL + text ) );
+			post( Slack.message( DICT_URL + text, channel ) );
 		}
 	}
 

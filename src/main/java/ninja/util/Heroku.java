@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 
 import net.gpedro.integrations.slack.SlackActionType;
 import net.gpedro.integrations.slack.SlackAttachment;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Act;
 import ninja.consts.Task;
 import ninja.slack.Action;
@@ -24,7 +23,7 @@ public class Heroku {
 
 		Stream.of( Task.values() ).map( Heroku::action ).forEach( i -> attach.addAction( i ) );
 
-		return new SlackMessage( text ).setChannel( channel ).addAttachments( attach ).prepare();
+		return Slack.message( text, channel ).addAttachments( attach ).prepare();
 	}
 
 	private static Action action( Task task ) { // "confirm": {} -> 會出現預設的確認視窗

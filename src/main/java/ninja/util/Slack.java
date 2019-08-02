@@ -13,6 +13,10 @@ public class Slack {
 		return message().addAttachments( footer( attach, command, text ) );
 	}
 
+	public static SlackMessage message( String text, String channel ) {
+		return new SlackMessage( text ).setChannel( channel );
+	}
+
 	public static SlackMessage message() {
 		return new SlackMessage( StringUtils.EMPTY );
 	}
