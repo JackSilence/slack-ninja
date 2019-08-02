@@ -18,7 +18,6 @@ import ninja.util.AQI;
 import ninja.util.Cast;
 import ninja.util.Check;
 import ninja.util.Gson;
-import ninja.util.Metro;
 import ninja.util.Utils;
 
 @RestController
@@ -51,9 +50,6 @@ public class OptionController extends BaseController {
 				return options( AQI.call( Filter.COUNTY.eq( value ) ).stream().map( i -> {
 					return option( Utils.spacer( value, Cast.string( i, Filter.SITE_NAME.toString() ) ) );
 				} ) );
-
-			case MRT:
-				return options( Metro.find( value ).map( super::option ) );
 
 			default:
 				throw new IllegalArgumentException( payload );

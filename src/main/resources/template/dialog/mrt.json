@@ -6,23 +6,16 @@
 			"label": "起站名稱",
 			"type": "select",
 			"name": "start",
+			"value": "葫洲",
 			"placeholder": "輸入車站關鍵字",
-			"data_source": "external",
-			"min_query_length": 1,
-			"selected_options": [
-				{
-					"label": "葫洲",
-					"value": "葫洲"
-				}
-			]
+			"option_groups": %1$s
 		},
 		{
 			"label": "訖站名稱",
 			"type": "select",
 			"name": "end",
 			"placeholder": "輸入車站關鍵字",
-			"data_source": "external",
-			"min_query_length": 1
+			"option_groups": %1$s
 		}
 	]
 }

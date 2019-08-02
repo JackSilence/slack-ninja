@@ -1,5 +1,6 @@
 package ninja.util;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -26,6 +27,10 @@ public class Check {
 
 	public static <T> T nil( T value, String message ) {
 		return Optional.ofNullable( value ).orElseThrow( () -> new IllegalArgumentException( message ) );
+	}
+
+	public static String option( Map<String, Map<String, String>> map, String key, String message ) {
+		return first( map.values().stream().filter( i -> i.containsKey( key ) ), message ).get( key );
 	}
 
 	public static String[] params( String text ) {

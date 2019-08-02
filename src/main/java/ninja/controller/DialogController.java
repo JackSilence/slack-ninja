@@ -53,6 +53,12 @@ public abstract class DialogController extends BaseController {
 		return Stream.iterate( seed, f ).limit( size );
 	}
 
+	protected String[] groups( Map<String, Map<String, String>> map ) {
+		return ArrayUtils.toArray( json( map.entrySet().stream().map( i -> {
+			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, list( i.getValue().keySet().stream().map( super::option ) ) );
+		} ) ) );
+	}
+
 	protected String[] skip() {
 		return ArrayUtils.EMPTY_STRING_ARRAY;
 	}
