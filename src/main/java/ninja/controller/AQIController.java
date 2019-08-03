@@ -73,7 +73,7 @@ public class AQIController extends DialogController {
 
 		SlackAttachment attach = Slack.attachment( color ).setTitle( TITLE ).setTitleLink( LINK ).setText( tag( county, site ) );
 
-		attach.addFields( field( "AQI指標", aqi ) ).addFields( field( "狀態", info.get( "Status" ) ) );
+		attach.addFields( field( "AQI指標", aqi ) ).addFields( field( "狀態", status ) );
 
 		TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( info.get( i ), UNITS.get( i ) ) ) ) );
 
