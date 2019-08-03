@@ -6,9 +6,9 @@
 			"label": "測站名稱",
 			"type": "select",
 			"name": "site",
+			"value": "%s",
 			"placeholder": "輸入縣市選擇測站",
-			"data_source": "external",
-			"min_query_length": 3
+			"option_groups": %s
 		}
 	]
 }

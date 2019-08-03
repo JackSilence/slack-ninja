@@ -143,7 +143,7 @@ public class MovieController extends DialogController {
 	}
 
 	@PostConstruct
-	public void init() {
+	private void init() {
 		Jsoup.select( URL + PATH, "ul#theaterList > li", i -> {
 			if ( i.hasClass( "type0" ) ) {
 				THEATERS.put( StringUtils.remove( i.text(), "▼" ), new LinkedHashMap<>() );

@@ -2,24 +2,37 @@ package ninja.controller;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.fluent.Request;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.net.UrlEscapers;
+
+import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Filter;
-import ninja.util.AQI;
-import ninja.util.Cast;
 import ninja.util.Check;
+import ninja.util.Gson;
 import ninja.util.Slack;
-import ninja.util.Utils;
 
 @RestController
 public class AQIController extends DialogController {
-	private static final String DEFAULT = "臺北市 松山", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
+	private static final String SITE_URL = "https://airtw.epa.gov.tw/ajax.aspx?Target=Get%s&%s=", COUNTY = "County", NAME = "Name";
+
+	private static final String API_URL = "http://opendata.epa.gov.tw/ws/Data/AQI/?$format=json&$filter=";
+
+	private static final String DEFAULT = "松山", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
+
+	private static final Map<String, List<String>> SITES = new LinkedHashMap<>();
 
 	private static final Map<String, String> TITLES = new LinkedHashMap<>(), UNITS = new HashMap<>();
 
@@ -39,28 +52,55 @@ public class AQIController extends DialogController {
 		UNITS.put( "NO2", "ppb" );
 	}
 
+	@Override
+	protected Object[] args() {
+		return ArrayUtils.toArray( DEFAULT, json( SITES.entrySet().stream().map( i -> {
+			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, list( i.getValue().stream().map( super::option ) ) );
+		} ) ) );
+	}
+
 	@PostMapping( "/aqi" )
 	public String aqi( @RequestParam String command, @RequestParam String text ) {
-		String[] params = Check.params( StringUtils.defaultIfEmpty( text, DEFAULT ) );
+		String site = StringUtils.defaultIfEmpty( text, DEFAULT );
 
-		String county = params[ 0 ], site = params[ 1 ], filter = Filter.and( Filter.COUNTY.eq( county ), Filter.SITE_NAME.eq( site ) );
+		Check.first( SITES.values().stream().filter( i -> i.contains( site ) ), "查無測站: " + site );
 
-		Map<String, ?> info = Check.first( AQI.call( filter ).stream(), "測站有誤: " + text );
+		Map<String, String> info = call( API_URL + UrlEscapers.urlFragmentEscaper().escape( Filter.SITE_NAME.eq( site ) ) ).get( 0 );
 
-		String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA ), status = Cast.string( info, "Status" ), color;
+		String county = info.get( COUNTY ), aqi = StringUtils.defaultIfEmpty( info.get( "AQI" ), NA ), status = info.get( "Status" ), color;
 
 		color = "良好".equals( status ) ? "good" : "普通".equals( status ) ? "warning" : "設備維護".equals( status ) ? "#3AA3E3" : "danger";
 
 		SlackAttachment attach = Slack.attachment( color ).setTitle( TITLE ).setTitleLink( LINK ).setText( tag( county, site ) );
 
-		attach.addFields( field( "AQI指標", aqi ) ).addFields( field( "狀態", Cast.string( info, "Status" ) ) );
+		attach.addFields( field( "AQI指標", aqi ) ).addFields( field( "狀態", info.get( "Status" ) ) );
 
-		TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
+		TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( info.get( i ), UNITS.get( i ) ) ) ) );
 
 		return message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text );
 	}
 
+	private List<Map<String, String>> call( String uri ) {
+		return Gson.list( Utils.getEntityAsString( Request.Get( uri ) ) );
+	}
+
 	private String value( String value, String unit ) {
-		return StringUtils.isEmpty( StringUtils.remove( value, "-" ) ) ? NA : Utils.spacer( value, unit );
+		return StringUtils.isEmpty( StringUtils.remove( value, "-" ) ) ? NA : ninja.util.Utils.spacer( value, unit );
+	}
+
+	private String url( String target, String field ) {
+		return String.format( SITE_URL, target, field );
+	}
+
+	@PostConstruct
+	private void init() {
+		call( url( COUNTY, "AreaID" ) ).forEach( i -> {
+			SITES.put( i.get( NAME ), list( call( url( "Site", COUNTY ) + i.get( VALUE ) ).stream().map( j -> j.get( NAME ) ) ) );
+		} );
+
+		log.info( list( SITES.values().stream().flatMap( i -> i.stream() ) ).toString() );
+
+		log.info( "" + list( SITES.values().stream().flatMap( i -> i.stream() ) ).size() );
+		log.info( "" + list( SITES.values().stream().flatMap( i -> i.stream() ).distinct() ).size() );
 	}
 }
