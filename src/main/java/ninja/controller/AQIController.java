@@ -97,7 +97,7 @@ public class AQIController extends DialogController {
 		log.info( url( COUNTY, "AreaID" ) );
 		call( url( COUNTY, "AreaID" ) ).forEach( i -> {
 			log.info( url( "Site", COUNTY ) + i.get( VALUE ) );
-			SITES.put( i.get( NAME ), list( call( url( "Site", COUNTY ) + i.get( VALUE ) ).stream().map( j -> j.get( NAME ) ) ) );
+			SITES.put( i.get( NAME ), list( call( url( "Site", COUNTY ) + i.get( "Value" ) ).stream().map( j -> j.get( NAME ) ) ) );
 		} );
 
 		log.info( list( SITES.values().stream().flatMap( i -> i.stream() ) ).toString() );
