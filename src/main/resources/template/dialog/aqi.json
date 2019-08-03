@@ -7,7 +7,7 @@
 			"type": "select",
 			"name": "site",
 			"value": "%s",
-			"placeholder": "輸入縣市選擇測站",
+			"placeholder": "請選擇測站",
 			"option_groups": %s
 		}
 	]

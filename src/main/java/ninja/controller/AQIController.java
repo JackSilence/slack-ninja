@@ -26,9 +26,9 @@ import ninja.util.Slack;
 
 @RestController
 public class AQIController extends DialogController {
-	private static final String SITE_URL = "https://airtw.epa.gov.tw/ajax.aspx?Target=Get%s&%s=", COUNTY = "County", NAME = "Name";
+	private static final String SITE_URL = "https://airtw.epa.gov.tw/ajax.aspx?Target=Get%s&%s=", COUNTY = "County";
 
-	private static final String API_URL = "http://opendata.epa.gov.tw/ws/Data/AQI/?$format=json&$filter=";
+	private static final String NAME = "Name", API_URL = "http://opendata.epa.gov.tw/ws/Data/AQI/?$format=json&$filter=";
 
 	private static final String DEFAULT = "松山", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
 
@@ -94,15 +94,8 @@ public class AQIController extends DialogController {
 
 	@PostConstruct
 	private void init() {
-		log.info( url( COUNTY, "AreaID" ) );
 		call( url( COUNTY, "AreaID" ) ).forEach( i -> {
-			log.info( url( "Site", COUNTY ) + i.get( VALUE ) );
 			SITES.put( i.get( NAME ), list( call( url( "Site", COUNTY ) + i.get( "Value" ) ).stream().map( j -> j.get( NAME ) ) ) );
 		} );
-
-		log.info( list( SITES.values().stream().flatMap( i -> i.stream() ) ).toString() );
-
-		log.info( "" + list( SITES.values().stream().flatMap( i -> i.stream() ) ).size() );
-		log.info( "" + list( SITES.values().stream().flatMap( i -> i.stream() ).distinct() ).size() );
 	}
 }
