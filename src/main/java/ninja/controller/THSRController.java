@@ -62,7 +62,7 @@ public class THSRController extends DialogController {
 	}
 
 	@PostMapping( "/thsr" )
-	public SlackMessage thsr( @RequestParam String command, @RequestParam String text ) {
+	public String thsr( @RequestParam String command, @RequestParam String text ) {
 		String[] params = Check.params( text, 5 );
 
 		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), date = params[ 2 ], time = params[ 3 ];
@@ -93,7 +93,7 @@ public class THSRController extends DialogController {
 
 		SlackMessage message = Slack.message( attach1, command, text );
 
-		return info.size() > 0 ? message.addAttachments( attach2 ) : message;
+		return message( info.size() > 0 ? message.addAttachments( attach2 ) : message );
 	}
 
 	private String id( String station ) {

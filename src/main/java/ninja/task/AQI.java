@@ -19,6 +19,6 @@ public class AQI extends Task {
 	@Retryable( value = RuntimeException.class, backoff = @Backoff( 30000 ) )
 	@Override
 	public void exec() {
-		exec( aqi.aqi( COMMAND, StringUtils.EMPTY ).prepare().toString() );
+		exec( aqi.aqi( COMMAND, StringUtils.EMPTY ) );
 	}
 }

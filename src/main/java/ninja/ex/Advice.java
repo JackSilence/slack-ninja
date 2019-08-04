@@ -1,5 +1,7 @@
 package ninja.ex;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,15 +19,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import com.google.gson.JsonObject;
-
 import magic.util.Utils;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.controller.DelController;
 import ninja.controller.DialogController;
+import ninja.util.Gson;
 
 @RestControllerAdvice( assignableTypes = { DialogController.class, DelController.class } )
-public class Advice implements ResponseBodyAdvice<SlackMessage> {
+public class Advice implements ResponseBodyAdvice<String> {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
 	@Value( "${slack.user.token:}" )
@@ -44,18 +44,17 @@ public class Advice implements ResponseBodyAdvice<SlackMessage> {
 	}
 
 	@Override
-	public SlackMessage beforeBodyWrite( SlackMessage body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response ) {
+	public String beforeBodyWrite( String body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response ) {
 		HttpServletRequest req = ( HttpServletRequest ) request;
 
-		body.setChannel( req.getParameter( "channel_id" ) );
+		Map<String, Object> map = Gson.from( body, Map.class );
 
-		JsonObject object = body.prepare();
+		map.put( "channel", req.getParameter( "channel_id" ) );
 
-		object.addProperty( "user", req.getParameter( "user_id" ) );
+		map.put( "user", req.getParameter( "user_id" ) );
 
-		log.info( Utils.getEntityAsString( Request.Post( "https://slack.com/api/chat.postEphemeral" ).setHeader( "Authorization", "Bearer " + token ).bodyString( object.toString(), ContentType.APPLICATION_JSON ) ) );
+		log.info( Utils.getEntityAsString( Request.Post( "https://slack.com/api/chat.postEphemeral" ).setHeader( "Authorization", "Bearer " + token ).bodyString( Gson.json( map ), ContentType.APPLICATION_JSON ) ) );
 
 		return null;
 	}
-
 }

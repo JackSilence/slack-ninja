@@ -14,11 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.collect.ImmutableMap;
 
 import net.gpedro.integrations.slack.SlackAttachment;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.slack.Event;
 import ninja.slack.History;
 import ninja.util.Gson;
-import ninja.util.Slack;
 
 @RestController
 public class DelController extends BaseController {
@@ -29,7 +27,7 @@ public class DelController extends BaseController {
 	private static final Map<String, Long> DAYS_AGO = ImmutableMap.of( StringUtils.EMPTY, 0L, "今天", 0L, "昨天", 1L, "前天", 2L );
 
 	@PostMapping( value = "/delete" )
-	public SlackMessage delete( @RequestParam( CHANNEL_ID ) String channel, @RequestParam String command, @RequestParam String text ) {
+	public String delete( @RequestParam( CHANNEL_ID ) String channel, @RequestParam String command, @RequestParam String text ) {
 		Long days = DAYS_AGO.get( text ), success = 0L;
 
 		LocalDate date = days == null ? LocalDate.parse( text ) : LocalDate.now( ZONE_ID ).minusDays( days );
@@ -54,7 +52,7 @@ public class DelController extends BaseController {
 
 		String txt = String.format( TEXT, message.size(), success );
 
-		return Slack.message( new SlackAttachment( title + "\n" + txt ).setTitle( title ).setText( txt ), command, text );
+		return message( new SlackAttachment( title + "\n" + txt ).setTitle( title ).setText( txt ), command, text );
 	}
 
 	private long epochSecond( LocalDate date ) {

@@ -32,7 +32,7 @@ public class BusController extends DialogController {
 	private Bus bus;
 
 	@PostMapping( "/bus" )
-	public SlackMessage bus( @RequestParam String command, @RequestParam String text ) {
+	public String bus( @RequestParam String command, @RequestParam String text ) {
 		String[] params = text.contains( StringUtils.SPACE ) ? Check.params( text ) : ArrayUtils.toArray( text, StringUtils.EMPTY );
 
 		String route = params[ 0 ], stop = params[ 1 ], unwrap = bus.unwrap( stop ), filter;
@@ -48,7 +48,7 @@ public class BusController extends DialogController {
 		SlackMessage message = Slack.message( attach, command, text );
 
 		if ( stop.isEmpty() ) {
-			return message;
+			return message( message );
 		}
 
 		filter = Filter.and( filter, stop.equals( unwrap ) ? Filter.STOP.contains( stop ) : Filter.STOP.eq( unwrap ), Filter.DIRECTION.le( "1" ) );
@@ -62,11 +62,11 @@ public class BusController extends DialogController {
 			} ) ) ) );
 		} );
 
-		return message;
+		return message( message );
 	}
 
 	@PostMapping( "/station" )
-	public SlackMessage station( @RequestParam( CHANNEL_ID ) String channel, @RequestParam( "user_name" ) String user, @RequestParam String command, @RequestParam String text ) {
+	public String station( @RequestParam( CHANNEL_ID ) String channel, @RequestParam( "user_name" ) String user, @RequestParam String command, @RequestParam String text ) {
 		String[] params = Check.params( text );
 
 		String start = params[ 0 ], end = params[ 1 ], filter = Filter.or( Filter.STATION.eq( start ), Filter.STATION.eq( end ) );
@@ -82,7 +82,7 @@ public class BusController extends DialogController {
 
 		Sets.intersection( info.get( start ), info.get( end ) ).parallelStream().forEach( i -> command( user, channel, "bus", bus.text( i, start ) ) );
 
-		return Slack.message( Slack.attachment(), command, text );
+		return message( Slack.attachment(), command, text );
 	}
 
 	private String time( Double time ) {
