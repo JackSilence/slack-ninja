@@ -64,6 +64,6 @@ public class EventController extends BaseController {
 	}
 
 	private void post( Object src ) {
-		log.info( post( METHOD, token, src ) );
+		log.info( post( METHOD, src ) );
 	}
 }
