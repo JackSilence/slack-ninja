@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
@@ -45,7 +46,7 @@ public class Advice implements ResponseBodyAdvice<String> {
 
 	@Override
 	public String beforeBodyWrite( String body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response ) {
-		HttpServletRequest req = ( HttpServletRequest ) request;
+		HttpServletRequest req = ( ( ServletServerHttpRequest ) request ).getServletRequest();
 
 		Map<String, Object> map = Gson.from( body, Map.class );
 
