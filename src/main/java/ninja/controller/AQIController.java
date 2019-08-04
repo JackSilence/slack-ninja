@@ -19,6 +19,7 @@ import com.google.common.net.UrlEscapers;
 
 import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Filter;
 import ninja.util.Check;
 import ninja.util.Gson;
@@ -60,7 +61,7 @@ public class AQIController extends DialogController {
 	}
 
 	@PostMapping( "/aqi" )
-	public String aqi( @RequestParam String command, @RequestParam String text ) {
+	public SlackMessage aqi( @RequestParam String command, @RequestParam String text ) {
 		String site = StringUtils.defaultIfEmpty( text, DEFAULT );
 
 		Check.first( SITES.values().stream().filter( i -> i.contains( site ) ), "查無測站: " + site );
@@ -77,7 +78,7 @@ public class AQIController extends DialogController {
 
 		TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( info.get( i ), UNITS.get( i ) ) ) ) );
 
-		return message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text );
+		return Slack.message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text );
 	}
 
 	private List<Map<String, String>> call( String uri ) {

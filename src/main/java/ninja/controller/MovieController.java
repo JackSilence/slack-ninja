@@ -25,6 +25,7 @@ import com.google.common.collect.Iterables;
 
 import net.gpedro.integrations.slack.SlackActionType;
 import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Act;
 import ninja.slack.Action;
 import ninja.slack.Confirm;
@@ -68,18 +69,18 @@ public class MovieController extends DialogController {
 	}
 
 	@PostMapping( "/theater" )
-	public String theater( @RequestParam String text ) {
+	public SlackMessage theater( @RequestParam String text ) {
 		Action action = new Action( Act.MOVIE, "請選擇要觀看的電影", SlackActionType.SELECT, null ).setConfirm( new Confirm() );
 
 		SlackAttachment attach = Slack.attachment( Act.MOVIE ).addAction( action );
 
 		films( text, attach ).forEach( i -> action.addOption( option( title( i ), text ) ) );
 
-		return message( Slack.message().addAttachments( attach ) );
+		return Slack.message().addAttachments( attach );
 	}
 
 	@PostMapping( MOVIE_PATH )
-	public String movie( @RequestParam String command, @RequestParam String text ) {
+	public SlackMessage movie( @RequestParam String command, @RequestParam String text ) {
 		String[] params = Check.params( text );
 
 		String theater = params[ 0 ], film = params[ 1 ];
@@ -109,7 +110,7 @@ public class MovieController extends DialogController {
 			} ).collect( Collectors.joining() ) ) );
 		} );
 
-		return message( attach, command, text );
+		return Slack.message( attach, command, text );
 	}
 
 	private Elements films( String theater, SlackAttachment attach ) {

@@ -27,14 +27,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.net.UrlEscapers;
 
 import magic.util.Utils;
-import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Zone;
 import ninja.util.Check;
 import ninja.util.Gson;
 import ninja.util.Signature;
-import ninja.util.Slack;
 
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
@@ -78,14 +75,6 @@ public abstract class BaseController {
 
 	protected Map<String, String> option( String label, Object value ) {
 		return ImmutableMap.of( LABEL, label, VALUE, value.toString() );
-	}
-
-	protected String message( SlackAttachment attach, String command, String text ) {
-		return message( Slack.message( attach, command, text ) );
-	}
-
-	protected String message( SlackMessage message ) {
-		return message.prepare().toString();
 	}
 
 	protected String get( String method, String channel, String query ) {

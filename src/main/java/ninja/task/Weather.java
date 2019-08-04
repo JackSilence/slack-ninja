@@ -16,6 +16,6 @@ public class Weather extends Task {
 	@Scheduled( cron = "0 0 0,6,12,18 * * *", zone = Zone.TAIPEI )
 	@Override
 	public void exec() {
-		exec( weather.weather( COMMAND, StringUtils.EMPTY ) );
+		exec( weather.weather( COMMAND, StringUtils.EMPTY ).prepare().toString() );
 	}
 }

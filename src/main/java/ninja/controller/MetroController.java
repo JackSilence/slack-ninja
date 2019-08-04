@@ -8,16 +8,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.util.Check;
 import ninja.util.Jsoup;
 import ninja.util.Metro;
+import ninja.util.Slack;
 
 @RestController
 public class MetroController extends DialogController {
 	private static final String QUERY = "?s1elect=%s&s2elect=%s&action=query", TITLE = "捷運票價及乘車時間";
 
 	@PostMapping( "/mrt" )
-	public String mrt( @RequestParam String command, @RequestParam String text ) {
+	public SlackMessage mrt( @RequestParam String command, @RequestParam String text ) {
 		String[] params = Check.params( text );
 
 		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), url, txt;
@@ -36,7 +38,7 @@ public class MetroController extends DialogController {
 
 		attach.setText( txt = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
 
-		return message( attach.setFallback( txt ), command, text );
+		return Slack.message( attach.setFallback( txt ), command, text );
 	}
 
 	@Override

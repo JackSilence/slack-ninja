@@ -77,7 +77,7 @@ public class WeatherController extends DialogController {
 	}
 
 	@PostMapping
-	public String weather( @RequestParam String command, @RequestParam String text ) {
+	public SlackMessage weather( @RequestParam String command, @RequestParam String text ) {
 		String[] params = Check.params( StringUtils.defaultIfEmpty( text, ninja.util.Utils.spacer( DEFAULT_DIST, DEFAULT_HOURS ) ) );
 
 		String district = StringUtils.appendIfMissing( params[ 0 ], "區" );
@@ -131,7 +131,7 @@ public class WeatherController extends DialogController {
 			message.addAttachments( attach.setText( data[ 0 ] + DELIMITER + wind ) );
 		} );
 
-		return message( message );
+		return message;
 	}
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {
