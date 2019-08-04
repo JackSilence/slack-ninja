@@ -11,6 +11,7 @@
 - chat.command
 - chat.delete
 - chat.postMessage
+- chat.postEphemeral
 - dialog.open
 
 提供功能如下:
