@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -29,9 +28,6 @@ public class EventController extends BaseController {
 	private enum Type {
 		APP_MENTION, MESSAGE;
 	}
-
-	@Value( "${slack.bot.token:}" )
-	private String token;
 
 	@PostMapping( "/event" )
 	public void event( @RequestAttribute( REQ_BODY ) String body, Model model ) {
@@ -64,6 +60,6 @@ public class EventController extends BaseController {
 	}
 
 	private void post( Object src ) {
-		log.info( post( METHOD, token, src ) );
+		log.info( post( METHOD, src ) );
 	}
 }
