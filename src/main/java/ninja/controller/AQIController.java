@@ -61,9 +61,9 @@ public class AQIController extends DialogController {
 
 	@PostMapping( "/aqi" )
 	public String aqi( @RequestParam String command, @RequestParam String text ) {
-		String site = StringUtils.defaultIfEmpty( text, DEFAULT );
+		String site = StringUtils.defaultIfEmpty( text, DEFAULT ), county;
 
-		String county = Check.first( SITES.entrySet().stream().filter( i -> i.getValue().contains( site ) ), "查無測站: " + site ).getKey();
+		county = Check.first( SITES.entrySet().stream().filter( i -> i.getValue().contains( site ) ), "查無測站: " + site ).getKey();
 
 		Map<String, String> info = call( API_URL + UrlEscapers.urlFragmentEscaper().escape( Filter.SITE_NAME.eq( site ) ) ).get( 0 );
 
