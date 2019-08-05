@@ -10,7 +10,7 @@ public abstract class Data<T> {
 
 	public Map<String, T> data() {
 		init();
-		System.out.println( data );
+
 		return data;
 	}
 
@@ -19,7 +19,6 @@ public abstract class Data<T> {
 	@PostConstruct
 	private void init() {
 		if ( data.isEmpty() ) {
-			System.out.println( "init" );
 			init( data );
 		}
 	};
