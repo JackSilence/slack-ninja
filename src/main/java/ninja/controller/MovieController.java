@@ -104,7 +104,7 @@ public class MovieController extends DialogController {
 			String[] times = StringUtils.split( i.child( 1 ).child( 1 ).select( "li:not(.filmVersion,.theaterElse)" ).text().replace( "：", ":" ) );
 
 			attach.addFields( field( i.select( "li.filmVersion" ).text(), IntStream.range( 0, times.length ).boxed().map( j -> {
-				return String.format( j % number == 0 ? "%s" : j % number == number - 1 ? "|%s\n" : "|%s", times[ j ] );
+				return String.format( j % number == 0 ? "%s" : j % number == number - 1 ? " %s\n" : " %s", times[ j ] );
 
 			} ).collect( Collectors.joining() ) ) );
 		} );
