@@ -63,11 +63,11 @@ public class AQIController extends DialogController {
 	public String aqi( @RequestParam String command, @RequestParam String text ) {
 		String site = StringUtils.defaultIfEmpty( text, DEFAULT );
 
-		Check.first( SITES.values().stream().filter( i -> i.contains( site ) ), "查無測站: " + site );
+		String county = Check.first( SITES.entrySet().stream().filter( i -> i.getValue().contains( site ) ), "查無測站: " + site ).getKey();
 
 		Map<String, String> info = call( API_URL + UrlEscapers.urlFragmentEscaper().escape( Filter.SITE_NAME.eq( site ) ) ).get( 0 );
 
-		String county = info.get( COUNTY ), aqi = StringUtils.defaultIfEmpty( info.get( "AQI" ), NA ), status = info.get( "Status" ), color;
+		String aqi = StringUtils.defaultIfEmpty( info.get( "AQI" ), NA ), status = info.get( "Status" ), color;
 
 		color = "良好".equals( status ) ? "good" : "普通".equals( status ) ? "warning" : "設備維護".equals( status ) ? "#3AA3E3" : "danger";
 
