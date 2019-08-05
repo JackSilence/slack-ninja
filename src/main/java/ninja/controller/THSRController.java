@@ -6,11 +6,8 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalUnit;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
@@ -34,8 +31,6 @@ public class THSRController extends DialogController {
 
 	private static final String TITLE = "高鐵時刻表與票價查詢", LINK = "https://m.thsrc.com.tw/tw/TimeTable/SearchResult";
 
-	private static final Map<String, String> STATIONS = new LinkedHashMap<>();
-
 	private enum Way {
 		出發( "OriginStopTime/DepartureTime", "ge", "asc" ), 抵達( "DestinationStopTime/ArrivalTime", "le", "desc" );
 
@@ -58,7 +53,7 @@ public class THSRController extends DialogController {
 
 		LocalDateTime time = ( time = LocalDateTime.now( ZONE_ID ) ).truncatedTo( ChronoUnit.HOURS ).plusMinutes( 30 * ( int ) Math.ceil( time.getMinute() / 30d ) );
 
-		return ArrayUtils.toArray( TITLE, options( STATIONS.keySet() ), time.toLocalDate(), options( dates() ), time.toLocalTime(), options( times() ), Way.出發, way );
+		return ArrayUtils.toArray( TITLE, options( thsr.data().keySet() ), time.toLocalDate(), options( dates() ), time.toLocalTime(), options( times() ), Way.出發, way );
 	}
 
 	@PostMapping( "/thsr" )
@@ -97,7 +92,7 @@ public class THSRController extends DialogController {
 	}
 
 	private String id( String station ) {
-		return Check.nil( STATIONS.get( station ), "查無此站: " + station );
+		return Check.nil( thsr.data().get( station ), "查無此站: " + station );
 	}
 
 	private String time( Map<String, ?> map, Way way ) {
@@ -120,10 +115,5 @@ public class THSRController extends DialogController {
 
 	private List<String> iterate( Temporal temporal, long amount, TemporalUnit unit, long size ) {
 		return list( iterate( temporal, i -> i.plus( amount, unit ), size ).map( Temporal::toString ) );
-	}
-
-	@PostConstruct
-	private void init() {
-		thsr.call( "Station" ).forEach( i -> STATIONS.put( thsr.station( i ), Cast.string( i, "StationID" ) ) );
 	}
 }

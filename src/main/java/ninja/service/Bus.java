@@ -1,6 +1,5 @@
 package ninja.service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -18,18 +17,6 @@ public class Bus extends PTX {
 	private static final String ROUTES_URL = "https://ebus.gov.taipei/EBus/RouteList?ct=tpc", QUOTE = "\"";
 
 	private static final String ROUTE_ID_REGEX = "javascript:go\\('(.+?)'\\)", PATH = "Bus/%s/City/Taipei";
-
-	private static final Map<String, String> ROUTES = new HashMap<>();
-
-	static {
-		Jsoup.select( ROUTES_URL, "section.busline li > a", i -> {
-			String id = Utils.find( ROUTE_ID_REGEX, Jsoup.href( i ) );
-
-			if ( id != null ) {
-				ROUTES.put( i.text(), id );
-			}
-		} );
-	}
 
 	@Override
 	public List<Map<String, ?>> call( String path, String filter, String... query ) {
@@ -53,10 +40,21 @@ public class Bus extends PTX {
 	}
 
 	public String id( String route ) {
-		return ROUTES.get( route );
+		return data().get( route );
 	}
 
 	public boolean check( String route ) {
-		return ROUTES.containsKey( route );
+		return data().containsKey( route );
+	}
+
+	@Override
+	void init( Map<String, String> data ) {
+		Jsoup.select( ROUTES_URL, "section.busline li > a", i -> {
+			String id = Utils.find( ROUTE_ID_REGEX, Jsoup.href( i ) );
+
+			if ( id != null ) {
+				data.put( i.text(), id );
+			}
+		} );
 	}
 }
