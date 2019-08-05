@@ -9,7 +9,7 @@ import ninja.consts.Zone;
 import ninja.controller.WeatherController;
 
 @Service
-public class Weather extends Task {
+public class WeatherTask extends Task {
 	@Autowired
 	private WeatherController weather;
 

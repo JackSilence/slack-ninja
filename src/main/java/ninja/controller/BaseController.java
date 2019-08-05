@@ -6,7 +6,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.UrlEscapers;
 
-import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
@@ -35,6 +33,7 @@ import ninja.util.Check;
 import ninja.util.Gson;
 import ninja.util.Signature;
 import ninja.util.Slack;
+import ninja.util.Utils;
 
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
@@ -93,7 +92,7 @@ public abstract class BaseController {
 	}
 
 	protected String get( String method, String token, String channel, String query ) {
-		return call( Request.Get( uri( method ) + String.format( API_QUERY, token, channel ) + query ) );
+		return Utils.call( Request.Get( uri( method ) + String.format( API_QUERY, token, channel ) + query ) );
 	}
 
 	protected String post( String method, Object src ) {
@@ -103,11 +102,11 @@ public abstract class BaseController {
 	protected String post( String method, String token, Object src ) {
 		Request request = Request.Post( uri( method ) ).setHeader( "Authorization", "Bearer " + token );
 
-		return call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
+		return Utils.call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
 	}
 
 	protected String tag( String... tag ) {
-		return ninja.util.Utils.spacer( Arrays.stream( tag ).map( i -> StringUtils.wrap( i, "`" ) ).toArray( String[]::new ) );
+		return Utils.spacer( Arrays.stream( tag ).map( i -> StringUtils.wrap( i, "`" ) ).toArray( String[]::new ) );
 	}
 
 	protected SlackField field( String title, String value ) {
@@ -124,18 +123,14 @@ public abstract class BaseController {
 	}
 
 	protected <T> List<T> list( Stream<T> stream ) {
-		return stream.collect( Collectors.toList() );
+		return Utils.list( stream );
 	}
-
+	
 	private String digest( String content ) {
 		return String.join( "=", VERSION, Hex.encodeHexString( Signature.hmac( content, secret, HmacAlgorithms.HMAC_SHA_256 ) ) );
 	}
 
 	private String uri( String method ) {
 		return API_URL + method;
-	}
-
-	private String call( Request request ) {
-		return Utils.getEntityAsString( request );
 	}
 }

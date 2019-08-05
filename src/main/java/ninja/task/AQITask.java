@@ -11,7 +11,7 @@ import ninja.consts.Zone;
 import ninja.controller.AQIController;
 
 @Service
-public class AQI extends Task {
+public class AQITask extends Task {
 	@Autowired
 	private AQIController aqi;
 

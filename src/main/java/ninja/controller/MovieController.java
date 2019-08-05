@@ -1,19 +1,17 @@
 package ninja.controller;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,11 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 
 import net.gpedro.integrations.slack.SlackActionType;
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Act;
+import ninja.service.Movie;
 import ninja.slack.Action;
 import ninja.slack.Confirm;
 import ninja.util.Check;
@@ -35,11 +33,7 @@ import ninja.util.Utils;
 
 @RestController
 public class MovieController extends DialogController {
-	private static final String URL = "http://www.atmovies.com.tw", PATH = "/showtime/a02/";
-
 	private static final String MOVIE_PATH = "/movie", IMG = "img", RATING_REGEX = "/images/cer_(.+?).gif";
-
-	private static final Map<String, Map<String, String>> THEATERS = new LinkedHashMap<>();
 
 	private static final Map<String, String> RATINGS = new HashMap<>();
 
@@ -52,6 +46,9 @@ public class MovieController extends DialogController {
 		RATINGS.put( "R", "限制級" );
 	}
 
+	@Autowired
+	private Movie movie;
+
 	@Value( "${movie.icon.url:}" )
 	private String url;
 
@@ -62,7 +59,7 @@ public class MovieController extends DialogController {
 
 	@Override
 	protected Object[] args() {
-		return ArrayUtils.toArray( json( THEATERS.entrySet().stream().map( i -> {
+		return ArrayUtils.toArray( json( movie.data().entrySet().stream().map( i -> {
 			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, list( i.getValue().keySet().stream().map( super::option ) ) );
 		} ) ) );
 	}
@@ -92,7 +89,7 @@ public class MovieController extends DialogController {
 
 		Element movie = films.get( 0 ), info = movie.child( 1 ).child( 0 ).child( 0 );
 
-		attach.setTitleLink( Jsoup.href( link( info ) ) ).setImageUrl( src( info ) ).setColor( star( title( movie ) ) ? "good" : null );
+		attach.setTitleLink( Jsoup.href( this.movie.link( info ) ) ).setImageUrl( src( info ) ).setColor( star( title( movie ) ) ? "good" : null );
 
 		String rating = RATINGS.get( Utils.find( RATING_REGEX, src( info = info.nextElementSibling() ) ) );
 
@@ -113,9 +110,9 @@ public class MovieController extends DialogController {
 	}
 
 	private Elements films( String theater, SlackAttachment attach ) {
-		String url = Check.first( THEATERS.values().stream().map( i -> i.get( theater ) ).filter( Objects::nonNull ), "查無影院: " + theater );
+		String url = Check.first( movie.data().values().stream().map( i -> i.get( theater ) ).filter( Objects::nonNull ), "查無影院: " + theater );
 
-		attach.setAuthorName( theater ).setAuthorLink( url = URL + url ).setAuthorIcon( this.url );
+		attach.setAuthorName( theater ).setAuthorLink( url = Movie.URL + url ).setAuthorIcon( this.url );
 
 		return Jsoup.select( url, "ul#theaterShowtimeTable" );
 	}
@@ -134,24 +131,7 @@ public class MovieController extends DialogController {
 		return element.selectFirst( IMG ).attr( "src" );
 	}
 
-	private Element link( Element element ) {
-		return element.selectFirst( "a[href]" );
-	}
-
 	private Element title( Element element ) {
 		return element.selectFirst( "li.filmTitle" );
-	}
-
-	@PostConstruct
-	private void init() {
-		Jsoup.select( URL + PATH, "ul#theaterList > li", i -> {
-			if ( i.hasClass( "type0" ) ) {
-				THEATERS.put( StringUtils.remove( i.text(), "▼" ), new LinkedHashMap<>() );
-			} else {
-				Element link = link( i );
-
-				THEATERS.get( Iterables.getLast( THEATERS.keySet() ) ).put( link.text(), Jsoup.href( link ) );
-			}
-		} );
 	}
 }

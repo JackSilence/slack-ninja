@@ -9,7 +9,7 @@ import ninja.consts.Zone;
 import ninja.controller.DelController;
 
 @Service
-public class Delete extends Task {
+public class DelTask extends Task {
 	@Autowired
 	private DelController del;
 
