@@ -91,13 +91,13 @@ public class BusController extends DialogController {
 
 		Check.expr( info.keySet().size() == 2, "查無起站或訖站: " + text );
 
-		Action action = Slack.action( Act.BUS, "請選擇路線查詢動態" );
+		Action action = Slack.action( Act.BUS, "請選擇公車路線" );
 
 		Sets.intersection( info.get( start ), info.get( end ) ).stream().sorted().forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
 
 		SlackAttachment attach = Slack.attachment( Act.BUS ).setText( tag( start, end ) );
 
-		message( Slack.message().addAttachments( attach.setAuthorName( "大台北公車" ).setAuthorIcon( this.url ).addAction( action ) ), url );
+		message( Slack.message().addAttachments( attach.setAuthorName( "台北市公車路線查詢" ).setAuthorIcon( this.url ).addAction( action ) ), url );
 	}
 
 	private String time( Double time ) {
