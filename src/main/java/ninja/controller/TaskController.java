@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.net.UrlEscapers;
+
 import ninja.consts.Act;
 import ninja.consts.Dialog;
 import ninja.consts.Task;
@@ -23,6 +25,8 @@ import ninja.util.Heroku;
 @RestController
 @RequestMapping( "/task" )
 public class TaskController extends BaseController {
+	private static final String COMMAND_METHOD = "chat.command", COMMAND_QUERY = "&command=/%s&text=%s";
+
 	private enum Type {
 		INTERACTIVE_MESSAGE, DIALOG_SUBMISSION;
 	}
@@ -65,7 +69,9 @@ public class TaskController extends BaseController {
 			text = Check.name( Dialog.class, command, payload ).text( submission );
 		}
 
-		command( message.getUser().getName(), message.getChannel().getId(), command.toLowerCase(), text );
+		String query = String.format( COMMAND_QUERY, command, UrlEscapers.urlFragmentEscaper().escape( text ) );
+
+		log.info( get( COMMAND_METHOD, System.getenv( "slack.legacy.token." + message.getUser().getName() ), message.getChannel().getId(), query ) );
 	}
 
 	private <T> T check( List<T> list, String payload ) {

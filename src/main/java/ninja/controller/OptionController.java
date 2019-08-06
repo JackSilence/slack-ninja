@@ -45,7 +45,7 @@ public class OptionController extends BaseController {
 				return options( info.isEmpty() ? Stream.empty() : bus.stops( info.get( 0 ), bus::stop ).map( i -> option( i, bus.text( value, i ) ) ) );
 
 			case STATION:
-				return options( bus.call( "Station", Filter.STATION.contains( value ), "$select=StationName" ).stream().map( bus::station ).distinct().map( super::option ) );
+				return options( bus.call( "Station", Filter.STATION.contains( value ), "$select=StationName" ).stream().map( bus::station ).distinct().limit( 100 ).map( super::option ) );
 
 			case MRT:
 				return options( metro.data().keySet().stream().filter( i -> i.contains( value ) ).map( super::option ) );

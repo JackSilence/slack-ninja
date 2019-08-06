@@ -10,7 +10,7 @@ import ninja.slack.Action;
 import ninja.slack.Confirm;
 
 public class Slack {
-	private static final String ICON = "https://platform.slack-edge.com/img/default_application_icon.png";
+	private static final String ICON = "https://a.slack-edge.com/4a5c4/marketing/img/meta/favicon-32.png";
 
 	public static SlackMessage message( SlackAttachment attach, String command, String text ) {
 		return message().addAttachments( footer( attach, command, text ) );

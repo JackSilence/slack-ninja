@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.net.UrlEscapers;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
@@ -46,8 +45,6 @@ public abstract class BaseController {
 	private static final String HEADER_TIMESTAMP = "X-Slack-Request-Timestamp", HEADER_SIGNATURE = "X-Slack-Signature";
 
 	private static final String VERSION = "v0", API_URL = "https://slack.com/api/", API_QUERY = "?token=%s&channel=%s";
-
-	private static final String COMMAND_METHOD = "chat.command", COMMAND_QUERY = "&command=/%s&text=%s";
 
 	@Value( "${slack.signing.secret:}" )
 	private String secret;
@@ -115,12 +112,6 @@ public abstract class BaseController {
 
 	protected void message( SlackMessage message, String url ) {
 		log.info( Utils.call( url, message ) );
-	}
-
-	protected void command( String user, String channel, String command, String text ) {
-		String query = String.format( COMMAND_QUERY, command, UrlEscapers.urlFragmentEscaper().escape( text ) );
-
-		log.info( get( COMMAND_METHOD, System.getenv( "slack.legacy.token." + user ), channel, query ) );
 	}
 
 	protected <T> List<T> list( Stream<T> stream ) {

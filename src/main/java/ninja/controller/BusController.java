@@ -77,7 +77,7 @@ public class BusController extends DialogController {
 
 	@PostMapping( "/station" )
 	@Async
-	public void station( @RequestParam( CHANNEL_ID ) String channel, @RequestParam( "user_name" ) String user, @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
+	public void station( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		String[] params = Check.params( text );
 
 		String start = params[ 0 ], end = params[ 1 ], filter = Filter.or( Filter.STATION.eq( start ), Filter.STATION.eq( end ) );
@@ -95,7 +95,7 @@ public class BusController extends DialogController {
 
 		Sets.intersection( info.get( start ), info.get( end ) ).stream().sorted().forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
 
-		message( Slack.attachment( Act.BUS ).setAuthorName( "公車動態查詢" ).setAuthorIcon( this.url ).addAction( action ), command, text, url );
+		message( Slack.message().addAttachments( Slack.attachment( Act.BUS ).setText( tag( end ) ).setAuthorName( start ).setAuthorIcon( this.url ).addAction( action ) ), url );
 	}
 
 	private String time( Double time ) {
