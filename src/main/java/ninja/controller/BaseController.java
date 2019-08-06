@@ -110,6 +110,7 @@ public abstract class BaseController {
 	}
 
 	protected void message( SlackMessage message, String url ) {
+		log.info( message.prepare().toString() );
 		log.info( Utils.call( url, message ) );
 	}
 
