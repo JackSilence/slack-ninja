@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +34,9 @@ public class BusController extends DialogController {
 
 	@Autowired
 	private Bus bus;
+
+	@Value( "${bus.icon.url:}" )
+	private String url;
 
 	@PostMapping( "/bus" )
 	@Async
@@ -87,11 +91,11 @@ public class BusController extends DialogController {
 
 		Check.expr( info.keySet().size() == 2, "查無起站或訖站: " + text );
 
-		Action action = Slack.action( Act.BUS, "請選擇路線以查詢動態" );
+		Action action = Slack.action( Act.BUS, "請選擇公車路線" );
 
-		Sets.intersection( info.get( start ), info.get( end ) ).forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
+		Sets.intersection( info.get( start ), info.get( end ) ).stream().sorted().forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
 
-		message( Slack.attachment( Act.BUS ).setAuthorName( "台北市公車路線查詢" ).addAction( action ), command, text, url );
+		message( Slack.attachment( Act.BUS ).setAuthorName( "公車動態查詢" ).setAuthorIcon( url ).addAction( action ), command, text, url );
 	}
 
 	private String time( Double time ) {
