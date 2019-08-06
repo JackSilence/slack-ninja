@@ -95,7 +95,7 @@ public class BusController extends DialogController {
 
 		Sets.intersection( info.get( start ), info.get( end ) ).stream().sorted().forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
 
-		message( Slack.attachment( Act.BUS ).setAuthorName( "公車動態查詢" ).setAuthorIcon( url ).addAction( action ), command, text, url );
+		message( Slack.attachment( Act.BUS ).setAuthorName( "公車動態查詢" ).setAuthorIcon( this.url ).addAction( action ), command, text, url );
 	}
 
 	private String time( Double time ) {
