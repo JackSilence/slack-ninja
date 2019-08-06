@@ -121,7 +121,7 @@ public class MovieController extends DialogController {
 	private Map<String, String> option( Element title, String theater ) {
 		String film = title.text(), star = star( title ) ? "★" : StringUtils.EMPTY;
 
-		return ImmutableMap.of( TEXT, star + film, VALUE, Utils.spacer( theater, film ) );
+		return option2( star + film, Utils.spacer( theater, film ) );
 	}
 
 	private boolean star( Element title ) {

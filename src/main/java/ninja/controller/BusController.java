@@ -89,9 +89,9 @@ public class BusController extends DialogController {
 
 		Action action = Slack.action( Act.BUS, "請選擇路線以查詢動態" );
 
-		Sets.intersection( info.get( start ), info.get( end ) ).forEach( i -> action.addOption( option( i, bus.text( i, start ) ) ) );
+		Sets.intersection( info.get( start ), info.get( end ) ).forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
 
-		message( Slack.attachment( Act.BUS ).setAuthorName( "公車路線查詢" ).addAction( action ), command, text, url );
+		message( Slack.attachment( Act.BUS ).setAuthorName( "台北市公車路線查詢" ).addAction( action ), command, text, url );
 	}
 
 	private String time( Double time ) {

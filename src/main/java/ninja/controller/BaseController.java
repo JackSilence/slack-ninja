@@ -78,6 +78,10 @@ public abstract class BaseController {
 		return ImmutableMap.of( LABEL, label, VALUE, value.toString() );
 	}
 
+	protected Map<String, String> option2( String text, String value ) {
+		return ImmutableMap.of( TEXT, text, VALUE, value );
+	}
+
 	protected String get( String method, String channel, String query ) {
 		return get( method, token, channel, query );
 	}
@@ -110,7 +114,6 @@ public abstract class BaseController {
 	}
 
 	protected void message( SlackMessage message, String url ) {
-		log.info( message.prepare().toString() );
 		log.info( Utils.call( url, message ) );
 	}
 
