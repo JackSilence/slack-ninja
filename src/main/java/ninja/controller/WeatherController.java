@@ -107,7 +107,7 @@ public class WeatherController extends DialogController {
 
 			image.put( start, String.format( url, when, Cast.string( Cast.map( Cast.list( j, ELEMENT_VALUE ).get( 1 ) ), VALUE ) ) );
 		} );
-
+log.info( image.toString() );
 		each( elements, "AT", j -> at.put( Cast.string( j, "dataTime" ), Cast.string( first( j, ELEMENT_VALUE ), VALUE ) ) );
 
 		each( elements, "WeatherDescription", j -> {
@@ -124,7 +124,7 @@ public class WeatherController extends DialogController {
 			String title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點";
 
 			SlackAttachment attach = Slack.attachment( color ).setAuthorName( title ).setAuthorIcon( image.get( start ) );
-
+log.info( start );
 			attach.addFields( super.field( "溫度 / 體感", data[ 2 ].substring( 4, 6 ) + " / " + at.get( start ) + "˚C" ) );
 
 			attach.addFields( super.field( "舒適度", ci ) ).addFields( field( data[ 1 ], 4 ) ).addFields( field( data[ 5 ], 4 ) );

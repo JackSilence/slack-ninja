@@ -17,6 +17,8 @@ public class EXHandler implements AsyncUncaughtExceptionHandler {
 	public void handleUncaughtException( Throwable ex, Method method, Object... params ) {
 		log.error( StringUtils.EMPTY, ex );
 
-		log.info( Utils.call( params[ params.length - 1 ].toString(), new SlackMessage( ex.getMessage() ) ) );
+		String message = ex instanceof IllegalArgumentException ? ex.getMessage() : "系統忙碌中";
+
+		log.info( Utils.call( params[ params.length - 1 ].toString(), new SlackMessage( message ) ) );
 	}
 }
