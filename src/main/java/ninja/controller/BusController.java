@@ -91,7 +91,7 @@ public class BusController extends DialogController {
 
 		Check.expr( info.keySet().size() == 2, "查無起站或訖站: " + text );
 
-		Action action = Slack.action( Act.BUS, "請選擇公車路線" );
+		Action action = Slack.action( Act.BUS, "請選擇路線查詢動態" );
 
 		Sets.intersection( info.get( start ), info.get( end ) ).stream().sorted().forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
 
