@@ -23,7 +23,6 @@ import ninja.service.Bus;
 import ninja.slack.Action;
 import ninja.util.Cast;
 import ninja.util.Check;
-import ninja.util.Gson;
 import ninja.util.Slack;
 
 @RestController
@@ -91,9 +90,8 @@ public class BusController extends DialogController {
 		Action action = Slack.action( Act.BUS, "請選擇路線以查詢動態" );
 
 		Sets.intersection( info.get( start ), info.get( end ) ).forEach( i -> action.addOption( option( i, bus.text( i, start ) ) ) );
-		log.info( Sets.intersection( info.get( start ), info.get( end ) ).toString() );
-		log.info( Gson.json( Slack.attachment( Act.BUS ).setAuthorName( ":bus: 公車路線查詢" ).addAction( action ) ) );
-		message( Slack.attachment( Act.BUS ).setAuthorName( ":bus: 公車路線查詢" ).addAction( action ), command, text, url );
+
+		message( Slack.attachment( Act.BUS ).setAuthorName( "公車路線查詢" ).addAction( action ), command, text, url );
 	}
 
 	private String time( Double time ) {
