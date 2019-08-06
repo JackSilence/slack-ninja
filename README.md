@@ -33,4 +33,4 @@
 [weather]:https://res.cloudinary.com/lethington/image/upload/v1564668917/slack/weather.png
 [thsr]:https://res.cloudinary.com/lethington/image/upload/v1564668535/slack/thsr.png
 [aqi]:https://res.cloudinary.com/lethington/image/upload/v1564827683/slack/aqi.png
-[movie]:https://res.cloudinary.com/lethington/image/upload/v1564667673/slack/movie.png
+[movie]:https://res.cloudinary.com/lethington/image/upload/v1565075141/slack/movie.png
