@@ -17,8 +17,10 @@ import com.google.common.collect.Sets;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
+import ninja.consts.Act;
 import ninja.consts.Filter;
 import ninja.service.Bus;
+import ninja.slack.Action;
 import ninja.util.Cast;
 import ninja.util.Check;
 import ninja.util.Slack;
@@ -85,9 +87,11 @@ public class BusController extends DialogController {
 
 		Check.expr( info.keySet().size() == 2, "查無起站或訖站: " + text );
 
-		Sets.intersection( info.get( start ), info.get( end ) ).parallelStream().forEach( i -> command( user, channel, "bus", bus.text( i, start ) ) );
+		Action action = Slack.action( Act.BUS, "請選擇路線以查詢動態" );
 
-		message( Slack.attachment(), command, text, url );
+		Sets.intersection( info.get( start ), info.get( end ) ).forEach( i -> action.addOption( option( i, bus.text( i, start ) ) ) );
+
+		message( Slack.attachment( Act.BUS ).setAuthorName( ":bus: 公車路線查詢" ).addAction( action ), command, text, url );
 	}
 
 	private String time( Double time ) {

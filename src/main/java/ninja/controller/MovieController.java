@@ -21,12 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.ImmutableMap;
 
-import net.gpedro.integrations.slack.SlackActionType;
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Act;
 import ninja.service.Movie;
 import ninja.slack.Action;
-import ninja.slack.Confirm;
 import ninja.util.Check;
 import ninja.util.Jsoup;
 import ninja.util.Slack;
@@ -68,7 +66,7 @@ public class MovieController extends DialogController {
 	@PostMapping( "/theater" )
 	@Async
 	public void theater( @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		Action action = new Action( Act.MOVIE, "請選擇要觀看的電影", SlackActionType.SELECT, null ).setConfirm( new Confirm() );
+		Action action = Slack.action( Act.MOVIE, "請選擇要觀看的電影" );
 
 		SlackAttachment attach = Slack.attachment( Act.MOVIE ).addAction( action );
 
