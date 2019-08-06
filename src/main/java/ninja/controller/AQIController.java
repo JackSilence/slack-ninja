@@ -19,6 +19,7 @@ import ninja.consts.Filter;
 import ninja.service.AQI;
 import ninja.util.Check;
 import ninja.util.Slack;
+import ninja.util.Utils;
 
 @RestController
 public class AQIController extends DialogController {
@@ -76,6 +77,6 @@ public class AQIController extends DialogController {
 	}
 
 	private String value( String value, String unit ) {
-		return StringUtils.isEmpty( StringUtils.remove( value, "-" ) ) ? NA : ninja.util.Utils.spacer( value, unit );
+		return StringUtils.isEmpty( StringUtils.remove( value, "-" ) ) ? NA : Utils.spacer( value, unit );
 	}
 }

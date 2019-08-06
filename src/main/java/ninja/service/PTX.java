@@ -16,10 +16,10 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.google.common.net.UrlEscapers;
 
-import magic.util.Utils;
 import ninja.util.Cast;
 import ninja.util.Gson;
 import ninja.util.Signature;
+import ninja.util.Utils;
 
 public abstract class PTX extends Data<String> {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
@@ -45,7 +45,7 @@ public abstract class PTX extends Data<String> {
 
 		Request request = Request.Get( uri ).addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
 
-		return Gson.list( Utils.getEntityAsString( request.addHeader( "Accept-Encoding", "gzip" ) ) );
+		return Gson.list( Utils.call( request.addHeader( "Accept-Encoding", "gzip" ) ) );
 	}
 
 	public String station( Map<?, ?> map ) {

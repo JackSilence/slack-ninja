@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 
-import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
@@ -32,6 +31,7 @@ import ninja.util.Cast;
 import ninja.util.Check;
 import ninja.util.Gson;
 import ninja.util.Slack;
+import ninja.util.Utils;
 
 @RestController
 @RequestMapping( "/weather" )
@@ -78,7 +78,7 @@ public class WeatherController extends DialogController {
 
 	@PostMapping
 	public String weather( @RequestParam String command, @RequestParam String text ) {
-		String[] params = Check.params( StringUtils.defaultIfEmpty( text, ninja.util.Utils.spacer( DEFAULT_DIST, DEFAULT_HOURS ) ) );
+		String[] params = Check.params( StringUtils.defaultIfEmpty( text, Utils.spacer( DEFAULT_DIST, DEFAULT_HOURS ) ) );
 
 		String district = StringUtils.appendIfMissing( params[ 0 ], "區" );
 
@@ -93,7 +93,7 @@ public class WeatherController extends DialogController {
 
 		log.info( "From: {}, to: {}", from, to );
 
-		Map<?, ?> result = Gson.from( Utils.getEntityAsString( Request.Get( API_URL + String.format( QUERY, key, district, from, to ) ) ), Map.class );
+		Map<?, ?> result = Gson.from( Utils.call( Request.Get( API_URL + String.format( QUERY, key, district, from, to ) ) ), Map.class );
 
 		SlackMessage message = Slack.message( attachment( String.format( TITLE, district ), WEB_URL + town ), command, text );
 

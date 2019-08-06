@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import magic.service.IService;
-import magic.util.Utils;
+import ninja.util.Utils;
 
 public abstract class Task implements IService {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
@@ -18,6 +18,6 @@ public abstract class Task implements IService {
 	private String url;
 
 	protected void exec( String body ) {
-		log.info( Utils.getEntityAsString( Request.Post( url ).bodyString( body, ContentType.APPLICATION_JSON ) ) );
+		log.info( Utils.call( Request.Post( url ).bodyString( body, ContentType.APPLICATION_JSON ) ) );
 	}
 }
