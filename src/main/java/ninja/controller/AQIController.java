@@ -78,6 +78,10 @@ public class AQIController extends DialogController {
 		message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text, url );
 	}
 
+	public void aqi( String command, String url ) {
+		aqi( command, StringUtils.EMPTY, url ); // 利用Proxy模式下內部呼叫非同步不會作用的機制提供此方法給Task @Retryable
+	}
+
 	private String value( String value, String unit ) {
 		return StringUtils.isEmpty( StringUtils.remove( value, "-" ) ) ? NA : Utils.spacer( value, unit );
 	}
