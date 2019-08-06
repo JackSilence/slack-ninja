@@ -13,7 +13,7 @@ import ninja.util.Utils;
 
 @Service
 public class SiteTask extends Task {
-	private static final String TEMPLATE = "測站數量: %s, 不重複名稱數: %s";
+	private static final String TEMPLATE = "測站數量: %d, 不重複名稱數: %d";
 
 	@Autowired
 	private AQI aqi;
