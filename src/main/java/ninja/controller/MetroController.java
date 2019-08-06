@@ -3,6 +3,7 @@ package ninja.controller;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,26 +22,27 @@ public class MetroController extends DialogController {
 	private Metro metro;
 
 	@PostMapping( "/mrt" )
-	public String mrt( @RequestParam String command, @RequestParam String text ) {
+	@Async
+	public void mrt( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		String[] params = Check.params( text );
 
-		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), url, txt;
+		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), link, txt;
 
 		Check.expr( !start.equals( end ), "起訖站不得相同: " + text );
 
 		log.info( "Start: {}, end: {}", start, end );
 
-		Elements tables = Jsoup.select( url = Metro.URL.concat( String.format( QUERY, start, end ) ), "form table" );
+		Elements tables = Jsoup.select( link = Metro.URL.concat( String.format( QUERY, start, end ) ), "form table" );
 
 		Element table = tables.first(), row = row( table, 2 );
 
-		SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( url );
+		SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( link );
 
 		row( table, 1 ).select( "td:lt(3)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
 
 		attach.setText( txt = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
 
-		return message( attach.setFallback( txt ), command, text );
+		message( attach.setFallback( txt ), command, text, url );
 	}
 
 	@Override

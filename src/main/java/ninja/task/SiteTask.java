@@ -25,6 +25,6 @@ public class SiteTask extends Task {
 
 		String text = String.format( TEMPLATE, sites.size(), sites.stream().distinct().count() );
 
-		exec( new SlackMessage( text ).prepare().toString() );
+		Utils.call( url, new SlackMessage( text ) );
 	}
 }

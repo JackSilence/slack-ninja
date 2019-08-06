@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,7 +57,8 @@ public class AQIController extends DialogController {
 	}
 
 	@PostMapping( "/aqi" )
-	public String aqi( @RequestParam String command, @RequestParam String text ) {
+	@Async
+	public void aqi( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		String site = StringUtils.defaultIfEmpty( text, DEFAULT ), county;
 
 		county = Check.first( aqi.data().entrySet().stream().filter( i -> i.getValue().contains( site ) ), "查無測站: " + site ).getKey();
@@ -73,7 +75,7 @@ public class AQIController extends DialogController {
 
 		TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( info.get( i ), UNITS.get( i ) ) ) ) );
 
-		return message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text );
+		message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text, url );
 	}
 
 	private String value( String value, String unit ) {

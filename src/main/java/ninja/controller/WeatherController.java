@@ -14,8 +14,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.fluent.Request;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,7 +34,7 @@ import ninja.util.Slack;
 import ninja.util.Utils;
 
 @RestController
-@RequestMapping( "/weather" )
+@RequestMapping
 public class WeatherController extends DialogController {
 	private static final String API_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-061";
 
@@ -76,8 +76,9 @@ public class WeatherController extends DialogController {
 		return ArrayUtils.toArray( DEFAULT_DIST, options( DISTRICTS.keySet() ), DEFAULT_HOURS, hours );
 	}
 
-	@PostMapping
-	public String weather( @RequestParam String command, @RequestParam String text ) {
+	@PostMapping( "/weather" )
+	@Async
+	public void weather( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		String[] params = Check.params( StringUtils.defaultIfEmpty( text, Utils.spacer( DEFAULT_DIST, DEFAULT_HOURS ) ) );
 
 		String district = StringUtils.appendIfMissing( params[ 0 ], "區" );
@@ -93,7 +94,7 @@ public class WeatherController extends DialogController {
 
 		log.info( "From: {}, to: {}", from, to );
 
-		Map<?, ?> result = Gson.from( Utils.call( Request.Get( API_URL + String.format( QUERY, key, district, from, to ) ) ), Map.class );
+		Map<?, ?> result = Gson.from( Utils.call( API_URL + String.format( QUERY, key, district, from, to ) ), Map.class );
 
 		SlackMessage message = Slack.message( attachment( String.format( TITLE, district ), WEB_URL + town ), command, text );
 
@@ -131,7 +132,7 @@ public class WeatherController extends DialogController {
 			message.addAttachments( attach.setText( data[ 0 ] + DELIMITER + wind ) );
 		} );
 
-		return message( message );
+		message( message, url );
 	}
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {

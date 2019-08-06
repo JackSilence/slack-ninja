@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,8 @@ public class BusController extends DialogController {
 	private Bus bus;
 
 	@PostMapping( "/bus" )
-	public String bus( @RequestParam String command, @RequestParam String text ) {
+	@Async
+	public void bus( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		String[] params = text.contains( StringUtils.SPACE ) ? Check.params( text ) : ArrayUtils.toArray( text, StringUtils.EMPTY );
 
 		String route = params[ 0 ], stop = params[ 1 ], unwrap = bus.unwrap( stop ), filter;
@@ -48,7 +50,9 @@ public class BusController extends DialogController {
 		SlackMessage message = Slack.message( attach, command, text );
 
 		if ( stop.isEmpty() ) {
-			return message( message );
+			message( message, url );
+
+			return;
 		}
 
 		filter = Filter.and( filter, stop.equals( unwrap ) ? Filter.STOP.contains( stop ) : Filter.STOP.eq( unwrap ), Filter.DIRECTION.le( "1" ) );
@@ -62,11 +66,12 @@ public class BusController extends DialogController {
 			} ) ) ) );
 		} );
 
-		return message( message );
+		message( message, url );
 	}
 
 	@PostMapping( "/station" )
-	public String station( @RequestParam( CHANNEL_ID ) String channel, @RequestParam( "user_name" ) String user, @RequestParam String command, @RequestParam String text ) {
+	@Async
+	public void station( @RequestParam( CHANNEL_ID ) String channel, @RequestParam( "user_name" ) String user, @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		String[] params = Check.params( text );
 
 		String start = params[ 0 ], end = params[ 1 ], filter = Filter.or( Filter.STATION.eq( start ), Filter.STATION.eq( end ) );
@@ -82,7 +87,7 @@ public class BusController extends DialogController {
 
 		Sets.intersection( info.get( start ), info.get( end ) ).parallelStream().forEach( i -> command( user, channel, "bus", bus.text( i, start ) ) );
 
-		return message( Slack.attachment(), command, text );
+		message( Slack.attachment(), command, text, url );
 	}
 
 	private String time( Double time ) {

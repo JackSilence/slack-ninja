@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +28,8 @@ public class DelController extends BaseController {
 	private static final Map<String, Long> DAYS_AGO = ImmutableMap.of( StringUtils.EMPTY, 0L, "今天", 0L, "昨天", 1L, "前天", 2L );
 
 	@PostMapping( value = "/delete" )
-	public String delete( @RequestParam( CHANNEL_ID ) String channel, @RequestParam String command, @RequestParam String text ) {
+	@Async
+	public void delete( @RequestParam( CHANNEL_ID ) String channel, @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		Long days = DAYS_AGO.get( text ), success = 0L;
 
 		LocalDate date = days == null ? LocalDate.parse( text ) : LocalDate.now( ZONE_ID ).minusDays( days );
@@ -52,7 +54,7 @@ public class DelController extends BaseController {
 
 		String txt = String.format( TEXT, message.size(), success );
 
-		return message( new SlackAttachment( title + "\n" + txt ).setTitle( title ).setText( txt ), command, text );
+		message( new SlackAttachment( title + "\n" + txt ).setTitle( title ).setText( txt ), command, text, url );
 	}
 
 	private long epochSecond( LocalDate date ) {

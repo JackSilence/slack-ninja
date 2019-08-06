@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,7 +58,8 @@ public class THSRController extends DialogController {
 	}
 
 	@PostMapping( "/thsr" )
-	public String thsr( @RequestParam String command, @RequestParam String text ) {
+	@Async
+	public void thsr( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		String[] params = Check.params( text, 5 );
 
 		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), date = params[ 2 ], time = params[ 3 ];
@@ -88,7 +90,7 @@ public class THSRController extends DialogController {
 
 		SlackMessage message = Slack.message( attach1, command, text );
 
-		return message( info.size() > 0 ? message.addAttachments( attach2 ) : message );
+		message( info.size() > 0 ? message.addAttachments( attach2 ) : message, url );
 	}
 
 	private String id( String station ) {

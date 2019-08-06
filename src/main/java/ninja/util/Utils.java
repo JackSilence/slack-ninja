@@ -8,10 +8,25 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
+
+import net.gpedro.integrations.slack.SlackMessage;
 
 public class Utils {
 	public static String call( Request request ) {
 		return magic.util.Utils.getEntityAsString( request );
+	}
+
+	public static String call( Request request, String body ) {
+		return call( request.bodyString( body, ContentType.APPLICATION_JSON ) );
+	}
+
+	public static String call( String uri ) {
+		return call( Request.Get( uri ) );
+	}
+
+	public static String call( String uri, SlackMessage message ) {
+		return call( Request.Post( uri ), message.prepare().toString() );
 	}
 
 	public static String spacer( String... elements ) {

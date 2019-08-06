@@ -19,6 +19,6 @@ public class DelTask extends Task {
 	@Scheduled( cron = "0 0 0 * * *", zone = Zone.TAIPEI )
 	@Override
 	public void exec() {
-		exec( del.delete( channel, COMMAND, "昨天" ) );
+		del.delete( channel, COMMAND, "昨天", url );
 	}
 }

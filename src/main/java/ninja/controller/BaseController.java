@@ -14,7 +14,6 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
-import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +37,7 @@ import ninja.util.Utils;
 public abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id";
+	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id", RESPONSE_URL = "response_url";
 
 	protected static final String TEXT = "text", LABEL = "label", VALUE = "value", OPTIONS = "options";
 
@@ -79,20 +78,12 @@ public abstract class BaseController {
 		return ImmutableMap.of( LABEL, label, VALUE, value.toString() );
 	}
 
-	protected String message( SlackAttachment attach, String command, String text ) {
-		return message( Slack.message( attach, command, text ) );
-	}
-
-	protected String message( SlackMessage message ) {
-		return message.prepare().toString();
-	}
-
 	protected String get( String method, String channel, String query ) {
 		return get( method, token, channel, query );
 	}
 
 	protected String get( String method, String token, String channel, String query ) {
-		return Utils.call( Request.Get( uri( method ) + String.format( API_QUERY, token, channel ) + query ) );
+		return Utils.call( uri( method ) + String.format( API_QUERY, token, channel ) + query );
 	}
 
 	protected String post( String method, Object src ) {
@@ -100,9 +91,7 @@ public abstract class BaseController {
 	}
 
 	protected String post( String method, String token, Object src ) {
-		Request request = Request.Post( uri( method ) ).setHeader( "Authorization", "Bearer " + token );
-
-		return Utils.call( request.bodyString( Gson.json( src ), ContentType.APPLICATION_JSON ) );
+		return Utils.call( Request.Post( uri( method ) ).setHeader( "Authorization", "Bearer " + token ), Gson.json( src ) );
 	}
 
 	protected String tag( String... tag ) {
@@ -116,6 +105,14 @@ public abstract class BaseController {
 	protected void preHandle( HttpServletRequest request ) {
 	}
 
+	protected void message( SlackAttachment attach, String command, String text, String url ) {
+		message( Slack.message( attach, command, text ), url );
+	}
+
+	protected void message( SlackMessage message, String url ) {
+		log.info( Utils.call( url, message ) );
+	}
+
 	protected void command( String user, String channel, String command, String text ) {
 		String query = String.format( COMMAND_QUERY, command, UrlEscapers.urlFragmentEscaper().escape( text ) );
 
@@ -125,7 +122,7 @@ public abstract class BaseController {
 	protected <T> List<T> list( Stream<T> stream ) {
 		return Utils.list( stream );
 	}
-	
+
 	private String digest( String content ) {
 		return String.join( "=", VERSION, Hex.encodeHexString( Signature.hmac( content, secret, HmacAlgorithms.HMAC_SHA_256 ) ) );
 	}

@@ -3,7 +3,6 @@ package ninja.service;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.client.fluent.Request;
 import org.springframework.stereotype.Service;
 
 import ninja.util.Gson;
@@ -16,7 +15,7 @@ public class AQI extends Data<List<String>> {
 	private static final String COUNTY = "County", NAME = "Name";
 
 	public List<Map<String, String>> call( String uri ) {
-		return Gson.list( Utils.call( Request.Get( uri ) ) );
+		return Gson.list( Utils.call( uri ) );
 	}
 
 	@Override

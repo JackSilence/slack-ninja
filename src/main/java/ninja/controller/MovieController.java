@@ -13,6 +13,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,18 +66,20 @@ public class MovieController extends DialogController {
 	}
 
 	@PostMapping( "/theater" )
-	public String theater( @RequestParam String text ) {
+	@Async
+	public void theater( @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		Action action = new Action( Act.MOVIE, "請選擇要觀看的電影", SlackActionType.SELECT, null ).setConfirm( new Confirm() );
 
 		SlackAttachment attach = Slack.attachment( Act.MOVIE ).addAction( action );
 
 		films( text, attach ).forEach( i -> action.addOption( option( title( i ), text ) ) );
 
-		return message( Slack.message().addAttachments( attach ) );
+		message( Slack.message().addAttachments( attach ), url );
 	}
 
 	@PostMapping( MOVIE_PATH )
-	public String movie( @RequestParam String command, @RequestParam String text ) {
+	@Async
+	public void movie( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		String[] params = Check.params( text );
 
 		String theater = params[ 0 ], film = params[ 1 ];
@@ -106,7 +109,7 @@ public class MovieController extends DialogController {
 			} ).collect( Collectors.joining() ) ) );
 		} );
 
-		return message( attach, command, text );
+		message( attach, command, text, url );
 	}
 
 	private Elements films( String theater, SlackAttachment attach ) {
