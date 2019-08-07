@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.ImmutableMap;
 
+import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.slack.Event;
 import ninja.slack.History;
@@ -35,7 +36,7 @@ public class DelController extends BaseController {
 
 		LocalDate date = days == null ? LocalDate.parse( text ) : LocalDate.now( ZONE_ID ).minusDays( days );
 
-		String title = date.toString(), query = String.format( QUERY, epochSecond( date ), epochSecond( date.plusDays( 1 ) ) );
+		String title = date.toString(), query = String.format( QUERY, epochSecond( date ), epochSecond( date.plusDays( 1 ) ) ), response;
 
 		log.info( "Date: {}, query: {}", date, query );
 
@@ -49,24 +50,18 @@ public class DelController extends BaseController {
 			event.setChannel( channel );
 
 			try {
-				success += post( DEL_METHOD, event ).contains( "\"ok\":true" ) ? 1 : 0;
+				log.info( response = post( DEL_METHOD, event ) );
+
+				success += response.contains( "\"ok\":true" ) ? 1 : 0;
 
 			} catch ( IllegalStateException e ) {
 				if ( !e.getMessage().contains( String.valueOf( HttpStatus.TOO_MANY_REQUESTS.value() ) ) ) {
 					throw e;
 				}
 
-				log.error( StringUtils.EMPTY, e );
-
 				i--;
 
-				try {
-					Thread.sleep( 2000 );
-
-				} catch ( InterruptedException e1 ) {
-					throw new RuntimeException( e );
-
-				}
+				Utils.sleep( 5000 );
 			}
 		}
 
