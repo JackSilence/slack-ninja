@@ -57,11 +57,11 @@ public abstract class DialogController extends BaseController {
 		return ArrayUtils.EMPTY_STRING_ARRAY;
 	}
 
-	protected Object[] args( Dialog dialog ) {
+	protected Object[] args() {
 		return ArrayUtils.EMPTY_OBJECT_ARRAY;
 	}
 
 	private void dialog( String id, Dialog dialog ) {
-		dialog( id, dialog, args( dialog ) );
+		dialog( id, dialog, args() );
 	}
 }

@@ -27,7 +27,6 @@ import com.google.common.primitives.Ints;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
-import ninja.consts.Dialog;
 import ninja.util.Cast;
 import ninja.util.Check;
 import ninja.util.Gson;
@@ -71,7 +70,7 @@ public class WeatherController extends DialogController {
 	private String url;
 
 	@Override
-	protected Object[] args( Dialog dialog ) {
+	protected Object[] args() {
 		String hours = json( iterate( 0, i -> i + 6, 9 ).map( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
 
 		return ArrayUtils.toArray( DEFAULT_DIST, options( DISTRICTS.keySet() ), DEFAULT_HOURS, hours );
@@ -124,7 +123,7 @@ public class WeatherController extends DialogController {
 
 			String title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點";
 
-			SlackAttachment attach = Slack.attachment( color ).setAuthorName( title ).setAuthorIcon( image.get( start ) );
+			SlackAttachment attach = Slack.author( Slack.attachment( color ), title, null, image.get( start ) );
 
 			attach.addFields( super.field( "溫度 / 體感", data[ 2 ].substring( 4, 6 ) + " / " + at.get( start ) + "˚C" ) );
 

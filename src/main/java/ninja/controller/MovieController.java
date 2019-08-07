@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableMap;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Act;
-import ninja.consts.Dialog;
 import ninja.service.Movie;
 import ninja.slack.Action;
 import ninja.util.Check;
@@ -58,7 +57,7 @@ public class MovieController extends DialogController {
 	}
 
 	@Override
-	protected Object[] args( Dialog dialog ) {
+	protected Object[] args() {
 		return ArrayUtils.toArray( json( movie.data().entrySet().stream().map( i -> {
 			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, list( i.getValue().keySet().stream().map( super::option ) ) );
 		} ) ) );
@@ -114,7 +113,7 @@ public class MovieController extends DialogController {
 	private Elements films( String theater, SlackAttachment attach ) {
 		String url = Check.first( movie.data().values().stream().map( i -> i.get( theater ) ).filter( Objects::nonNull ), "查無影院: " + theater );
 
-		attach.setAuthorName( theater ).setAuthorLink( url = Movie.URL + url ).setAuthorIcon( this.url );
+		Slack.author( attach, theater, url = Movie.URL + url, this.url );
 
 		return Jsoup.select( url, "ul#theaterShowtimeTable" );
 	}

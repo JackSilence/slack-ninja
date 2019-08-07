@@ -14,9 +14,9 @@ import ninja.util.Utils;
 
 @Service
 public class Bus extends PTX {
-	private static final String ROUTES_URL = "https://ebus.gov.taipei/EBus/RouteList?ct=tpc", QUOTE = "\"";
+	public static final String ROUTES_URL = "https://ebus.gov.taipei/EBus/RouteList?ct=tpc";
 
-	private static final String ROUTE_ID_REGEX = "javascript:go\\('(.+?)'\\)", PATH = "Bus/%s/City/Taipei";
+	private static final String ROUTE_ID_REGEX = "javascript:go\\('(.+?)'\\)", PATH = "Bus/%s/City/Taipei", QUOTE = "\"";
 
 	@Override
 	public List<Map<String, ?>> call( String path, String filter, String... query ) {

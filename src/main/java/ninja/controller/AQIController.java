@@ -16,7 +16,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.net.UrlEscapers;
 
 import net.gpedro.integrations.slack.SlackAttachment;
-import ninja.consts.Dialog;
 import ninja.consts.Filter;
 import ninja.service.AQI;
 import ninja.util.Check;
@@ -51,7 +50,7 @@ public class AQIController extends DialogController {
 	private AQI aqi;
 
 	@Override
-	protected Object[] args( Dialog dialog ) {
+	protected Object[] args() {
 		return ArrayUtils.toArray( DEFAULT, json( aqi.data().entrySet().stream().map( i -> {
 			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, list( i.getValue().stream().map( super::option ) ) );
 		} ) ) );

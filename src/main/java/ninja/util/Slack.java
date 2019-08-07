@@ -36,6 +36,10 @@ public class Slack {
 		return new SlackAttachment( StringUtils.EMPTY );
 	}
 
+	public static SlackAttachment author( SlackAttachment attach, String name, String link, String icon ) {
+		return attach.setAuthorName( name ).setAuthorLink( link ).setAuthorIcon( icon );
+	}
+
 	public static Action action( Act act, String text ) {
 		return new Action( act, text, SlackActionType.SELECT, null ).setConfirm( new Confirm() );
 	}
