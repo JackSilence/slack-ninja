@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Act;
+import ninja.consts.Dialog;
 import ninja.service.Movie;
 import ninja.slack.Action;
 import ninja.util.Check;
@@ -57,7 +58,7 @@ public class MovieController extends DialogController {
 	}
 
 	@Override
-	protected Object[] args() {
+	protected Object[] args( Dialog dialog ) {
 		return ArrayUtils.toArray( json( movie.data().entrySet().stream().map( i -> {
 			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, list( i.getValue().keySet().stream().map( super::option ) ) );
 		} ) ) );

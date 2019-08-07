@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Act;
+import ninja.consts.Dialog;
 import ninja.consts.Filter;
 import ninja.service.Bus;
 import ninja.slack.Action;
@@ -28,7 +29,7 @@ import ninja.util.Slack;
 
 @RestController
 public class BusController extends DialogController {
-	private static final String WEB_URL = "https://ebus.gov.taipei/EBus/VsSimpleMap?routeid=%s&gb=0";
+	private static final String WEB_URL = "https://ebus.gov.taipei/EBus/VsSimpleMap?routeid=%s&gb=0", TITLE = "台北市公車路線查詢";
 
 	private static final Map<Double, String> STATUS = ImmutableMap.of( 1d, "尚未發車", 2d, "交管不停靠", 3d, "末班車已過", 4d, "今日未營運" );
 
@@ -37,6 +38,11 @@ public class BusController extends DialogController {
 
 	@Value( "${bus.icon.url:}" )
 	private String url;
+
+	@Override
+	protected Object[] args( Dialog dialog ) {
+		return dialog.equals( Dialog.STATION ) ? ArrayUtils.toArray( TITLE ) : super.args( dialog );
+	}
 
 	@PostMapping( "/bus" )
 	@Async
@@ -97,7 +103,7 @@ public class BusController extends DialogController {
 
 		SlackAttachment attach = Slack.attachment( Act.BUS ).setText( tag( start, end ) );
 
-		message( Slack.message().addAttachments( attach.setAuthorName( "台北市公車路線查詢" ).setAuthorIcon( this.url ).addAction( action ) ), url );
+		message( Slack.message().addAttachments( attach.setAuthorName( TITLE ).setAuthorIcon( this.url ).addAction( action ) ), url );
 	}
 
 	private String time( Double time ) {

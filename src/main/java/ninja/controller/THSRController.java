@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
+import ninja.consts.Dialog;
 import ninja.service.THSR;
 import ninja.util.Cast;
 import ninja.util.Check;
@@ -49,7 +50,7 @@ public class THSRController extends DialogController {
 
 	@SuppressWarnings( "unchecked" )
 	@Override
-	protected Object[] args() {
+	protected Object[] args( Dialog dialog ) {
 		String way = options( EnumUtils.getEnumMap( Way.class ).keySet() );
 
 		LocalDateTime time = ( time = LocalDateTime.now( ZONE_ID ) ).truncatedTo( ChronoUnit.HOURS ).plusMinutes( 30 * ( int ) Math.ceil( time.getMinute() / 30d ) );

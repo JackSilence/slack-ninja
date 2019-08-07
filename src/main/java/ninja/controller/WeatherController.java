@@ -27,6 +27,7 @@ import com.google.common.primitives.Ints;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
+import ninja.consts.Dialog;
 import ninja.util.Cast;
 import ninja.util.Check;
 import ninja.util.Gson;
@@ -70,7 +71,7 @@ public class WeatherController extends DialogController {
 	private String url;
 
 	@Override
-	protected Object[] args() {
+	protected Object[] args( Dialog dialog ) {
 		String hours = json( iterate( 0, i -> i + 6, 9 ).map( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
 
 		return ArrayUtils.toArray( DEFAULT_DIST, options( DISTRICTS.keySet() ), DEFAULT_HOURS, hours );
