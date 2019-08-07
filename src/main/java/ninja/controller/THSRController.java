@@ -60,11 +60,9 @@ public class THSRController extends DialogController {
 	@PostMapping( "/thsr" )
 	@Async
 	public void thsr( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		String[] params = Check.params( text, 5 );
+		String[] params = Check.station( Check.params( text, 5 ) );
 
 		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), date = params[ 2 ], time = params[ 3 ];
-
-		Check.expr( !start.equals( end ), "起訖站不得相同: " + text );
 
 		Check.expr( dates().contains( date ) && times().contains( time ), "時間有誤: " + text );
 
@@ -94,7 +92,7 @@ public class THSRController extends DialogController {
 	}
 
 	private String id( String station ) {
-		return Check.nil( thsr.data().get( station ), "查無此站: " + station );
+		return Check.station( thsr, station );
 	}
 
 	private String time( Map<String, ?> map, Way way ) {

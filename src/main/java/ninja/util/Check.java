@@ -9,6 +9,8 @@ import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
+import ninja.service.Data;
+
 public class Check {
 	public static void equals( String expected, String actual, String message ) {
 		expr( expected.equals( actual ), message );
@@ -40,6 +42,18 @@ public class Check {
 		Assert.notEmpty( map, message );
 
 		return map;
+	}
+
+	public static String station( Data<String> data, String station ) {
+		return nil( data.data().get( station ), "查無此站: " + station );
+	}
+
+	public static String[] station( String[] params ) {
+		String start = params[ 0 ];
+
+		expr( !start.equals( params[ 1 ] ), "起訖站不得相同: " + start );
+
+		return params;
 	}
 
 	public static String[] params( String text ) {

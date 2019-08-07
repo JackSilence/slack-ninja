@@ -24,11 +24,9 @@ public class MetroController extends DialogController {
 	@PostMapping( "/mrt" )
 	@Async
 	public void mrt( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		String[] params = Check.params( text );
+		String[] params = Check.station( Check.params( text ) );
 
 		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), link, txt;
-
-		Check.expr( !start.equals( end ), "起訖站不得相同: " + text );
 
 		log.info( "Start: {}, end: {}", start, end );
 
@@ -51,7 +49,7 @@ public class MetroController extends DialogController {
 	}
 
 	private String id( String station ) {
-		return Check.nil( metro.data().get( station ), "查無此站: " + station );
+		return Check.station( metro, station );
 	}
 
 	private Element row( Element table, int index ) {

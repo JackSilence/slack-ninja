@@ -81,11 +81,9 @@ public class BusController extends DialogController {
 	@PostMapping( "/station" )
 	@Async
 	public void station( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		String[] params = Check.params( text );
+		String[] params = Check.station( Check.params( text ) );
 
 		String start = params[ 0 ], end = params[ 1 ], filter = Filter.or( Filter.STATION.eq( start ), Filter.STATION.eq( end ) );
-
-		Check.expr( !start.equals( end ), "起訖站不得相同: " + start );
 
 		Map<String, Set<String>> info = bus.call( "Station", filter ).stream().collect( Collectors.toMap( bus::station, i -> {
 			return bus.stops( i, j -> bus.name( j, "RouteName" ) ).collect( Collectors.toSet() );
@@ -96,13 +94,9 @@ public class BusController extends DialogController {
 
 		Action action = Slack.action( Act.BUS, "請選擇路線查詢動態" );
 
-		Set<String> routes = Sets.intersection( info.get( start ), info.get( end ) );
+		Sets.intersection( info.get( start ), info.get( end ) ).stream().sorted().forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
 
-		routes.stream().sorted().forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
-
-		String txt = routes.isEmpty() ? "\n查無符合條件的公車路線" : StringUtils.EMPTY;
-
-		SlackAttachment attach = Slack.attachment( Act.BUS ).setText( tag( start, end ) + txt ).addAction( action );
+		SlackAttachment attach = Slack.attachment( Act.BUS ).setText( tag( start, end ) ).addAction( action );
 
 		message( Slack.message().addAttachments( Slack.author( attach, "台北市公車路線簡圖", Bus.ROUTES_URL, this.url ) ), url );
 	}
