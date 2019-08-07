@@ -1,5 +1,7 @@
 package ninja.util;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -26,6 +28,18 @@ public class Check {
 
 	public static <T> T nil( T value, String message ) {
 		return Optional.ofNullable( value ).orElseThrow( () -> new IllegalArgumentException( message ) );
+	}
+
+	public static <T> List<T> list( List<T> list, String message ) {
+		Assert.notEmpty( list, message );
+
+		return list;
+	}
+
+	public static <K, V> Map<K, V> map( Map<K, V> map, String message ) {
+		Assert.notEmpty( map, message );
+
+		return map;
 	}
 
 	public static String[] params( String text ) {

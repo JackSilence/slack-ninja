@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,9 +61,7 @@ public class TaskController extends BaseController {
 			}
 
 		} else {
-			Map<String, String> submission = message.getSubmission();
-
-			Assert.notEmpty( submission, payload );
+			Map<String, String> submission = Check.map( message.getSubmission(), payload );
 
 			text = Check.name( Dialog.class, command, payload ).text( submission );
 		}

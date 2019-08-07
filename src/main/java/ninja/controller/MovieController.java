@@ -14,7 +14,6 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -84,9 +83,7 @@ public class MovieController extends DialogController {
 
 		SlackAttachment attach = Slack.attachment().setTitle( film );
 
-		List<Element> films = list( films( theater, attach ).stream().filter( i -> film.equals( title( i ).text() ) ) );
-
-		Assert.notEmpty( films, "查無影片: " + film );
+		List<Element> films = Check.list( list( films( theater, attach ).stream().filter( i -> film.equals( title( i ).text() ) ) ), "查無影片: " + film );
 
 		Element movie = films.get( 0 ), info = movie.child( 1 ).child( 0 ).child( 0 );
 

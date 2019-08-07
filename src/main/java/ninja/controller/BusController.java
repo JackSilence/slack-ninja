@@ -1,5 +1,6 @@
 package ninja.controller;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,7 +64,9 @@ public class BusController extends DialogController {
 
 		filter = Filter.and( filter, stop.equals( unwrap ) ? Filter.STOP.contains( stop ) : Filter.STOP.eq( unwrap ), Filter.DIRECTION.le( "1" ) );
 
-		bus.call( "EstimatedTimeOfArrival", filter, "$orderby=Direction" ).stream().collect( Collectors.groupingBy( bus::stop, Collectors.toList() ) ).forEach( ( k, v ) -> {
+		List<Map<String, ?>> info2 = Check.list( bus.call( "EstimatedTimeOfArrival", filter, "$orderby=Direction" ), "查無站牌: " + stop );
+
+		info2.stream().collect( Collectors.groupingBy( bus::stop, Collectors.toList() ) ).forEach( ( k, v ) -> {
 			message.addAttachments( Slack.attachment( "good" ).setText( ":busstop:" + k ).setFields( list( v.stream().map( i -> {
 				Double direction = ( Double ) i.get( "Direction" ), time = ( Double ) i.get( "EstimateTime" ), status = ( Double ) i.get( "StopStatus" );
 
@@ -93,9 +96,13 @@ public class BusController extends DialogController {
 
 		Action action = Slack.action( Act.BUS, "請選擇路線查詢動態" );
 
-		Sets.intersection( info.get( start ), info.get( end ) ).stream().sorted().forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
+		Set<String> routes = Sets.intersection( info.get( start ), info.get( end ) );
 
-		SlackAttachment attach = Slack.attachment( Act.BUS ).setText( tag( start, end ) ).addAction( action );
+		routes.stream().sorted().forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
+
+		String txt = routes.isEmpty() ? "\n查無符合條件的公車路線" : StringUtils.EMPTY;
+
+		SlackAttachment attach = Slack.attachment( Act.BUS ).setText( tag( start, end ) + txt ).addAction( action );
 
 		message( Slack.message().addAttachments( Slack.author( attach, "台北市公車路線簡圖", Bus.ROUTES_URL, this.url ) ), url );
 	}
