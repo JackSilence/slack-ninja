@@ -3,6 +3,7 @@ package ninja.util;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ public class Jsoup {
 			select( url, selector ).forEach( action );
 
 		} catch ( RuntimeException e ) {
-			log.error( "", e );
+			log.error( StringUtils.EMPTY, e );
 
 		}
 	}

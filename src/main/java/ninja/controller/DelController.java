@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,14 +43,31 @@ public class DelController extends BaseController {
 
 		List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
 
-		for ( Event i : message ) {
-			i.setChannel( channel );
+		for ( int i = 0, size = message.size(); i < size; i++ ) {
+			Event event = message.get( i );
 
-			String response = post( DEL_METHOD, i );
+			event.setChannel( channel );
 
-			success += response.contains( "\"ok\":true" ) ? 1 : 0;
+			try {
+				success += post( DEL_METHOD, event ).contains( "\"ok\":true" ) ? 1 : 0;
 
-			log.info( response );
+			} catch ( IllegalStateException e ) {
+				if ( !e.getMessage().contains( String.valueOf( HttpStatus.TOO_MANY_REQUESTS.value() ) ) ) {
+					throw e;
+				}
+
+				log.error( StringUtils.EMPTY, e );
+
+				i--;
+
+				try {
+					Thread.sleep( 2000 );
+
+				} catch ( InterruptedException e1 ) {
+					throw new RuntimeException( e );
+
+				}
+			}
 		}
 
 		String txt = String.format( TEXT, message.size(), success );
