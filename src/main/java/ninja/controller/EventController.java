@@ -58,8 +58,8 @@ public class EventController extends BaseController {
 		if ( Type.APP_MENTION.equals( type ) && StringUtils.contains( text, MENTION_KEYWORD ) ) {
 			post( Heroku.task( "您可選擇任務並於確認後執行", channel ) );
 
-		} else if ( Type.MESSAGE.equals( type ) && text.matches( "[a-zA-Z]+" ) ) {
-			post( Slack.message( DICT_URL + text, channel ) );
+		} else if ( Type.MESSAGE.equals( type ) && StringUtils.defaultString( text ).matches( "[a-zA-Z]+" ) ) {
+			post( Slack.message( DICT_URL + text, channel ) ); // text可能為null, 例如subtype: message_changed
 		}
 	}
 
