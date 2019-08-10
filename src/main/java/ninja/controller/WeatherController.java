@@ -27,6 +27,7 @@ import com.google.common.primitives.Ints;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
 import net.gpedro.integrations.slack.SlackMessage;
+import ninja.consts.Color;
 import ninja.util.Cast;
 import ninja.util.Check;
 import ninja.util.Gson;
@@ -96,7 +97,7 @@ public class WeatherController extends DialogController {
 
 		Map<?, ?> result = Gson.from( Utils.call( API_URL + String.format( QUERY, key, district, from, to ) ), Map.class );
 
-		SlackMessage message = Slack.message( attachment( String.format( TITLE, district ), WEB_URL + town ), command, text );
+		SlackMessage message = Slack.message( Slack.attachment( String.format( TITLE, district ), WEB_URL + town ), command, text );
 
 		List<?> elements = Cast.list( first( first( Cast.map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
@@ -113,9 +114,9 @@ public class WeatherController extends DialogController {
 		each( elements, "WeatherDescription", j -> {
 			String[] data = Cast.string( first( j, ELEMENT_VALUE ), VALUE ).split( DELIMITER );
 
-			String ci = data[ 3 ], color = "舒適".equals( ci ) ? "good" : "悶熱".equals( ci ) ? "warning" : "易中暑".equals( ci ) ? "danger" : "#3AA3E3";
+			String ci = data[ 3 ], wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
 
-			String wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
+			Color color = "舒適".equals( ci ) ? Color.G : "悶熱".equals( ci ) ? Color.Y : "易中暑".equals( ci ) ? Color.R : Color.B;
 
 			int hr = hour( start = Cast.string( j, START_TIME ) );
 
@@ -151,10 +152,6 @@ public class WeatherController extends DialogController {
 
 	private int hour( String time ) {
 		return LocalDateTime.parse( time, DATE_TIME_FORMATTER ).getHour();
-	}
-
-	private SlackAttachment attachment( String title, String link ) {
-		return Slack.attachment().setTitle( title ).setFallback( title ).setTitleLink( link );
 	}
 
 	private SlackField field( String data, int index ) {

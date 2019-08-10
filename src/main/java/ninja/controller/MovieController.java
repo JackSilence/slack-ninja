@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Act;
+import ninja.consts.Color;
 import ninja.service.Movie;
 import ninja.slack.Action;
 import ninja.util.Check;
@@ -71,7 +72,7 @@ public class MovieController extends DialogController {
 
 		films( text, attach ).forEach( i -> action.addOption( option( title( i ), text ) ) );
 
-		message( Slack.message().addAttachments( attach ), url );
+		message( Slack.message().addAttachments( attach.setFallback( text + "上映影片" ) ), url );
 	}
 
 	@PostMapping( MOVIE_PATH )
@@ -81,13 +82,13 @@ public class MovieController extends DialogController {
 
 		String theater = params[ 0 ], film = params[ 1 ];
 
-		SlackAttachment attach = Slack.attachment().setTitle( film );
+		SlackAttachment attach = new SlackAttachment( text + "時刻表" ).setTitle( film );
 
 		List<Element> films = Check.list( list( films( theater, attach ).stream().filter( i -> film.equals( title( i ).text() ) ) ), "查無影片: " + film );
 
 		Element movie = films.get( 0 ), info = movie.child( 1 ).child( 0 ).child( 0 );
 
-		attach.setTitleLink( Jsoup.href( this.movie.link( info ) ) ).setImageUrl( src( info ) ).setColor( star( title( movie ) ) ? "good" : null );
+		attach.setTitleLink( Jsoup.href( this.movie.link( info ) ) ).setImageUrl( src( info ) ).setColor( star( title( movie ) ) ? Color.G.value() : null );
 
 		String rating = RATINGS.get( Utils.find( RATING_REGEX, src( info = info.nextElementSibling() ) ) );
 

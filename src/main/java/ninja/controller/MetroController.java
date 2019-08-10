@@ -13,6 +13,7 @@ import net.gpedro.integrations.slack.SlackField;
 import ninja.service.Metro;
 import ninja.util.Check;
 import ninja.util.Jsoup;
+import ninja.util.Slack;
 
 @RestController
 public class MetroController extends DialogController {
@@ -26,7 +27,7 @@ public class MetroController extends DialogController {
 	public void mrt( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		String[] params = Check.station( Check.params( text ) );
 
-		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), link, txt;
+		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), link;
 
 		log.info( "Start: {}, end: {}", start, end );
 
@@ -34,13 +35,13 @@ public class MetroController extends DialogController {
 
 		Element table = tables.first(), row = row( table, 2 );
 
-		SlackAttachment attach = new SlackAttachment().setTitle( TITLE ).setTitleLink( link );
+		SlackAttachment attach = Slack.attachment( TITLE, link );
 
 		row( table, 1 ).select( "td:lt(3)" ).forEach( i -> attach.addFields( field( i.text(), row.child( i.siblingIndex() ).text() ) ) );
 
-		attach.setText( txt = String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
+		attach.setText( String.format( "%s（%s）", row( table = tables.get( 1 ), 2 ).text(), row( table, 1 ).text() ) );
 
-		message( attach.setFallback( txt ), command, text, url );
+		message( attach, command, text, url );
 	}
 
 	@Override

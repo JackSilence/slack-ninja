@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
+import ninja.consts.Color;
 import ninja.service.THSR;
 import ninja.util.Cast;
 import ninja.util.Check;
@@ -68,7 +69,7 @@ public class THSRController extends DialogController {
 
 		Way way = Check.name( Way.class, params[ 4 ], "行程有誤: " + text );
 
-		SlackAttachment attach1 = Slack.attachment().setTitle( TITLE ).setTitleLink( LINK ), attach2 = Slack.attachment( "good" );
+		SlackAttachment attach1 = Slack.attachment( TITLE, LINK ), attach2 = Slack.attachment( Color.G );
 
 		List<?> fares = Cast.list( thsr.call( String.format( FARE, start, end ) ).get( 0 ), "Fares" );
 

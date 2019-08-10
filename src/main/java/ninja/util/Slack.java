@@ -6,6 +6,7 @@ import net.gpedro.integrations.slack.SlackActionType;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Act;
+import ninja.consts.Color;
 import ninja.slack.Action;
 import ninja.slack.Confirm;
 
@@ -25,15 +26,15 @@ public class Slack {
 	}
 
 	public static SlackAttachment attachment( Act act ) {
-		return Slack.attachment( "#3AA3E3" ).setCallbackId( act.name() );
+		return attachment( Color.B ).setCallbackId( act.name() );
 	}
 
-	public static SlackAttachment attachment( String color ) {
-		return attachment().setColor( color );
+	public static SlackAttachment attachment( String title, String link ) {
+		return new SlackAttachment( title ).setTitle( title ).setTitleLink( link );
 	}
 
-	public static SlackAttachment attachment() {
-		return new SlackAttachment( StringUtils.EMPTY );
+	public static SlackAttachment attachment( Color color ) {
+		return new SlackAttachment( StringUtils.EMPTY ).setColor( color.value() );
 	}
 
 	public static SlackAttachment author( SlackAttachment attach, String name, String link, String icon ) {

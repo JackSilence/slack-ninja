@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.net.UrlEscapers;
 
 import net.gpedro.integrations.slack.SlackAttachment;
+import ninja.consts.Color;
 import ninja.consts.Filter;
 import ninja.service.AQI;
 import ninja.util.Check;
@@ -65,9 +66,9 @@ public class AQIController extends DialogController {
 
 		Map<String, String> info = aqi.call( API_URL + UrlEscapers.urlFragmentEscaper().escape( Filter.SITE_NAME.eq( site ) ) ).get( 0 );
 
-		String aqi = StringUtils.defaultIfEmpty( info.get( "AQI" ), NA ), status = info.get( "Status" ), color;
+		String aqi = StringUtils.defaultIfEmpty( info.get( "AQI" ), NA ), status = info.get( "Status" );
 
-		color = "良好".equals( status ) ? "good" : "普通".equals( status ) ? "warning" : "設備維護".equals( status ) ? "#3AA3E3" : "danger";
+		Color color = "良好".equals( status ) ? Color.G : "普通".equals( status ) ? Color.Y : "設備維護".equals( status ) ? Color.B : Color.R;
 
 		SlackAttachment attach = Slack.attachment( color ).setTitle( TITLE ).setTitleLink( LINK ).setText( tag( county, site ) );
 

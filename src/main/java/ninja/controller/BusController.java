@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Act;
+import ninja.consts.Color;
 import ninja.consts.Filter;
 import ninja.service.Bus;
 import ninja.slack.Action;
@@ -29,7 +30,7 @@ import ninja.util.Slack;
 
 @RestController
 public class BusController extends DialogController {
-	private static final String WEB_URL = "https://ebus.gov.taipei/EBus/VsSimpleMap?routeid=%s&gb=0";
+	private static final String WEB_URL = "https://ebus.gov.taipei/EBus/VsSimpleMap?routeid=%s&gb=0", TITLE = "台北市公車路線簡圖";
 
 	private static final Map<Double, String> STATUS = ImmutableMap.of( 1d, "尚未發車", 2d, "交管不停靠", 3d, "末班車已過", 4d, "今日未營運" );
 
@@ -52,7 +53,7 @@ public class BusController extends DialogController {
 
 		String departure = Cast.string( info, "DepartureStopNameZh" ), destination = Cast.string( info, "DestinationStopNameZh" );
 
-		SlackAttachment attach = Slack.attachment().setTitle( route + "公車動態" ).setTitleLink( String.format( WEB_URL, bus.id( route ) ) );
+		SlackAttachment attach = Slack.attachment( route + "公車動態", String.format( WEB_URL, bus.id( route ) ) );
 
 		SlackMessage message = Slack.message( attach, command, text );
 
@@ -67,7 +68,7 @@ public class BusController extends DialogController {
 		List<Map<String, ?>> info2 = Check.list( bus.call( "EstimatedTimeOfArrival", filter, "$orderby=Direction" ), "查無站牌: " + stop );
 
 		info2.stream().collect( Collectors.groupingBy( bus::stop, Collectors.toList() ) ).forEach( ( k, v ) -> {
-			message.addAttachments( Slack.attachment( "good" ).setText( ":busstop:" + k ).setFields( list( v.stream().map( i -> {
+			message.addAttachments( Slack.attachment( Color.G ).setText( ":busstop:" + k ).setFields( list( v.stream().map( i -> {
 				Double direction = ( Double ) i.get( "Direction" ), time = ( Double ) i.get( "EstimateTime" ), status = ( Double ) i.get( "StopStatus" );
 
 				return field( "往".concat( direction.equals( 0d ) ? destination : departure ), time == null ? STATUS.get( status ) : time( time ) );
@@ -96,9 +97,9 @@ public class BusController extends DialogController {
 
 		Sets.intersection( info.get( start ), info.get( end ) ).stream().sorted().forEach( i -> action.addOption( option2( i, bus.text( i, start ) ) ) );
 
-		SlackAttachment attach = Slack.attachment( Act.BUS ).setText( tag( start, end ) ).addAction( action );
+		SlackAttachment attach = Slack.attachment( Act.BUS ).setFallback( TITLE ).setText( tag( start, end ) ).addAction( action );
 
-		message( Slack.message().addAttachments( Slack.author( attach, "台北市公車路線簡圖", Bus.ROUTES_URL, this.url ) ), url );
+		message( Slack.message().addAttachments( Slack.author( attach, TITLE, Bus.ROUTES_URL, this.url ) ), url );
 	}
 
 	private String time( Double time ) {
