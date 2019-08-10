@@ -14,7 +14,7 @@ public class Slack {
 	private static final String ICON = "https://platform.slack-edge.com/img/default_application_icon.png";
 
 	public static SlackMessage message( SlackAttachment attach, String command, String text ) {
-		return message().addAttachments( footer( attach, command, text ) );
+		return message().addAttachments( attach.setFooter( String.format( "%s %s", command, text ) ).setFooterIcon( ICON ) );
 	}
 
 	public static SlackMessage message( String text, String channel ) {
@@ -29,12 +29,12 @@ public class Slack {
 		return attachment( Color.B ).setCallbackId( act.name() );
 	}
 
-	public static SlackAttachment attachment( String title, String link ) {
-		return new SlackAttachment( title ).setTitle( title ).setTitleLink( link );
-	}
-
 	public static SlackAttachment attachment( Color color ) {
 		return new SlackAttachment( StringUtils.EMPTY ).setColor( color.value() );
+	}
+
+	public static SlackAttachment attachment( String title, String link ) {
+		return new SlackAttachment( title ).setTitle( title ).setTitleLink( link );
 	}
 
 	public static SlackAttachment author( SlackAttachment attach, String name, String link, String icon ) {
@@ -43,9 +43,5 @@ public class Slack {
 
 	public static Action action( Act act, String text ) {
 		return new Action( act, text, SlackActionType.SELECT, null ).setConfirm( new Confirm() );
-	}
-
-	private static SlackAttachment footer( SlackAttachment attach, String command, String text ) {
-		return attach.setFooter( String.format( "%s %s", command, text ) ).setFooterIcon( ICON );
 	}
 }
