@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -47,7 +48,7 @@ public class WeatherController extends DialogController {
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
 
-	private static final Map<String, Integer> DISTRICTS = new HashMap<>();
+	private static final Map<String, Integer> DISTRICTS = new LinkedHashMap<>();
 
 	static {
 		DISTRICTS.put( "中正區", 6300500 );
