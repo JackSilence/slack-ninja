@@ -29,7 +29,7 @@ public class DelController extends BaseController {
 
 	private static final Map<String, Long> DAYS_AGO = ImmutableMap.of( StringUtils.EMPTY, 0L, "今天", 0L, "昨天", 1L, "前天", 2L );
 
-	@PostMapping( value = "/delete" )
+	@PostMapping( "/delete" )
 	@Async
 	public void delete( @RequestParam( CHANNEL_ID ) String channel, @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		Long days = DAYS_AGO.get( text ), success = 0L;
