@@ -58,8 +58,8 @@ public abstract class BaseController {
 
 		Check.expr( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
 
-		String digest = digest( String.join( ":", VERSION, timestamp, body ) );
-		log.info( digest( String.join( ":", VERSION, timestamp, body.replace( "*", "%2A" ) ) ) );
+		String digest = digest( String.join( ":", VERSION, timestamp, getClass().equals( EventController.class ) ? body : body.replace( "*", "%2A" ) ) );
+
 		Check.equals( signature, digest, String.format( "%s, body: %s", String.join( "!=", signature, digest ), body ) );
 
 		request.setAttribute( REQ_BODY, body );

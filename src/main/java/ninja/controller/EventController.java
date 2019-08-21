@@ -18,7 +18,6 @@ import ninja.util.Heroku;
 import ninja.util.Slack;
 
 @RestController
-
 public class EventController extends BaseController {
 	private static final String CHALLENGE = "challenge", MENTION_KEYWORD = "查詢可用任務", METHOD = "chat.postMessage";
 
