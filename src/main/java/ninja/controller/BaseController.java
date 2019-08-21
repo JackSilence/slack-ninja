@@ -59,7 +59,7 @@ public abstract class BaseController {
 		Check.expr( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
 
 		String digest = digest( String.join( ":", VERSION, timestamp, body.replace( "*", "%2A" ) ) );
-
+		log.info( digest( String.join( ":", VERSION, timestamp, body ) ) );
 		Check.equals( signature, digest, String.format( "%s, body: %s", String.join( "!=", signature, digest ), body ) );
 
 		request.setAttribute( REQ_BODY, body );
