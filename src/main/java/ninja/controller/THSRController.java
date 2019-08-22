@@ -103,7 +103,7 @@ public class THSRController extends DialogController {
 	}
 
 	private Double price( Map<?, ?> map ) {
-		return ( Double ) map.get( "Price" );
+		return Cast.dble( map, "Price" );
 	}
 
 	private List<String> dates() {

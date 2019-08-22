@@ -19,4 +19,8 @@ public class Cast {
 	public static String string( Map<?, ?> map, String key ) {
 		return ( String ) map.get( key );
 	}
+
+	public static Double dble( Map<?, ?> map, String key ) {
+		return ( Double ) map.get( key );
+	}
 }

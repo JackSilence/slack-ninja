@@ -1,11 +1,17 @@
 package ninja.controller;
 
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import net.gpedro.integrations.slack.SlackAttachment;
+import ninja.consts.Color;
+import ninja.util.Cast;
+import ninja.util.Gson;
 import ninja.util.Slack;
 import ninja.util.Utils;
 
@@ -19,6 +25,8 @@ public class TyphoonController extends BaseController {
 
 	private static final String IMG_URL = "https://www.cwb.gov.tw/Data/typhoon/TY_NEWS/PTA_%s-72_zhtw.png";
 
+	private static final String AREA_URL = "https://www.cwb.gov.tw/Data/typhoon/TY_NEWS/WSP-AREA_201908221200_WHOLE-DURATION.json";
+
 	@PostMapping( "/typhoon" )
 	@Async
 	public void typhoon( @RequestParam String command, @RequestParam( RESPONSE_URL ) String url ) {
@@ -30,6 +38,10 @@ public class TyphoonController extends BaseController {
 
 		String time = Utils.find( TIME_REGEX, Utils.call( DATA_URL ) );
 
-		message( Slack.attachment( TITLE, WEB_URL ).setImageUrl( String.format( IMG_URL, time ) ), command, StringUtils.EMPTY, url );
+		SlackAttachment attach = Slack.attachment( TITLE, WEB_URL ).setImageUrl( String.format( IMG_URL, time ) );
+
+		int pr = Cast.dble( Cast.map( Gson.from( Utils.call( AREA_URL ), Map.class ), "AREA" ), "Taipei" ).intValue();
+
+		message( attach.setColor( ( pr > 80 ? Color.R : pr > 40 ? Color.Y : Color.G ).value() ), command, StringUtils.EMPTY, url );
 	}
 }

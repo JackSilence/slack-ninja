@@ -69,7 +69,7 @@ public class BusController extends DialogController {
 
 		info2.stream().collect( Collectors.groupingBy( bus::stop, Collectors.toList() ) ).forEach( ( k, v ) -> {
 			message.addAttachments( Slack.attachment( Color.G ).setText( ":busstop:" + k ).setFields( list( v.stream().map( i -> {
-				Double direction = ( Double ) i.get( "Direction" ), time = ( Double ) i.get( "EstimateTime" ), status = ( Double ) i.get( "StopStatus" );
+				Double direction = Cast.dble( i, "Direction" ), time = Cast.dble( i, "EstimateTime" ), status = Cast.dble( i, "StopStatus" );
 
 				return field( "往".concat( direction.equals( 0d ) ? destination : departure ), time == null ? STATUS.get( status ) : time( time ) );
 
