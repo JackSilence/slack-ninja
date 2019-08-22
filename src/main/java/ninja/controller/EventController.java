@@ -25,7 +25,7 @@ import ninja.util.Utils;
 public class EventController extends BaseController {
 	private static final String CHALLENGE = "challenge", MENTION_KEYWORD = "查詢可用任務", METHOD = "chat.postMessage";
 
-	private static final String GRAMMAR_API_URL = "http://api.grammarbot.io/v2/check?api_key=%s&text=%s&language=en-US";
+	private static final String GRAMMAR_URL = "http://api.grammarbot.io/v2/check?api_key=%s&text=%s&language=en-US";
 
 	private static final String DICT_URL = "https://tw.dictionary.search.yahoo.com/search?p=";
 
@@ -67,12 +67,12 @@ public class EventController extends BaseController {
 			post( Heroku.task( "您可選擇任務並於確認後執行", channel ) );
 
 		} else if ( Type.MESSAGE.equals( type ) && StringUtils.defaultString( text ).matches( "[a-zA-Z]+" ) ) {
-			String value = Cast.list( Gson.from( Utils.call( String.format( GRAMMAR_API_URL, "", "txt" ) ), Map.class ), "matches" ).stream().flatMap( i -> {
+			String value = Cast.list( Gson.from( Utils.call( String.format( GRAMMAR_URL, key, text ) ), Map.class ), "matches" ).stream().flatMap( i -> {
 				return Cast.list( Cast.map( i ), "replacements" ).stream();
 
 			} ).limit( 1 ).map( i -> Cast.string( Cast.map( i ), VALUE ) ).collect( Collectors.joining( StringUtils.SPACE ) );
 
-			String suggest = value.isEmpty() ? StringUtils.EMPTY : "您是不是要查： " + value + "\n";
+			String suggest = value.isEmpty() ? StringUtils.EMPTY : "您是不是要查：" + value + "\n";
 
 			post( Slack.message( suggest + DICT_URL + text, channel ) ); // text可能為null, 例如subtype: message_changed
 		}
