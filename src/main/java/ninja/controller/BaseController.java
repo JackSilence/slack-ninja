@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.net.HttpHeaders;
 
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
@@ -92,7 +93,7 @@ public abstract class BaseController {
 	}
 
 	protected String post( String method, String token, Object src ) {
-		return Utils.call( Request.Post( uri( method ) ).setHeader( "Authorization", "Bearer " + token ), Gson.json( src ) );
+		return Utils.call( Request.Post( uri( method ) ).setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + token ), Gson.json( src ) );
 	}
 
 	protected String tag( String... tag ) {

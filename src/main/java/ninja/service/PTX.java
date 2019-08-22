@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
+import com.google.common.net.HttpHeaders;
 import com.google.common.net.UrlEscapers;
 
 import ninja.util.Cast;
@@ -43,9 +44,9 @@ public abstract class PTX extends Data<String> {
 
 		log.info( "Uri: {}", uri = UrlEscapers.urlFragmentEscaper().escape( String.format( API_URL, path, filter, String.join( "&", query ) ) ) );
 
-		Request request = Request.Get( uri ).addHeader( "Authorization", String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
+		Request request = Request.Get( uri ).addHeader( HttpHeaders.AUTHORIZATION, String.format( AUTH_HEADER, id, signature ) ).addHeader( "x-date", xdate );
 
-		return Gson.list( Utils.call( request.addHeader( "Accept-Encoding", "gzip" ) ) );
+		return Gson.list( Utils.call( request.addHeader( HttpHeaders.ACCEPT_ENCODING, "gzip" ) ) );
 	}
 
 	public String station( Map<?, ?> map ) {
