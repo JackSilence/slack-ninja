@@ -67,7 +67,7 @@ public class DelController extends BaseController {
 
 		String txt = String.format( TEXT, message.size(), success );
 
-		message( new SlackAttachment( txt ).setTitle( title ).setText( txt ), command, text, url );
+		message( new SlackAttachment( text + "\n" + txt ).setTitle( title ).setText( txt ), command, text, url );
 	}
 
 	private long epochSecond( LocalDate date ) {
