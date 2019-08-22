@@ -2,6 +2,7 @@ package ninja.ex;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +20,6 @@ public class Advice {
 	}
 
 	private String message( HttpServletRequest request ) {
-		return String.format( TEMPLATE, request.getHeader( "User-Agent" ), request.getRemoteAddr(), request.getRequestURI() );
+		return String.format( TEMPLATE, request.getHeader( HTTP.USER_AGENT ), request.getRemoteAddr(), request.getRequestURI() );
 	}
 }
