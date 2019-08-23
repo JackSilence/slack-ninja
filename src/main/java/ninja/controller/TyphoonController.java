@@ -19,7 +19,9 @@ import ninja.util.Utils;
 public class TyphoonController extends BaseController {
 	private static final String WARN_URL = "https://www.cwb.gov.tw/Data/js/warn/Warning_Content.js", TY_NEWS = "'TY_NEWS'";
 
-	private static final String DATA_URL = "https://www.cwb.gov.tw/Data/js/typhoon/TY_NEWS-Data.js", TIME_REGEX = "var TY_DataTime = '(.+?)';";
+	private static final String DATA_URL = "https://www.cwb.gov.tw/Data/js/typhoon/TY_NEWS-Data.js";
+
+	private static final String TIME_REGEX = "var TY_DataTime = '(.+?)';", COUNT_REGEX = "var TY_COUNT = [(.+?)];";
 
 	private static final String WEB_URL = "https://www.cwb.gov.tw/V8/C/P/Typhoon/TY_NEWS.html", TITLE = "氣象局颱風消息";
 
@@ -36,13 +38,13 @@ public class TyphoonController extends BaseController {
 			return;
 		}
 
-		String time = Utils.find( TIME_REGEX, Utils.call( DATA_URL ) );
+		String data = Utils.call( DATA_URL ), time = Utils.find( TIME_REGEX, data ), count = Utils.find( COUNT_REGEX, data );
 
 		SlackAttachment attach = Slack.attachment( TITLE, WEB_URL ).setImageUrl( String.format( IMG_URL, time ) );
 
 		int pr = Cast.dble( Cast.map( Gson.from( Utils.call( String.format( AREA_URL, time ) ), Map.class ), "AREA" ), "Taipei" ).intValue();
 
-		log.info( "台北暴風圈侵襲機率: " + pr );
+		attach.addFields( field( "TD / TY數量", count.replace( ",", " / " ) + "個" ) ).addFields( field( "侵襲機率", pr + "%" ) );
 
 		message( attach.setColor( ( pr > 80 ? Color.R : pr > 40 ? Color.Y : Color.G ).value() ), command, StringUtils.EMPTY, url );
 	}
