@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.Iterables;
+
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Color;
 import ninja.util.Cast;
@@ -25,9 +27,9 @@ public class TyphoonController extends BaseController {
 
 	private static final String WEB_URL = "https://www.cwb.gov.tw/V8/C/P/Typhoon/TY_NEWS.html", TITLE = "氣象局颱風消息";
 
-	private static final String IMG_URL = "https://www.cwb.gov.tw/Data/typhoon/TY_NEWS/PTA_%s-72_zhtw.png";
+	private static final String NEWS_URL = "https://www.cwb.gov.tw/Data/typhoon/TY_NEWS/";
 
-	private static final String AREA_URL = "https://www.cwb.gov.tw/Data/typhoon/TY_NEWS/WSP-AREA_%s_WHOLE-DURATION.json";
+	private static final String IMG_JSON = "PTA_IMGS_%s_zhtw.json", AREA_JSON = "WSP-AREA_%s_WHOLE-DURATION.json";
 
 	@PostMapping( "/typhoon" )
 	@Async
@@ -40,12 +42,16 @@ public class TyphoonController extends BaseController {
 
 		String data = Utils.call( DATA_URL ), time = Utils.find( TIME_REGEX, data ), count = Utils.find( COUNT_REGEX, data );
 
-		SlackAttachment attach = Slack.attachment( TITLE, WEB_URL ).setImageUrl( String.format( IMG_URL, time ) );
+		SlackAttachment attach = Slack.attachment( TITLE, WEB_URL ).setImageUrl( NEWS_URL + Iterables.getLast( Cast.list( map( IMG_JSON, time ), "WHOLE" ) ) );
 
-		int pr = Cast.dble( Cast.map( Gson.from( Utils.call( String.format( AREA_URL, time ) ), Map.class ), "AREA" ), "Taipei" ).intValue();
+		int pr = Cast.dble( Cast.map( map( AREA_JSON, time ), "AREA" ), "Taipei" ).intValue();
 
 		attach.addFields( field( "熱帶低壓 / 颱風", count.replace( ",", " / " ) + "個" ) ).addFields( field( "侵襲台北機率", pr + "%" ) );
 
 		message( attach.setColor( ( pr > 80 ? Color.R : pr > 40 ? Color.Y : Color.G ).value() ), command, StringUtils.EMPTY, url );
+	}
+
+	private Map<?, ?> map( String path, String time ) {
+		return Gson.from( Utils.call( NEWS_URL + String.format( path, time ) ), Map.class );
 	}
 }
