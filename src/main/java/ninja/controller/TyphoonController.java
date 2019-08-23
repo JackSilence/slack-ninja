@@ -44,7 +44,7 @@ public class TyphoonController extends BaseController {
 
 		int pr = Cast.dble( Cast.map( Gson.from( Utils.call( String.format( AREA_URL, time ) ), Map.class ), "AREA" ), "Taipei" ).intValue();
 
-		attach.addFields( field( "熱帶低壓 / 颱風", count.replace( ",", " / " ) + "個" ) ).addFields( field( "侵襲機率", pr + "%" ) );
+		attach.addFields( field( "熱帶低壓 / 颱風", count.replace( ",", " / " ) + "個" ) ).addFields( field( "侵襲台北機率", pr + "%" ) );
 
 		message( attach.setColor( ( pr > 80 ? Color.R : pr > 40 ? Color.Y : Color.G ).value() ), command, StringUtils.EMPTY, url );
 	}
