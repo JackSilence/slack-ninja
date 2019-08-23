@@ -15,7 +15,7 @@ import ninja.util.Utils;
 
 @Service
 public class MiscTask extends Task {
-	private static final String TEMPLATE = "*_Cloudinary_*\nMonthly plan: %.0f credits\nUsed in last 30 days: %s credits\n";
+	private static final String TEMPLATE = "*Cloudinary*\nMonthly plan: %.0f credits\nUsed in last 30 days: %s credits\n";
 
 	@Scheduled( cron = "0 30 23 * * *", zone = Zone.TAIPEI )
 	@Override
