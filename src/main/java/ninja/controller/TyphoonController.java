@@ -25,7 +25,7 @@ public class TyphoonController extends BaseController {
 
 	private static final String IMG_URL = "https://www.cwb.gov.tw/Data/typhoon/TY_NEWS/PTA_%s-72_zhtw.png";
 
-	private static final String AREA_URL = "https://www.cwb.gov.tw/Data/typhoon/TY_NEWS/WSP-AREA_201908221200_WHOLE-DURATION.json";
+	private static final String AREA_URL = "https://www.cwb.gov.tw/Data/typhoon/TY_NEWS/WSP-AREA_%s_WHOLE-DURATION.json";
 
 	@PostMapping( "/typhoon" )
 	@Async
@@ -40,7 +40,7 @@ public class TyphoonController extends BaseController {
 
 		SlackAttachment attach = Slack.attachment( TITLE, WEB_URL ).setImageUrl( String.format( IMG_URL, time ) );
 
-		int pr = Cast.dble( Cast.map( Gson.from( Utils.call( AREA_URL ), Map.class ), "AREA" ), "Taipei" ).intValue();
+		int pr = Cast.dble( Cast.map( Gson.from( Utils.call( String.format( AREA_URL, time ) ), Map.class ), "AREA" ), "Taipei" ).intValue();
 
 		log.info( "台北暴風圈侵襲機率: " + pr );
 
