@@ -15,7 +15,7 @@ import ninja.util.Utils;
 
 @Service
 public class MiscTask extends Task {
-	private static final String TEMPLATE = "Cloudinary\nMonthly plan: %s credits\nUsed in last 30 days: %.0f credits\n";
+	private static final String TEMPLATE = "*_Cloudinary_*\nMonthly plan: %s credits\nUsed in last 30 days: %.0f credits\n";
 
 	@Scheduled( cron = "0 30 23 * * *", zone = Zone.TAIPEI )
 	@Override
@@ -23,7 +23,7 @@ public class MiscTask extends Task {
 		try {
 			Map<?, ?> credits = Cast.map( new Cloudinary().api().usage( ObjectUtils.emptyMap() ), "credits" );
 
-			Utils.call( url, new SlackMessage( String.format( TEMPLATE, Cast.dble( credits, "usage" ), Cast.dble( credits, "limit" ) ) ) );
+			Utils.call( url, new SlackMessage( String.format( TEMPLATE, Cast.dble( credits, "limit" ), Cast.dble( credits, "usage" ) ) ) );
 
 		} catch ( Exception e ) {
 			throw new RuntimeException( e );
