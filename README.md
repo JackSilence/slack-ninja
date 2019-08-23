@@ -28,6 +28,8 @@
 - 各縣市空氣品質概況 [圖片1][aqi_d] [圖片2][aqi]
 - 雙北上映影片查詢 [圖片1][theater_d] [圖片2][theater]
 - 雙北上映影片時刻表 [圖片][movie]
+- 英文單字查詢與拼字檢查 [圖片][word]
+- 氣象局颱風消息 [圖片][typhoon]
 
 [epoint]:https://res.cloudinary.com/lethington/image/upload/v1565444996/slack/epoint.png
 [nba]:https://res.cloudinary.com/lethington/image/upload/v1564672810/slack/nba.png
@@ -50,3 +52,5 @@
 [theater_d]:https://res.cloudinary.com/lethington/image/upload/v1565446709/slack/theater_d.png
 [theater]:https://res.cloudinary.com/lethington/image/upload/v1565446714/slack/theater.png
 [movie]:https://res.cloudinary.com/lethington/image/upload/v1565075141/slack/movie.png
+[word]:https://res.cloudinary.com/lethington/image/upload/v1566573379/slack/word.png
+[typhoon]:https://res.cloudinary.com/lethington/image/upload/v1566573059/slack/typhoon.png
