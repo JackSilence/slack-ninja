@@ -1,5 +1,6 @@
 package ninja.task;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,6 @@ public class TyphoonTask extends Task {
 	@Scheduled( cron = "0 0 0,12 * * *", zone = Zone.TAIPEI )
 	@Override
 	public void exec() {
-		typhoon.typhoon( COMMAND, url );
+		typhoon.typhoon( COMMAND, StringUtils.EMPTY, url );
 	}
 }

@@ -1,0 +1,14 @@
+{
+	"callback_id": "TYPHOON",
+	"title": "氣象局颱風消息",
+	"elements": [
+		{
+			"label": "區域",
+			"type": "select",
+			"name": "area",
+			"value": "%s",
+			"placeholder": "請選擇區域",
+			"options": %s
+		}
+	]
+}
