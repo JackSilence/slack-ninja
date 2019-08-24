@@ -29,7 +29,7 @@
 - 雙北上映影片查詢 [圖片1][theater_d] [圖片2][theater]
 - 雙北上映影片時刻表 [圖片][movie]
 - 英文單字查詢與拼字檢查 [圖片][word]
-- 氣象局颱風消息 [圖片][typhoon]
+- 氣象局颱風消息 [圖片1][typhoon_d] [圖片2][typhoon]
 
 [epoint]:https://res.cloudinary.com/lethington/image/upload/v1565444996/slack/epoint.png
 [nba]:https://res.cloudinary.com/lethington/image/upload/v1564672810/slack/nba.png
@@ -53,4 +53,5 @@
 [theater]:https://res.cloudinary.com/lethington/image/upload/v1565446714/slack/theater.png
 [movie]:https://res.cloudinary.com/lethington/image/upload/v1565075141/slack/movie.png
 [word]:https://res.cloudinary.com/lethington/image/upload/v1566573379/slack/word.png
-[typhoon]:https://res.cloudinary.com/lethington/image/upload/v1566575555/slack/typhoon.png
+[typhoon_d]:https://res.cloudinary.com/lethington/image/upload/v1566617445/slack/typhoon_d.png
+[typhoon]:https://res.cloudinary.com/lethington/image/upload/v1566617312/slack/typhoon.png
