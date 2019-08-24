@@ -71,8 +71,6 @@ public class TyphoonController extends DialogController {
 	@Async
 	public void typhoon( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		if ( !Utils.call( WARN_URL ).contains( TY_NEWS ) ) {
-			log.info( "查無颱風消息" );
-
 			if ( PATH.equals( command ) ) {
 				message( new SlackMessage( "查無颱風消息" ), url );
 			}
@@ -80,13 +78,13 @@ public class TyphoonController extends DialogController {
 			return;
 		}
 
-		String area = Check.nil( AREAS.get( area = StringUtils.defaultIfEmpty( text, DEFAULT ) ), "查無區域: " + area );
+		String area = StringUtils.defaultIfEmpty( text, DEFAULT );
 
 		String data = Utils.call( DATA_URL ), time = Utils.find( TIME_REGEX, data ), count = Utils.find( COUNT_REGEX, data );
 
 		SlackAttachment attach = Slack.attachment( TITLE, WEB_URL ).setImageUrl( url( Iterables.getLast( Cast.list( map( IMG_JSON, time ), "WHOLE" ) ) ) );
 
-		int pr = Cast.dble( Cast.map( map( AREA_JSON, time ), "AREA" ), area ).intValue();
+		int pr = Cast.dble( Cast.map( map( AREA_JSON, time ), "AREA" ), Check.nil( AREAS.get( area ), "查無區域: " + area ) ).intValue();
 
 		attach.addFields( field( "熱帶低壓 / 颱風", count.replace( ",", " / " ) + "個" ) ).addFields( field( "侵襲" + area + "機率", pr + "%" ) );
 
