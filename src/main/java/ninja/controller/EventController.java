@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.JsonObject;
-
 import ninja.slack.Callback;
 import ninja.slack.Event;
 import ninja.util.Cast;
@@ -29,7 +27,7 @@ public class EventController extends BaseController {
 
 	private static final String GRAMMAR_URL = "http://api.grammarbot.io/v2/check?api_key=%s&text=%s&language=en-US";
 
-	private static final String DICT_TEMPLATE = "%1$s：<https://tw.dictionary.search.yahoo.com/search?p=%2$s|*%2$s*>";
+	private static final String DICT_TEMPLATE = "%1$s：<https://tw.dictionary.search.yahoo.com/search?p=%2$s|*%2$s*>\n";
 
 	private static final String QUERY_TITLE = "您查詢的單字是", CHECK_TITLE = "您是不是要查";
 
@@ -78,11 +76,7 @@ public class EventController extends BaseController {
 
 			String suggest = value.isEmpty() ? StringUtils.EMPTY : dict( CHECK_TITLE, text );
 
-			JsonObject object = Slack.message( suggest + dict( QUERY_TITLE, text ), channel ).prepare();
-
-			object.addProperty( "replace_original", true );
-
-			post( object ); // text可能為null, 例如subtype: message_changed
+			post( Slack.message( suggest + dict( QUERY_TITLE, text ), channel ) ); // text可能為null, 例如subtype: message_changed
 		}
 	}
 
