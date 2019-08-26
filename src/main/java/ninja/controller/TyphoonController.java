@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.collect.Iterables;
 
 import net.gpedro.integrations.slack.SlackAttachment;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Color;
 import ninja.util.Cast;
 import ninja.util.Check;
@@ -25,7 +24,7 @@ import ninja.util.Utils;
 public class TyphoonController extends DialogController {
 	private static final String WARN_URL = "https://www.cwb.gov.tw/Data/js/warn/Warning_Content.js", TY_NEWS = "'TY_NEWS'";
 
-	private static final String DATA_URL = "https://www.cwb.gov.tw/Data/js/typhoon/TY_NEWS-Data.js", PATH = "/typhoon";
+	private static final String DATA_URL = "https://www.cwb.gov.tw/Data/js/typhoon/TY_NEWS-Data.js";
 
 	private static final String TIME_REGEX = "var TY_DataTime = '(.+?)';", COUNT_REGEX = "var TY_COUNT = \\[(.+?)];";
 
@@ -67,16 +66,10 @@ public class TyphoonController extends DialogController {
 		return ArrayUtils.toArray( DEFAULT, options( AREAS.keySet() ) );
 	}
 
-	@PostMapping( PATH )
+	@PostMapping( "/typhoon" )
 	@Async
 	public void typhoon( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		if ( !Utils.call( WARN_URL ).contains( TY_NEWS ) ) {
-			if ( PATH.equals( command ) ) {
-				message( new SlackMessage( "查無颱風消息" ), url );
-			}
-
-			return;
-		}
+		Check.expr( Utils.call( WARN_URL ).contains( TY_NEWS ), "查無颱風消息" );
 
 		String area = StringUtils.defaultIfEmpty( text, DEFAULT );
 
