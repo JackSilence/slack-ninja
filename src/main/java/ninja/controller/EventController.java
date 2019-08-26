@@ -74,7 +74,7 @@ public class EventController extends BaseController {
 
 			} ).limit( 1 ).map( i -> Cast.string( Cast.map( i ), VALUE ) ).collect( Collectors.joining( StringUtils.SPACE ) );
 
-			String suggest = value.isEmpty() ? StringUtils.EMPTY : dict( CHECK_TITLE, text );
+			String suggest = value.isEmpty() ? StringUtils.EMPTY : dict( CHECK_TITLE, value );
 
 			post( Slack.message( suggest + dict( QUERY_TITLE, text ), channel ) ); // text可能為null, 例如subtype: message_changed
 		}
