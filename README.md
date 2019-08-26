@@ -52,6 +52,6 @@
 [theater_d]:https://res.cloudinary.com/lethington/image/upload/v1565446709/slack/theater_d.png
 [theater]:https://res.cloudinary.com/lethington/image/upload/v1565446714/slack/theater.png
 [movie]:https://res.cloudinary.com/lethington/image/upload/v1565075141/slack/movie.png
-[word]:https://res.cloudinary.com/lethington/image/upload/v1566573379/slack/word.png
+[word]:https://res.cloudinary.com/lethington/image/upload/v1566830684/slack/word.png
 [typhoon_d]:https://res.cloudinary.com/lethington/image/upload/v1566617625/slack/typhoon_d.png
 [typhoon]:https://res.cloudinary.com/lethington/image/upload/v1566617312/slack/typhoon.png
