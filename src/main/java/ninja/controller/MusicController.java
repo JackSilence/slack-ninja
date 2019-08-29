@@ -34,6 +34,6 @@ public class MusicController extends BaseController {
 	}
 
 	private void message( String text, String url ) {
-		message( Slack.message().addAttachments( new SlackAttachment().setText( text ) ), url );
+		message( Slack.message().addAttachments( new SlackAttachment( text ).setText( text ) ), url );
 	}
 }
