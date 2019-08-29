@@ -24,7 +24,7 @@ public class MusicController extends BaseController {
 
 		} else {
 			message( String.format( "*%s*\n%s", text, music.data().entrySet().stream().filter( i -> {
-				return text.equalsIgnoreCase( StringUtils.substringBefore( i.getKey(), "(" ) );
+				return text.equalsIgnoreCase( StringUtils.substringBefore( i.getKey(), "(" ).trim() );
 
 			} ).flatMap( i -> i.getValue().stream() ).collect( Collectors.joining( "\n" ) ) ), url );
 		}
