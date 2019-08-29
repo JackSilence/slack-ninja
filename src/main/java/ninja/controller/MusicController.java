@@ -5,14 +5,14 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.service.Music;
 import ninja.util.Check;
-import ninja.util.Slack;
 
 @RestController
 public class MusicController extends BaseController {
@@ -20,6 +20,7 @@ public class MusicController extends BaseController {
 	private Music music;
 
 	@PostMapping( "/music" )
+	@Async
 	public void music( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		if ( StringUtils.isEmpty( text ) ) {
 			message( String.format( "Number of songs: *%d*", music.data().values().stream().mapToInt( List::size ).sum() ), url );
@@ -34,6 +35,6 @@ public class MusicController extends BaseController {
 	}
 
 	private void message( String text, String url ) {
-		message( Slack.message().addAttachments( new SlackAttachment( text ).setText( text ) ), url );
+		message( new SlackMessage( text ), url );
 	}
 }
