@@ -44,6 +44,12 @@ public class Check {
 		return map;
 	}
 
+	public static String empty( String text, String message ) {
+		Assert.hasLength( text, message );
+
+		return text;
+	}
+
 	public static String station( Data<String> data, String station ) {
 		return nil( data.data().get( station ), "查無此站: " + station );
 	}
