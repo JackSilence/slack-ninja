@@ -22,7 +22,7 @@ import ninja.util.Gson;
 import ninja.util.Signature;
 import ninja.util.Utils;
 
-abstract class PTX extends Data<String> {
+public abstract class PTX extends Data<String> {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
 	private static final String AUTH_HEADER = "hmac username=\"%s\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"%s\"";

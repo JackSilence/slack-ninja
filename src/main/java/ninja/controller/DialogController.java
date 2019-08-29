@@ -19,7 +19,7 @@ import net.gpedro.integrations.slack.SlackException;
 import ninja.consts.Dialog;
 import ninja.util.Gson;
 
-abstract class DialogController extends BaseController {
+public abstract class DialogController extends BaseController {
 	private static final String DIALOG_TEMPLATE = "/template/dialog/%s.json", DIALOG_METHOD = "dialog.open";
 
 	@ExceptionHandler( SlackException.class )
