@@ -1,6 +1,5 @@
 package ninja.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ public class MusicController extends BaseController {
 
 		} else {
 			message( String.format( "*%s*\n%s", text, music.data().entrySet().stream().filter( i -> {
-				return Arrays.stream( StringUtils.split( StringUtils.substringBefore( i.getKey(), "(" ) ) ).anyMatch( text::equalsIgnoreCase );
+				return text.equalsIgnoreCase( StringUtils.substringBefore( i.getKey(), "(" ) );
 
 			} ).flatMap( i -> i.getValue().stream() ).collect( Collectors.joining( "\n" ) ) ), url );
 		}
