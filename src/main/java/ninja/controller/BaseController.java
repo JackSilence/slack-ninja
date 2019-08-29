@@ -34,7 +34,7 @@ import ninja.util.Signature;
 import ninja.util.Slack;
 import ninja.util.Utils;
 
-public abstract class BaseController {
+abstract class BaseController {
 	protected final Logger log = LoggerFactory.getLogger( this.getClass() );
 
 	protected static final String REQ_BODY = "req_body", CHANNEL_ID = "channel_id", TRIGGER_ID = "trigger_id", RESPONSE_URL = "response_url";
