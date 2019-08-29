@@ -68,7 +68,7 @@ public class EventController extends BaseController {
 		if ( Type.APP_MENTION.equals( type ) && StringUtils.contains( text, MENTION_KEYWORD ) ) {
 			post( Heroku.task( "您可選擇任務並於確認後執行", channel ) );
 
-		} else if ( Type.MESSAGE.equals( type ) && StringUtils.defaultString( text ).matches( "[a-zA-Z]+" ) ) {
+		} else if ( Type.MESSAGE.equals( type ) && ( text = StringUtils.defaultString( text ).trim() ).matches( "[a-zA-Z]+" ) ) {
 			String value = Cast.list( Gson.from( Utils.call( String.format( GRAMMAR_URL, key, text ) ), Map.class ), "matches" ).stream().flatMap( i -> {
 				return Cast.list( Cast.map( i ), "replacements" ).stream();
 
