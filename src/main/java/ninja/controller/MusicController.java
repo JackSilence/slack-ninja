@@ -32,7 +32,7 @@ public class MusicController extends BaseController {
 		} else {
 			message( String.format( "*%s*\n%s", text, Check.empty( String.join( "\n", Utils.list( songs.filter( i -> {
 				return Arrays.stream( i.get( 0 ).split( "[,&]" ) ).anyMatch( j -> {
-					return text.equals( j.trim() );
+					return text.equalsIgnoreCase( j.trim() );
 
 				} ) || text.equalsIgnoreCase( StringUtils.substringBefore( i.get( 1 ), "(" ).trim() );
 

@@ -35,7 +35,7 @@ public class Music extends Data<List<List<String>>> {
 			data.computeIfAbsent( Cast.string( i, "id" ), k -> {
 				return new ArrayList<>();
 
-			} ).add( Utils.list( Stream.of( "artistName", "name", "url" ).map( j -> Cast.string( i, j ) ) ) );
+			} ).add( Utils.list( Stream.of( "artistName", "url", "name" ).map( j -> Cast.string( i, j ) ) ) );
 		} );
 	}
 }
