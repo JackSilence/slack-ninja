@@ -1,6 +1,5 @@
 package ninja.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +30,8 @@ public class Music extends Data<List<List<String>>> {
 
 		Map<?, ?> children = Cast.map( map, "children" );
 
-		Cast.list( map, "childrenIds" ).stream().map( i -> Cast.map( children, i.toString() ) ).forEach( i -> {
-			data.computeIfAbsent( Cast.string( i, "id" ), k -> {
-				return new ArrayList<>();
-
-			} ).add( Utils.list( Stream.of( "artistName", "url", "name" ).map( j -> Cast.string( i, j ) ) ) );
-		} );
+		data.put( id, Utils.list( Cast.list( map, "childrenIds" ).stream().map( i -> Cast.map( children, i.toString() ) ).map( i -> {
+			return Utils.list( Stream.of( "artistName", "url", "name" ).map( j -> Cast.string( i, j ) ) );
+		} ) ) );
 	}
 }
