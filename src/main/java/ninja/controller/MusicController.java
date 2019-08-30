@@ -34,7 +34,7 @@ public class MusicController extends BaseController {
 				return Arrays.stream( i.get( 0 ).split( "[,&]" ) ).anyMatch( j -> {
 					return text.equalsIgnoreCase( j.trim() );
 
-				} ) || text.equalsIgnoreCase( StringUtils.substringBefore( i.get( 1 ), "(" ).trim() );
+				} ) || text.equalsIgnoreCase( StringUtils.substringBefore( i.get( 2 ), "(" ).trim() );
 
 			} ).map( i -> String.format( "%s - <%s|%s>", i.toArray() ) ) ) ), "查無歌曲: " + text ) ), url );
 		}
