@@ -30,7 +30,7 @@ public class MusicController extends BaseController {
 		List<List<String>> songs = Iterables.getOnlyElement( music.data().values() );
 
 		if ( StringUtils.isEmpty( text ) ) {
-			String duplicate = text( songs.stream().filter( i -> Collections.frequency( songs, i ) > 1 ) );
+			String duplicate = text( songs.stream().filter( i -> Collections.frequency( songs, i ) > 1 ).distinct() );
 
 			duplicate = duplicate.isEmpty() ? StringUtils.EMPTY : ", duplicate:\n" + duplicate;
 
