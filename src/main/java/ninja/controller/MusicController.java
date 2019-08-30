@@ -37,7 +37,7 @@ public class MusicController extends BaseController {
 			message( String.format( "Number of songs: *%d*%s", songs.size(), duplicate ), url );
 
 		} else {
-			message( String.format( "*%s*\n%s", text, Check.empty( text( songs.stream().filter( i -> {
+			message( String.format( "*%s*\n%s", tag( text ), Check.empty( text( songs.stream().filter( i -> {
 				return Arrays.stream( i.get( 0 ).split( "[,&]" ) ).anyMatch( j -> {
 					return text.equalsIgnoreCase( j.trim() );
 
