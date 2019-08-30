@@ -39,6 +39,10 @@ public class Utils {
 		return matcher.find() ? matcher.group( 1 ) : null;
 	}
 
+	public static String join( Stream<String> stream, String delimiter ) {
+		return stream.collect( Collectors.joining( delimiter ) );
+	}
+
 	public static <T> List<T> list( Stream<T> stream ) {
 		return stream.collect( Collectors.toList() );
 	}

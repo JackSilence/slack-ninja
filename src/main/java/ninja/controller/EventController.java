@@ -3,7 +3,6 @@ package ninja.controller;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -69,10 +68,12 @@ public class EventController extends BaseController {
 			post( Heroku.task( "您可選擇任務並於確認後執行", channel ) );
 
 		} else if ( Type.MESSAGE.equals( type ) && ( text = StringUtils.defaultString( text ).trim() ).matches( "[a-zA-Z]+" ) ) {
-			String value = Cast.list( Gson.from( Utils.call( String.format( GRAMMAR_URL, key, text ) ), Map.class ), "matches" ).stream().flatMap( i -> {
+			String uri = String.format( GRAMMAR_URL, key, text ), value;
+
+			value = Utils.join( Cast.list( Gson.from( Utils.call( uri ), Map.class ), "matches" ).stream().flatMap( i -> {
 				return Cast.list( Cast.map( i ), "replacements" ).stream();
 
-			} ).limit( 1 ).map( i -> Cast.string( Cast.map( i ), VALUE ) ).collect( Collectors.joining( StringUtils.SPACE ) );
+			} ).limit( 1 ).map( i -> Cast.string( Cast.map( i ), VALUE ) ), StringUtils.SPACE );
 
 			String suggest = value.isEmpty() ? StringUtils.EMPTY : dict( CHECK_TITLE, value );
 

@@ -1,6 +1,7 @@
 package ninja.controller;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -10,6 +11,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.common.collect.Iterables;
 
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.service.Music;
@@ -24,20 +27,28 @@ public class MusicController extends BaseController {
 	@PostMapping( "/music" )
 	@Async
 	public void music( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		Stream<List<String>> songs = music.data().values().stream().flatMap( List::stream );
+		List<List<String>> songs = Iterables.getOnlyElement( music.data().values() );
 
 		if ( StringUtils.isEmpty( text ) ) {
-			message( String.format( "Number of songs: *%d*", songs.count() ), url );
+			String duplicate = text( songs.stream().filter( i -> Collections.frequency( songs, i ) > 1 ) );
+
+			duplicate = duplicate.isEmpty() ? StringUtils.EMPTY : ", duplicate:\n" + duplicate;
+
+			message( String.format( "Number of songs: *%d*%s", songs.size(), duplicate ), url );
 
 		} else {
-			message( String.format( "*%s*\n%s", text, Check.empty( String.join( "\n", Utils.list( songs.filter( i -> {
+			message( String.format( "*%s*\n%s", text, Check.empty( text( songs.stream().filter( i -> {
 				return Arrays.stream( i.get( 0 ).split( "[,&]" ) ).anyMatch( j -> {
 					return text.equalsIgnoreCase( j.trim() );
 
 				} ) || text.equalsIgnoreCase( StringUtils.substringBefore( i.get( 2 ), "(" ).trim() );
 
-			} ).map( i -> String.format( "%s - <%s|%s>", i.toArray() ) ) ) ), "查無歌曲: " + text ) ), url );
+			} ) ), "查無歌曲: " + text ) ), url );
 		}
+	}
+
+	private String text( Stream<List<String>> stream ) {
+		return Utils.join( stream.map( i -> String.format( "%s - <%s|%s>", i.toArray() ) ), "\n" );
 	}
 
 	private void message( String text, String url ) {
