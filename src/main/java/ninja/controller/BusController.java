@@ -72,7 +72,6 @@ public class BusController extends DialogController {
 				Double direction = Cast.dble( i, "Direction" ), time = Cast.dble( i, "EstimateTime" ), status = Cast.dble( i, "StopStatus" );
 
 				return field( "往".concat( direction.equals( 0d ) ? destination : departure ), time == null ? STATUS.get( status ) : time( time ) );
-
 			} ) ) ) );
 		} );
 

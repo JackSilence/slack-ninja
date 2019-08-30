@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,12 +15,12 @@ import ninja.util.Gson;
 import ninja.util.Utils;
 
 @Service
-public class Music extends Data<List<String>> {
+public class Music extends Data<List<List<String>>> {
 	@Value( "${playlist.url:}" )
 	private String url;
 
 	@Override
-	void init( Map<String, List<String>> data ) {
+	void init( Map<String, List<List<String>>> data ) {
 		String id = StringUtils.substringBefore( StringUtils.substringAfterLast( url, "/" ), "?" );
 
 		Map<?, ?> map = Gson.from( Utils.call( url ), Map.class );
@@ -31,9 +32,10 @@ public class Music extends Data<List<String>> {
 		Map<?, ?> children = Cast.map( map, "children" );
 
 		Cast.list( map, "childrenIds" ).stream().map( i -> Cast.map( children, i.toString() ) ).forEach( i -> {
-			String name = Cast.string( i, "name" ), artist = Cast.string( i, "artistName" ), url = Cast.string( i, "url" );
+			data.computeIfAbsent( Cast.string( i, "id" ), k -> {
+				return new ArrayList<>();
 
-			data.compute( name, ( k, v ) -> v == null ? new ArrayList<>() : v ).add( String.format( "%s - <%s|%s>", artist, url, name ) );
+			} ).add( Utils.list( Stream.of( "artistName", "name", "url" ).map( j -> Cast.string( i, j ) ) ) );
 		} );
 	}
 }
