@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -38,10 +39,12 @@ public class MusicController extends BaseController {
 
 		} else {
 			message( String.format( "*%s*\n%s", tag( text ), Check.empty( text( songs.stream().filter( i -> {
-				return Arrays.stream( i.get( 0 ).split( "[,&]" ) ).anyMatch( j -> {
+				String name = i.get( 2 ), feat = StringUtils.defaultString( Utils.find( "\\(feat. (.+?)\\)", name ) );
+
+				return Stream.of( i.get( 0 ), feat ).map( j -> j.split( "[,&]" ) ).flatMap( Arrays::stream ).anyMatch( j -> {
 					return text.equalsIgnoreCase( j.trim() );
 
-				} ) || text.equalsIgnoreCase( StringUtils.substringBefore( i.get( 2 ), "(" ).trim() );
+				} ) || text.equalsIgnoreCase( RegExUtils.removeAll( name, "\\(.+?\\)|\\[.+?\\]" ).trim() );
 
 			} ) ), "查無歌曲: " + text ) ), url );
 		}
