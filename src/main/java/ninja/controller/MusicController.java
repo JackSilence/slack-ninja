@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
 
 import com.google.common.collect.Iterables;
 
@@ -38,13 +39,15 @@ public class MusicController extends BaseController {
 			message( String.format( "Number of songs: *%d*%s", songs.size(), duplicate ), url );
 
 		} else {
+			String query = HtmlUtils.htmlUnescape( text );
+
 			message( String.format( "*%s*\n%s", tag( text ), Check.empty( text( songs.stream().filter( i -> {
 				String artist = i.get( 0 ), name = i.get( 2 ), feat = StringUtils.defaultString( Utils.find( "\\(feat. (.+?)\\)", name ) );
 
 				return Stream.concat( Stream.of( artist, name ), Stream.of( artist, feat ).map( j -> j.split( "[,&]" ) ).flatMap( Arrays::stream ) ).anyMatch( j -> {
-					return text.equalsIgnoreCase( j.trim() );
+					return query.equalsIgnoreCase( j.trim() );
 
-				} ) || text.equalsIgnoreCase( RegExUtils.removeAll( name, "\\(.+?\\)|\\[.+?\\]" ).trim() );
+				} ) || query.equalsIgnoreCase( RegExUtils.removeAll( name, "\\(.+?\\)|\\[.+?\\]" ).trim() );
 
 			} ) ), "查無歌曲: " + text ) ), url );
 		}
