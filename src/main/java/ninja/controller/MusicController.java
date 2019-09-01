@@ -41,7 +41,7 @@ public class MusicController extends BaseController {
 		} else {
 			String query = HtmlUtils.htmlUnescape( text );
 
-			message( String.format( "*%s*\n%s", tag( text ), Check.empty( text( songs.stream().filter( i -> {
+			message( String.format( "*%s*\n%s", tag( query ), Check.empty( text( songs.stream().filter( i -> {
 				String artist = i.get( 0 ), name = i.get( 2 ), feat = StringUtils.defaultString( Utils.find( "\\(feat. (.+?)\\)", name ) );
 
 				return Stream.concat( Stream.of( artist, name ), Stream.of( artist, feat ).map( j -> j.split( "[,&]" ) ).flatMap( Arrays::stream ) ).anyMatch( j -> {
@@ -49,7 +49,7 @@ public class MusicController extends BaseController {
 
 				} ) || query.equalsIgnoreCase( RegExUtils.removeAll( name, "\\(.+?\\)|\\[.+?\\]" ).trim() );
 
-			} ) ), "查無歌曲: " + text ) ), url );
+			} ) ), "查無歌曲: " + query ) ), url );
 		}
 	}
 
