@@ -39,9 +39,12 @@ public class MusicController extends BaseController {
 
 		} else {
 			message( String.format( "*%s*\n%s", tag( text ), Check.empty( text( songs.stream().filter( i -> {
-				String name = i.get( 2 ), feat = StringUtils.defaultString( Utils.find( "\\(feat. (.+?)\\)", name ) );
+				String artist = i.get( 0 ), name = i.get( 2 ), feat = StringUtils.defaultString( Utils.find( "\\(feat. (.+?)\\)", name ) );
 
-				return Stream.of( i.get( 0 ), feat ).map( j -> j.split( "[,&]" ) ).flatMap( Arrays::stream ).anyMatch( j -> {
+				return Arrays.asList( artist, name ).stream().anyMatch( text::equalsIgnoreCase ) || Stream.of( artist, feat ).map( j -> {
+					return j.split( "[,&]" );
+
+				} ).flatMap( Arrays::stream ).anyMatch( j -> {
 					return text.equalsIgnoreCase( j.trim() );
 
 				} ) || text.equalsIgnoreCase( RegExUtils.removeAll( name, "\\(.+?\\)|\\[.+?\\]" ).trim() );
