@@ -68,12 +68,17 @@ public class EventController extends BaseController {
 			post( Heroku.task( "您可選擇任務並於確認後執行", channel ) );
 
 		} else if ( Type.MESSAGE.equals( type ) && ( text = StringUtils.defaultString( text ).trim() ).matches( "[a-zA-Z]+" ) ) {
-			String uri = String.format( GRAMMAR_URL, key, text ), value;
+			String uri = String.format( GRAMMAR_URL, key, text ), value = StringUtils.EMPTY;
 
-			value = Utils.join( Cast.list( Gson.from( Utils.call( uri ), Map.class ), "matches" ).stream().flatMap( i -> {
-				return Cast.list( Cast.map( i ), "replacements" ).stream();
+			try {
+				value = Utils.join( Cast.list( Gson.from( Utils.call( uri ), Map.class ), "matches" ).stream().flatMap( i -> {
+					return Cast.list( Cast.map( i ), "replacements" ).stream();
 
-			} ).limit( 1 ).map( i -> Cast.string( Cast.map( i ), VALUE ) ), StringUtils.SPACE );
+				} ).limit( 1 ).map( i -> Cast.string( Cast.map( i ), VALUE ) ), StringUtils.SPACE );
+
+			} catch ( RuntimeException e ) {
+				log.error( StringUtils.EMPTY, e );
+			}
 
 			String suggest = value.isEmpty() ? StringUtils.EMPTY : dict( CHECK_TITLE, value );
 
