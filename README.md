@@ -30,6 +30,7 @@
 - 雙北上映影片時刻表 [圖片][movie]
 - 英文單字查詢與拼字檢查 [圖片][word]
 - 氣象局颱風消息 [圖片1][typhoon_d] [圖片2][typhoon]
+- 查詢Apple Music我的最愛播放列表 [圖片][music]
 
 [epoint]:https://res.cloudinary.com/lethington/image/upload/v1565444996/slack/epoint.png
 [nba]:https://res.cloudinary.com/lethington/image/upload/v1564672810/slack/nba.png
@@ -55,3 +56,4 @@
 [word]:https://res.cloudinary.com/lethington/image/upload/v1566830684/slack/word.png
 [typhoon_d]:https://res.cloudinary.com/lethington/image/upload/v1566617625/slack/typhoon_d.png
 [typhoon]:https://res.cloudinary.com/lethington/image/upload/v1566617312/slack/typhoon.png
+[music]:https://res.cloudinary.com/lethington/image/upload/v1567435411/slack/music.png
