@@ -23,6 +23,8 @@ import ninja.util.Utils;
 
 @RestController
 public class MusicController extends BaseController {
+	private static final String FEAT_REGEX = "[\\(\\[]feat. (.+?)[\\)\\]]", REMIX_REGEX = "[\\(\\[]([^\\(\\[]+?) Remix[\\)\\]]";
+
 	@Autowired
 	private Music music;
 
@@ -42,9 +44,12 @@ public class MusicController extends BaseController {
 			String query = HtmlUtils.htmlUnescape( text );
 
 			message( String.format( "*%s*\n%s", tag( query ), Check.empty( text( songs.stream().filter( i -> {
-				String artist = i.get( 0 ), name = i.get( 2 ), feat = StringUtils.defaultString( Utils.find( "\\(feat. (.+?)\\)", name ) );
+				String artist = i.get( 0 ), name = i.get( 2 ), feat = Utils.find( FEAT_REGEX, name ), remix = Utils.find( REMIX_REGEX, name );
 
-				return Stream.concat( Stream.of( artist, name ), Stream.of( artist, feat ).map( j -> j.split( "[,&]" ) ).flatMap( Arrays::stream ) ).anyMatch( j -> {
+				return Stream.concat( Stream.of( artist, name ), Stream.of( artist, feat, remix ).map( j -> {
+					return StringUtils.defaultString( j ).split( "(?i)[,&]| x " ); // feat., Remix可能為null, 但目前不用考慮(?i)
+
+				} ).flatMap( Arrays::stream ) ).anyMatch( j -> {
 					return query.equalsIgnoreCase( j.trim() );
 
 				} ) || query.equalsIgnoreCase( RegExUtils.removeAll( name, "\\(.+?\\)|\\[.+?\\]" ).trim() );
