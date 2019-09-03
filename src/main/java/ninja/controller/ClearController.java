@@ -14,9 +14,14 @@ public class ClearController extends BaseController {
 	private ApplicationContext context;
 
 	@PostMapping( "/clear" )
-	public String refresh( @RequestParam String text ) {
-		( ( Data<?> ) context.getBean( text ) ).data().clear();
+	public String clear( @RequestParam String text ) {
+		try {
+			( ( Data<?> ) context.getBean( text ) ).data().clear();
 
-		return "*OK*";
+			return "*OK*";
+
+		} catch ( RuntimeException e ) {
+			return e.getMessage();
+		}
 	}
 }
