@@ -3,10 +3,10 @@
 	"title": "清除暫存資料",
 	"elements": [
 		{
-			"label": "類名",
+			"label": "Bean Name",
 			"type": "select",
 			"name": "name",
-			"placeholder": "請選擇類名",
+			"placeholder": "請選擇Bean Name",
 			"options": %s
 		}
 	]

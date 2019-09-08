@@ -21,8 +21,14 @@ public class ClearController extends DialogController {
 
 	@PostMapping( "/clear" )
 	public String clear( @RequestParam String text ) {
-		( ( Data<?> ) context.getBean( text ) ).data().clear();
+		log.info( context.getClass().getName() );
+		try {
+			( ( Data<?> ) context.getBean( text ) ).data().clear();
 
-		return "*OK*";
+			return "*OK*";
+
+		} catch ( RuntimeException e ) {
+			return e.getMessage();
+		}
 	}
 }
