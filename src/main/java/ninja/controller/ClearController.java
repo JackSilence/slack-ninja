@@ -21,7 +21,7 @@ public class ClearController extends DialogController {
 
 	@PostMapping( "/clear" )
 	public String clear( @RequestParam String text ) {
-		log.info( context.getClass().getName() );
+		log.info( context.getBeansOfType( Data.class ).getClass().getName() );
 		try {
 			( ( Data<?> ) context.getBean( text ) ).data().clear();
 

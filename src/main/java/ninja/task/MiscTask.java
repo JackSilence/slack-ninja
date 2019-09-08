@@ -8,10 +8,8 @@ import org.springframework.stereotype.Service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Zone;
 import ninja.util.Cast;
-import ninja.util.Utils;
 
 @Service
 public class MiscTask extends Task {
@@ -23,7 +21,7 @@ public class MiscTask extends Task {
 		try {
 			Map<?, ?> credits = Cast.map( new Cloudinary().api().usage( ObjectUtils.emptyMap() ), "credits" );
 
-			Utils.call( url, new SlackMessage( String.format( TEMPLATE, Cast.dble( credits, "limit" ), Cast.dble( credits, "usage" ) ) ) );
+			call( String.format( TEMPLATE, Cast.dble( credits, "limit" ), Cast.dble( credits, "usage" ) ) );
 
 		} catch ( Exception e ) {
 			throw new RuntimeException( e );
