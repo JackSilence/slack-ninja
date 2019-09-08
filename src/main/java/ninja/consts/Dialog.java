@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import ninja.util.Utils;
 
 public enum Dialog {
-	WEATHER( "district", "hours" ), BUS( "stop" ), STATION( "start", "end" ), THSR( "start", "end", "date", "time", "way" ), AQI( "site" ), MRT( "start", "end" ), THEATER( "theater" ), MOVIE( "film" ), TYPHOON( "area" );
+	WEATHER( "district", "hours" ), BUS( "stop" ), STATION( "start", "end" ), THSR( "start", "end", "date", "time", "way" ), AQI( "site" ), MRT( "start", "end" ), THEATER( "theater" ), MOVIE( "film" ), TYPHOON( "area" ), CLEAR( "name" );
 
 	private final String[] key;
 
