@@ -16,7 +16,7 @@ public class ClearController extends DialogController {
 
 	@Override
 	protected Object[] args() {
-		return ArrayUtils.toArray( options( list( context.getBeansOfType( Data.class ).keySet().stream().sorted() ) ) );
+		return ArrayUtils.toArray( options( context.getBeansOfType( Data.class ).keySet() ) );
 	}
 
 	@PostMapping( "/clear" )
