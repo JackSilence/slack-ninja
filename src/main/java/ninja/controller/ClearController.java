@@ -16,12 +16,11 @@ public class ClearController extends DialogController {
 
 	@Override
 	protected Object[] args() {
-		return ArrayUtils.toArray( options( context.getBeansOfType( Data.class ).keySet() ) );
+		return ArrayUtils.toArray( options( list( context.getBeansOfType( Data.class ).keySet().stream().sorted() ) ) );
 	}
 
 	@PostMapping( "/clear" )
 	public String clear( @RequestParam String text ) {
-		log.info( context.getBeansOfType( Data.class ).getClass().getName() );
 		try {
 			( ( Data<?> ) context.getBean( text ) ).data().clear();
 
