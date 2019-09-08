@@ -78,7 +78,7 @@ public class MovieController extends DialogController {
 	@PostMapping( MOVIE_PATH )
 	@Async
 	public void movie( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		String[] params = text.split( StringUtils.SPACE, 2 ); // 考慮電影名稱可能會有空白
+		String[] params = StringUtils.split( text, StringUtils.SPACE, 2 ); // 考慮電影名稱可能會有空白
 
 		String theater = params[ 0 ], film = params[ 1 ];
 
