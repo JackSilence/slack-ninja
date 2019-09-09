@@ -111,6 +111,10 @@ public abstract class BaseController {
 		message( Slack.message( attach, command, text ), url );
 	}
 
+	protected void message( String text, String url ) {
+		message( new SlackMessage( text ), url );
+	}
+
 	protected void message( SlackMessage message, String url ) {
 		log.info( Utils.call( url, message ) );
 	}

@@ -16,7 +16,6 @@ import org.springframework.web.util.HtmlUtils;
 
 import com.google.common.collect.Iterables;
 
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.service.Music;
 import ninja.util.Check;
 import ninja.util.Utils;
@@ -60,9 +59,5 @@ public class MusicController extends BaseController {
 
 	private String text( Stream<List<String>> stream ) {
 		return Utils.join( stream.map( i -> String.format( "%s - <%s|%s>", i.toArray() ) ), "\n" );
-	}
-
-	private void message( String text, String url ) {
-		message( new SlackMessage( text ), url );
 	}
 }
