@@ -20,7 +20,7 @@ public class ClearController extends DialogController {
 
 	@Override
 	protected Object[] args() {
-		return ArrayUtils.toArray( options( list( datas.stream().map( ClassUtils::getSimpleName ) ) ) );
+		return ArrayUtils.toArray( options( list( datas.stream().map( ClassUtils::getSimpleName ).sorted() ) ) );
 	}
 
 	@PostMapping( "/clear" )
