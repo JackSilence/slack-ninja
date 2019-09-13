@@ -20,7 +20,7 @@ import ninja.util.Utils;
 public class NASAController extends BaseController {
 	private static final String API_URL = "https://api.nasa.gov/planetary/apod?api_key=%s&date=%s", WEB_URL = "https://apod.nasa.gov/apod/ap%s.html";
 
-	private static final String YOUTUBE_REGEX = "https://www.youtube.com/embed/(.+?)\\?rel=0", YOUTUBE_URL = "https://www.youtube.com/watch?v=";
+	private static final String YOUTUBE_REGEX = "https://www.youtube.com/embed/(.+?)\\?rel=0", YOUTUBE_IMG = "https://img.youtube.com/vi/%s/0.jpg";
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "yyMMdd" );
 
@@ -34,15 +34,10 @@ public class NASAController extends BaseController {
 
 		Map<?, ?> result = Gson.from( Utils.call( String.format( API_URL, key, date ) ), Map.class );
 
-		String link = Check.nil( Cast.string( result, "url" ), Cast.string( result, "msg" ) ), id = Utils.find( YOUTUBE_REGEX, url );
+		String link = Check.nil( Cast.string( result, "url" ), Cast.string( result, "msg" ) ), id = Utils.find( YOUTUBE_REGEX, link );
 
 		String title = Cast.string( result, "title" ), html = String.format( WEB_URL, date.format( DATE_TIME_FORMATTER ) );
 
-		if ( id == null ) {
-			message( Slack.attachment( title, html ).setImageUrl( link ), command, text, url );
-
-		} else {
-			message( String.format( "<%s|%s>\n%s", html, title, YOUTUBE_URL + id ), url );
-		}
+		message( Slack.attachment( title, html ).setImageUrl( id == null ? link : String.format( YOUTUBE_IMG, id ) ), command, text, url );
 	}
 }
