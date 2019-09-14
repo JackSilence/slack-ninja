@@ -1,6 +1,7 @@
 package ninja.controller;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ninja.consts.Zone;
 import ninja.util.Cast;
 import ninja.util.Check;
 import ninja.util.Gson;
@@ -22,6 +24,8 @@ public class NASAController extends BaseController {
 
 	private static final String YOUTUBE_REGEX = "https://www.youtube.com/embed/(.+?)\\?rel=0", YOUTUBE_IMG = "https://img.youtube.com/vi/%s/0.jpg";
 
+	private static final LocalDate START_DATE = LocalDate.parse( "1995-6-16" );
+
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "yyMMdd" );
 
 	@Value( "${nasa.api.key:}" )
@@ -30,7 +34,9 @@ public class NASAController extends BaseController {
 	@PostMapping( "/apod" )
 	@Async
 	public void apod( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		LocalDate date = text.isEmpty() ? LocalDate.now() : LocalDate.parse( text );
+		LocalDate now = LocalDate.now( ZoneId.of( Zone.NEW_YORK ) ), date = text.isEmpty() ? now : LocalDate.parse( text );
+
+		Check.expr( !date.isBefore( START_DATE ) && !date.isAfter( now ), "Date must be between Jun 16, 1995 and today." );
 
 		Map<?, ?> result = Gson.from( Utils.call( String.format( API_URL, key, date ) ), Map.class );
 

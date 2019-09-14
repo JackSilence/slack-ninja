@@ -1,6 +1,7 @@
 package ninja.ex;
 
 import java.lang.reflect.Method;
+import java.time.format.DateTimeParseException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,7 +23,9 @@ public class EXHandler implements AsyncUncaughtExceptionHandler {
 		String uri = params[ params.length - 1 ].toString();
 
 		if ( uri.startsWith( RESPONSE_URL_PREFIX ) ) {
-			log.info( Utils.call( uri, new SlackMessage( ex instanceof IllegalArgumentException ? ex.getMessage() : "系統忙碌中" ) ) );
+			String text = ex instanceof IllegalArgumentException || ex instanceof DateTimeParseException ? ex.getMessage() : "系統忙碌中";
+
+			log.info( Utils.call( uri, new SlackMessage( text ) ) );
 		}
 	}
 }
