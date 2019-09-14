@@ -31,6 +31,7 @@
 - 英文單字查詢與拼字檢查 [圖片][word]
 - 氣象局颱風消息 [圖片1][typhoon_d] [圖片2][typhoon]
 - 查詢Apple Music播放列表 [圖片1][music] [圖片2][music2]
+- Astronomy Picture of the Day [圖片][apod]
 
 [epoint]:https://res.cloudinary.com/lethington/image/upload/v1565444996/slack/epoint.png
 [nba]:https://res.cloudinary.com/lethington/image/upload/v1564672810/slack/nba.png
@@ -58,3 +59,4 @@
 [typhoon]:https://res.cloudinary.com/lethington/image/upload/v1566617312/slack/typhoon.png
 [music]:https://res.cloudinary.com/lethington/image/upload/v1567435411/slack/music.png
 [music2]:https://res.cloudinary.com/lethington/image/upload/v1567435892/slack/music2.png
+[apod]:https://res.cloudinary.com/lethington/image/upload/v1568436347/slack/apod.png
