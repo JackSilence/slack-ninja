@@ -13,7 +13,7 @@ public class NASATask extends Task {
 	@Autowired
 	private NASAController nasa;
 
-	@Scheduled( cron = "0 0 0 * * *", zone = Zone.NEW_YORK )
+	@Scheduled( cron = "0 30 0 * * *", zone = Zone.NEW_YORK )
 	@Override
 	public void exec() {
 		nasa.apod( COMMAND, StringUtils.EMPTY, url );
