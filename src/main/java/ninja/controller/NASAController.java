@@ -24,7 +24,7 @@ public class NASAController extends BaseController {
 
 	private static final String YOUTUBE_REGEX = "https://www.youtube.com/embed/(.+?)\\?rel=0", YOUTUBE_IMG = "https://img.youtube.com/vi/%s/0.jpg";
 
-	private static final LocalDate START_DATE = LocalDate.parse( "1995-6-16" );
+	private static final LocalDate START_DATE = LocalDate.parse( "1995-06-16" );
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "yyMMdd" );
 
