@@ -80,7 +80,7 @@ public class BusController extends DialogController {
 
 	@PostMapping( "/station" )
 	@Async
-	public void station( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
+	public void station( @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		String[] params = Check.station( Check.params( text ) );
 
 		String start = params[ 0 ], end = params[ 1 ], filter = Filter.or( Filter.STATION.eq( start ), Filter.STATION.eq( end ) );

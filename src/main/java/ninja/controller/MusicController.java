@@ -29,7 +29,7 @@ public class MusicController extends BaseController {
 
 	@PostMapping( "/music" )
 	@Async
-	public void music( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
+	public void music( @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		List<List<String>> songs = Iterables.getOnlyElement( music.data().values() );
 
 		if ( StringUtils.isEmpty( text ) ) {
