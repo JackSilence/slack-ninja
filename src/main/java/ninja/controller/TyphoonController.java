@@ -69,11 +69,7 @@ public class TyphoonController extends DialogController {
 	@PostMapping( "/typhoon" )
 	@Async
 	public void typhoon( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		if ( !Utils.call( WARN_URL ).contains( TY_NEWS ) ) {
-			message( "查無颱風消息", url );
-
-			return;
-		}
+		Check.expr( Utils.call( WARN_URL ).contains( TY_NEWS ), "查無颱風消息" );
 
 		String area = StringUtils.defaultIfEmpty( text, DEFAULT );
 
