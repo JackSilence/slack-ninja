@@ -14,7 +14,7 @@ import net.gpedro.integrations.slack.SlackMessage;
 
 public class Utils {
 	public static String call( Request request ) {
-		return magic.util.Utils.getEntityAsString( request );
+		return magic.util.Utils.getEntityAsString( request, 120000 );
 	}
 
 	public static String call( Request request, String body ) {
