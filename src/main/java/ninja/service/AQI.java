@@ -20,7 +20,7 @@ public class AQI extends Data<List<String>> {
 
 	@Override
 	void init( Map<String, List<String>> data ) {
-		call( url( COUNTY, "AreaID" ) ).forEach( i -> {
+		call( url( COUNTY, "AreaID=&SiteID" ) ).forEach( i -> {
 			data.put( i.get( NAME ), Utils.list( call( url( "Site", COUNTY ) + i.get( "Value" ) ).stream().map( j -> j.get( NAME ) ) ) );
 		} );
 	}
