@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-	compile('com.github.JackSilence:magic:e9a2adaf2e')
+	compile('com.github.JackSilence:magic:6854f731a6')
 	
 	compile('org.springframework.retry:spring-retry:1.2.2.RELEASE')
 	compile('org.aspectj:aspectjweaver:1.8.9')
