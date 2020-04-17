@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,11 @@ public abstract class Data<T> {
 
 	@PostConstruct
 	private void init() {
-		init( data );
+		try {
+			init( data );
+
+		} catch ( Exception e ) {
+			log.error( StringUtils.EMPTY, e );
+		}
 	};
 }
