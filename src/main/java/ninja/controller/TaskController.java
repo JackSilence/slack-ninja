@@ -30,7 +30,7 @@ import ninja.util.Heroku;
 @RestController
 @RequestMapping( "/task" )
 public class TaskController extends BaseController {
-	private static final String COMMAND_METHOD = "chat.command", COMMAND_QUERY = "&command=/%s&text=%s";
+	private static final String COMMAND_METHOD = "chat.command", COMMAND_QUERY = "&command=/%s";
 
 	private enum Type {
 		INTERACTIVE_MESSAGE, DIALOG_SUBMISSION;
@@ -70,14 +70,12 @@ public class TaskController extends BaseController {
 				String user = message.getUser().getName(), token = System.getenv( "slack.legacy.token." + user );
 
 				if ( token == null ) {
+					log.error( "權限不足: " + user );
+
 					message( "權限不足", url );
 
-					throw new IllegalArgumentException( "權限不足: " + user );
-
 				} else {
-					String query = String.format( COMMAND_QUERY, command, UrlEscapers.urlFragmentEscaper().escape( text ) );
-
-					log.info( get( COMMAND_METHOD, token, message.getChannel().getId(), query ) );
+					log.info( get( COMMAND_METHOD, token, message.getChannel().getId(), String.format( COMMAND_QUERY, command ) ) );
 				}
 
 				return;
@@ -93,7 +91,7 @@ public class TaskController extends BaseController {
 			text = Check.name( Dialog.class, command, payload ).text( submission );
 		}
 
-		Object[] args = { message.getChannel().getId(), path = "/" + command.toLowerCase(), text, url };
+		Object[] args = { path = "/" + command.toLowerCase(), text, url };
 
 		mapping.getHandlerMethods().entrySet().stream().filter( i -> {
 			return String.format( "[%s]", path ).equals( i.getKey().getPatternsCondition().toString() ); // methodsCondition就不比較了, 都是POST
