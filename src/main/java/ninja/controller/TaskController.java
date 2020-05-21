@@ -1,16 +1,22 @@
 package ninja.controller;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import com.google.common.net.UrlEscapers;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.google.common.net.UrlEscapers;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import ninja.consts.Act;
 import ninja.consts.Dialog;
@@ -30,6 +36,12 @@ public class TaskController extends BaseController {
 		INTERACTIVE_MESSAGE, DIALOG_SUBMISSION;
 	}
 
+	@Autowired
+	private RequestMappingHandlerMapping mapping;
+
+	@Autowired
+	private ApplicationContext context;
+
 	@PostMapping
 	public String task() {
 		return Heroku.task().toString();
@@ -43,7 +55,7 @@ public class TaskController extends BaseController {
 
 		log.info( "State: " + message.getState() ); // 目前是dialog有設state就會收到
 
-		String command = message.getId(), text = StringUtils.EMPTY;
+		String command = message.getId(), url = message.getUrl(), text = StringUtils.EMPTY, path;
 
 		if ( Type.INTERACTIVE_MESSAGE.equals( type ) ) {
 			Act act = Check.name( Act.class, command, payload );
@@ -54,6 +66,21 @@ public class TaskController extends BaseController {
 
 			if ( Act.HEROKU_TASK.equals( act ) ) {
 				Check.name( Task.class, command = action.getValue(), payload );
+
+				String user = message.getUser().getName(), token = System.getenv( "slack.legacy.token." + user );
+
+				if ( token == null ) {
+					message( "權限不足", url );
+
+					throw new IllegalArgumentException( "權限不足: " + user );
+
+				} else {
+					String query = String.format( COMMAND_QUERY, command, UrlEscapers.urlFragmentEscaper().escape( text ) );
+
+					log.info( get( COMMAND_METHOD, token, message.getChannel().getId(), query ) );
+				}
+
+				return;
 
 			} else {
 				text = check( action.getSelected(), payload ).get( VALUE );
@@ -66,9 +93,19 @@ public class TaskController extends BaseController {
 			text = Check.name( Dialog.class, command, payload ).text( submission );
 		}
 
-		String query = String.format( COMMAND_QUERY, command, UrlEscapers.urlFragmentEscaper().escape( text ) );
+		Object[] args = { message.getChannel().getId(), path = "/" + command.toLowerCase(), text, url };
 
-		log.info( get( COMMAND_METHOD, System.getenv( "slack.legacy.token." + message.getUser().getName() ), message.getChannel().getId(), query ) );
+		mapping.getHandlerMethods().entrySet().stream().filter( i -> {
+			return String.format( "[%s]", path ).equals( i.getKey().getPatternsCondition().toString() ); // methodsCondition就不比較了, 都是POST
+
+		} ).findFirst().map( Entry::getValue ).ifPresent( i -> { // 不用ParameterNameDiscoverer
+			try {
+				i.getMethod().invoke( context.getBean( i.getBeanType() ), Arrays.copyOfRange( args, args.length - i.getMethodParameters().length, args.length ) );
+
+			} catch ( IllegalAccessException | IllegalArgumentException | InvocationTargetException e ) {
+				throw new RuntimeException( e );
+			}
+		} );
 	}
 
 	private <T> T check( List<T> list, String payload ) {
