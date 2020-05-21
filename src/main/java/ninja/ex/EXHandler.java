@@ -14,7 +14,7 @@ import ninja.util.Utils;
 public class EXHandler implements AsyncUncaughtExceptionHandler {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	private static final String RESPONSE_URL_PREFIX = "https://hooks.slack.com/commands/";
+	private static final String RESPONSE_URL_PREFIX = "https://hooks.slack.com/"; // 包含commands, actions, services, app (dialog)
 
 	@Override
 	public void handleUncaughtException( Throwable ex, Method method, Object... params ) {
