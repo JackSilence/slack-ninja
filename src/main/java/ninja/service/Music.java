@@ -30,7 +30,7 @@ public class Music extends Data<List<List<String>>> {
 	void init( Map<String, List<List<String>>> data ) {
 		data.put( id(), Collections.emptyList() );
 
-		apple.exec();
+		// apple.exec();
 	}
 
 	private String id() {
