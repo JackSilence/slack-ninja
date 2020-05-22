@@ -27,7 +27,11 @@ public class App implements AsyncConfigurer {
 	@Bean
 	@Override
 	public Executor getAsyncExecutor() {
-		return new ThreadPoolTaskExecutor();
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+
+		executor.setCorePoolSize( 10 );
+
+		return executor;
 	}
 
 	@Override
