@@ -48,7 +48,6 @@ public class THSRController extends DialogController {
 	@Autowired
 	private THSR thsr;
 
-	@SuppressWarnings( "unchecked" )
 	@Override
 	protected Object[] args() {
 		String way = options( EnumUtils.getEnumMap( Way.class ).keySet() );

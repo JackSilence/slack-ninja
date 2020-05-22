@@ -30,7 +30,7 @@
 - 雙北上映影片時刻表 [圖片][movie]
 - 英文單字查詢與拼字檢查 [圖片][word]
 - 氣象局颱風消息 [圖片1][typhoon_d] [圖片2][typhoon]
-- 查詢Apple Music播放列表 [圖片1][music] [圖片2][music2]
+- ~~查詢Apple Music播放列表 [圖片1][music] [圖片2][music2]~~
 - Astronomy Picture of the Day [圖片][apod]
 
 [epoint]:https://res.cloudinary.com/lethington/image/upload/v1565444996/slack/epoint.png
