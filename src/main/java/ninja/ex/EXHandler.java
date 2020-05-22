@@ -3,6 +3,7 @@ package ninja.ex;
 import java.lang.reflect.Method;
 import java.time.format.DateTimeParseException;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,10 @@ public class EXHandler implements AsyncUncaughtExceptionHandler {
 	@Override
 	public void handleUncaughtException( Throwable ex, Method method, Object... params ) {
 		log.error( StringUtils.EMPTY, ex );
+
+		if ( ArrayUtils.isEmpty( params ) ) {
+			return;
+		}
 
 		String uri = params[ params.length - 1 ].toString();
 
