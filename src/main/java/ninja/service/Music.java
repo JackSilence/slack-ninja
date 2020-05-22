@@ -1,37 +1,79 @@
 package ninja.service;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import ninja.util.Cast;
-import ninja.util.Gson;
-import ninja.util.Utils;
+import magic.service.IService;
+import magic.service.Selenium;
 
 @Service
 public class Music extends Data<List<List<String>>> {
+	@Autowired
+	private IService apple;
+
 	@Value( "${playlist.url:}" )
 	private String url;
 
 	@Override
 	void init( Map<String, List<List<String>>> data ) {
-		String id = StringUtils.substringBefore( StringUtils.substringAfterLast( url, "/" ), "?" );
+		data.put( id(), Collections.emptyList() );
 
-		Map<?, ?> map = Gson.from( Utils.call( url ), Map.class );
+		apple.exec();
+	}
 
-		for ( String i : Arrays.asList( "storePlatformData", "playlist-product", "results", id ) ) {
-			map = Cast.map( map, i );
+	private String id() {
+		return StringUtils.substringBefore( StringUtils.substringAfterLast( url, "/" ), "?" );
+	}
+
+	@Service( "apple" )
+	private class Apple extends Selenium {
+		@Async
+		@Override
+		public void exec() {
+			run( "--start-maximized" );
 		}
 
-		Map<?, ?> children = Cast.map( map, "children" );
+		@Override
+		protected synchronized void run( WebDriver driver ) {
+			driver.get( url );
 
-		data.put( id, Utils.list( Cast.list( map, "childrenIds" ).stream().map( i -> Cast.map( children, i.toString() ) ).map( i -> {
-			return Utils.list( Stream.of( "artistName", "url", "name" ).map( j -> Cast.string( i, j ) ) );
-		} ) ) );
+			sleep();
+
+			long last = height( driver ), recent;
+
+			for ( int i = 0; i < 20; i++ ) {
+				script( driver, "window.scrollTo(0, document.body.scrollHeight);" );
+
+				sleep();
+
+				if ( ( recent = height( driver ) ) == last ) {
+					break;
+				}
+
+				last = recent;
+			}
+
+			data().put( id(), list( driver, "div.songs-list > div.song" ).stream().map( e -> {
+				List<WebElement> song = list( e, "div.song-name-wrapper > div" );
+
+				return Arrays.asList( song.get( 1 ).getText(), find( e, "div.col-album > a" ).getAttribute( "href" ), song.get( 0 ).getText() );
+			} ).collect( Collectors.toList() ) );
+		}
+
+		private long height( WebDriver driver ) {
+			return ( long ) ( ( JavascriptExecutor ) driver ).executeScript( "return document.body.scrollHeight" );
+		}
 	}
 }
