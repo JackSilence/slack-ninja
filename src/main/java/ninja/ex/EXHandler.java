@@ -15,7 +15,7 @@ import ninja.util.Utils;
 public class EXHandler implements AsyncUncaughtExceptionHandler {
 	private final Logger log = LoggerFactory.getLogger( this.getClass() );
 
-	private static final String RESPONSE_URL_PREFIX = "https://hooks.slack.com/"; // 包含commands, actions, services, app (dialog)
+	private static final String RESPONSE_URL_REGEX = "https://hooks.slack.com/(commands|actions|app).+"; // 排除services (incoming-webhook)
 
 	@Override
 	public void handleUncaughtException( Throwable ex, Method method, Object... params ) {
@@ -27,10 +27,20 @@ public class EXHandler implements AsyncUncaughtExceptionHandler {
 
 		String uri = params[ params.length - 1 ].toString();
 
-		if ( uri.startsWith( RESPONSE_URL_PREFIX ) ) {
-			String text = ex instanceof IllegalArgumentException || ex instanceof DateTimeParseException ? ex.getMessage() : "系統忙碌中";
+		if ( uri.matches( RESPONSE_URL_REGEX ) ) {
+			log.info( Utils.call( uri, new SlackMessage( message( ex ) ) ) );
+		}
+	}
 
-			log.info( Utils.call( uri, new SlackMessage( text ) ) );
+	private String message( Throwable ex ) {
+		if ( ex instanceof IllegalArgumentException ) {
+			return ex.getMessage();
+
+		} else if ( ex instanceof DateTimeParseException ) {
+			return "時間格式有誤: " + ( ( DateTimeParseException ) ex ).getParsedString();
+
+		} else {
+			return "系統忙碌中";
 		}
 	}
 }
