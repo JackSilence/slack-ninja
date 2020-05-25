@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,5 +46,9 @@ public class NASAController extends BaseController {
 		String title = Cast.string( result, "title" ), html = String.format( WEB_URL, date.format( DATE_TIME_FORMATTER ) );
 
 		message( Slack.attachment( title, html ).setImageUrl( id == null ? link : String.format( YOUTUBE_IMG, id ) ), command, text, url );
+	}
+
+	public void apod( String command, String url ) {
+		apod( command, StringUtils.EMPTY, url );
 	}
 }
