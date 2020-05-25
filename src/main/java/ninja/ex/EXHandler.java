@@ -38,9 +38,8 @@ public class EXHandler implements AsyncUncaughtExceptionHandler {
 
 		} else if ( ex instanceof DateTimeParseException ) {
 			return "時間格式有誤: " + ( ( DateTimeParseException ) ex ).getParsedString();
-
-		} else {
-			return "系統忙碌中";
 		}
+
+		return "系統忙碌中";
 	}
 }
