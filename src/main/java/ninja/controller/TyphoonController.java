@@ -37,28 +37,31 @@ public class TyphoonController extends DialogController {
 	private static final Map<String, String> AREAS = new LinkedHashMap<>();
 
 	static {
-		AREAS.put( "基隆", "Keelung" );
-		AREAS.put( "臺北", "Taipei" );
-		AREAS.put( "桃園", "Taoyuan" );
-		AREAS.put( "新竹", "Hsinchu" );
-		AREAS.put( "苗栗", "Miaoli" );
-		AREAS.put( "臺中", "Taichung" );
-		AREAS.put( "彰化", "Changhua" );
-		AREAS.put( "南投", "Nantou" );
-		AREAS.put( "雲林", "Yunlin" );
-		AREAS.put( "嘉義", "Chiayi" );
-		AREAS.put( "臺南", "Tainan" );
-		AREAS.put( "高雄", "Kaohsiung" );
-		AREAS.put( "屏東", "Pingtung" );
+		AREAS.put( "基隆市", "Keelung" );
+		AREAS.put( "臺北市", "TaipeiCity" );
+		AREAS.put( "新北市", "NewTaipei" );
+		AREAS.put( "桃園市", "Taoyuan" );
+		AREAS.put( "新竹市", "HsinchuCity" );
+		AREAS.put( "新竹縣", "HsinchuCounty" );
+		AREAS.put( "苗栗縣", "Miaoli" );
+		AREAS.put( "臺中市", "Taichung" );
+		AREAS.put( "彰化縣", "Changhua" );
+		AREAS.put( "南投縣", "Nantou" );
+		AREAS.put( "雲林縣", "Yunlin" );
+		AREAS.put( "嘉義市", "ChiayiCity" );
+		AREAS.put( "嘉義縣", "ChiayiCounty" );
+		AREAS.put( "臺南市", "Tainan" );
+		AREAS.put( "高雄市", "Kaohsiung" );
+		AREAS.put( "屏東縣", "Pingtung" );
 		AREAS.put( "恆春", "Hengchun" );
-		AREAS.put( "宜蘭", "Yilan" );
-		AREAS.put( "花蓮", "Hualien" );
-		AREAS.put( "臺東", "Taitung" );
+		AREAS.put( "宜蘭縣", "Yilan" );
+		AREAS.put( "花蓮縣", "Hualien" );
+		AREAS.put( "臺東縣", "Taitung" );
 		AREAS.put( "綠島", "Ludao" );
 		AREAS.put( "蘭嶼", "Lanyu" );
-		AREAS.put( "澎湖", "Penghu" );
-		AREAS.put( "金門", "Kinmen" );
-		AREAS.put( "馬祖", "Matsu" );
+		AREAS.put( "澎湖縣", "Penghu" );
+		AREAS.put( "金門縣", "Kinmen" );
+		AREAS.put( "連江縣", "LienChiang" );
 	}
 
 	@Override
