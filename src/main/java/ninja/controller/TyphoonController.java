@@ -32,7 +32,7 @@ public class TyphoonController extends DialogController {
 
 	private static final String IMG_JSON = "PTA_IMGS_%s_zhtw.json", AREA_JSON = "WSP-AREA_%s_WHOLE-DURATION.json";
 
-	private static final String NEWS_URL = "https://www.cwb.gov.tw/Data/typhoon/TY_NEWS/", DEFAULT = "臺北";
+	private static final String NEWS_URL = "https://www.cwb.gov.tw/Data/typhoon/TY_NEWS/", DEFAULT = "臺北市";
 
 	private static final Map<String, String> AREAS = new LinkedHashMap<>();
 
