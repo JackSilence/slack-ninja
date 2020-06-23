@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.gson.JsonObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
@@ -26,7 +28,11 @@ public class Utils {
 	}
 
 	public static String call( String uri, SlackMessage message ) {
-		return call( Request.Post( uri ), message.prepare().toString() );
+		JsonObject data = message.prepare();
+
+		data.addProperty( "replace_original", false );
+
+		return call( Request.Post( uri ), data.toString() );
 	}
 
 	public static String spacer( String... elements ) {

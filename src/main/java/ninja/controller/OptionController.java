@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +34,10 @@ public class OptionController extends BaseController {
 		String id = message.getId(), value = message.getValue();
 
 		Check.equals( "dialog_suggestion", message.getType(), payload );
+
+		if ( StringUtils.isBlank( value ) ) {
+			return options( Stream.empty() );
+		}
 
 		switch ( Dialog.valueOf( id ) ) {
 			case BUS:
