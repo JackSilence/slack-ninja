@@ -80,13 +80,17 @@ public class MovieController extends DialogController {
 	public void movie( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		String[] params = StringUtils.split( text, null, 2 ); // 考慮電影名稱可能會有空白
 
-		Check.expr( params.length == 2, "參數個數有誤: " + text );
+		Check.expr( params.length <= 2, "參數個數有誤: " + text );
 
-		String theater = params[ 0 ], film = params[ 1 ];
+		String theater = params[ 0 ], film;
 
-		SlackAttachment attach = new SlackAttachment( text + "時刻表" ).setTitle( film );
+		SlackAttachment attach = new SlackAttachment();
 
-		List<Element> films = Check.list( list( films( theater, attach ).stream().filter( i -> film.equals( title( i ).text() ) ) ), "查無影片: " + film );
+		Elements elements = films( theater, attach );
+
+		attach.setTitle( film = params.length == 1 ? title( elements.first() ).text() : params[ 1 ] ).setFallback( String.format( "%s %s時刻表", theater, film ) );
+
+		List<Element> films = Check.list( list( elements.stream().filter( i -> film.equals( title( i ).text() ) ) ), "查無影片: " + film );
 
 		Element movie = films.get( 0 ), info = movie.child( 1 ).child( 0 ).child( 0 );
 
