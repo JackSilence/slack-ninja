@@ -25,7 +25,7 @@ import ninja.util.Utils;
 
 @RestController
 public class AQIController extends DialogController {
-	private static final String API_URL = "https://opendata.epa.gov.tw/api/v1/AQI/?$format=json&$filter=";
+	private static final String API_URL = "https://opendata.epa.gov.tw/webapi/Data/REWIQA/?$format=json&$filter=";
 
 	private static final String DEFAULT = "松山", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
 
