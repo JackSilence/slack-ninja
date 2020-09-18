@@ -5,30 +5,32 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.api.ApiResponse;
+import com.google.common.collect.Iterables;
 
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 
-import ninja.util.Cast;
+import ninja.service.Music;
 import ninja.util.Check;
-import ninja.util.Gson;
 import ninja.util.Utils;
 
 @RestController
 public class MusicController extends BaseController {
     private static final String FEAT_REGEX = "[\\(\\[]feat. (.+?)[\\)\\]]", REMIX_REGEX = "[\\(\\[]([^\\(\\[]+?) Remix[\\)\\]]";
 
+    @Autowired
+    private Music music;
+
     @PostMapping( "/music" )
     @Async
     public void music( @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-        List<List<String>> songs = Gson.list( Utils.call( url() ) );
+        List<List<String>> songs = Iterables.getOnlyElement( music.data().values() );
 
         if ( StringUtils.isEmpty( text ) ) {
             String duplicate = text( songs.stream().filter( i -> Collections.frequency( songs, i ) > 1 ).distinct() );
@@ -53,18 +55,6 @@ public class MusicController extends BaseController {
 
             } ) ), "查無歌曲: " + query ) ), url );
         }
-    }
-
-    private String url() {
-        try {
-            ApiResponse response = new Cloudinary().search().expression( "music AND resource_type:raw" ).execute();
-
-            return Cast.map( Cast.list( response, "resources" ).get( 0 ) ).get( "secure_url" ).toString();
-
-        } catch ( Exception e ) {
-            throw new RuntimeException( e );
-        }
-
     }
 
     private String text( Stream<List<String>> stream ) {
