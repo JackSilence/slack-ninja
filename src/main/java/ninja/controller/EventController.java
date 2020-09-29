@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +37,7 @@ public class EventController extends BaseController {
 	private static final List<String> REJECT_SUB_TYPES = Arrays.asList( "bot_message", "message_deleted" );
 
 	private enum Type {
-		APP_MENTION, MESSAGE;
+		APP_MENTION, MESSAGE, APP_HOME_OPENED;
 	}
 
 	@Value( "${slack.bot.token:}" )
@@ -72,6 +73,11 @@ public class EventController extends BaseController {
 
 		} else if ( Type.MESSAGE.equals( type ) && ( text = StringUtils.defaultString( text ).trim() ).matches( ENG_REGEX ) ) {
 			post( Slack.message( translate( text ), channel ) ); // text可能為null, 例如subtype: message_changed
+
+		} else if ( Type.APP_HOME_OPENED.equals( type ) ) {
+			String view = magic.util.Utils.getResourceAsString( "/template/home.json" );
+
+			log.info( post( "views.publish", token, ImmutableMap.of( "user_id", event.getUser(), "view", view ) ) );
 		}
 	}
 

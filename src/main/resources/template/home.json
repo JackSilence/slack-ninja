@@ -1,0 +1,12 @@
+{
+    "type": "home",
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": "Hello, World!"
+            }
+        }
+    ]
+}
