@@ -7,25 +7,25 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.net.UrlEscapers;
-
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Color;
-import ninja.consts.Filter;
 import ninja.service.AQI;
+import ninja.util.Cast;
 import ninja.util.Check;
+import ninja.util.Gson;
 import ninja.util.Slack;
 import ninja.util.Utils;
 
 @RestController
 public class AQIController extends DialogController {
-	private static final String API_URL = "https://opendata.epa.gov.tw/webapi/Data/REWIQA/?$format=json&$filter=";
+	private static final String API_URL = "https://data.epa.gov.tw/api/v1/aqx_p_432?format=json&api_key=%s&filters=SiteName,EQ,%s";
 
 	private static final String DEFAULT = "松山", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
 
@@ -50,6 +50,9 @@ public class AQIController extends DialogController {
 	@Autowired
 	private AQI aqi;
 
+	@Value( "${epa.api.key:}" )
+	private String key;
+
 	@Override
 	protected Object[] args() {
 		return ArrayUtils.toArray( DEFAULT, json( aqi.data().entrySet().stream().map( i -> {
@@ -64,9 +67,9 @@ public class AQIController extends DialogController {
 
 		county = Check.first( aqi.data().entrySet().stream().filter( i -> i.getValue().contains( site ) ), "查無測站: " + site ).getKey();
 
-		Map<String, String> info = aqi.call( API_URL + UrlEscapers.urlFragmentEscaper().escape( Filter.SITE_NAME.eq( site ) ) ).get( 0 );
+		Map<?, ?> info = Cast.map( Cast.list( Gson.from( Utils.call( String.format( API_URL, key, site ) ), Map.class ), "records" ).get( 0 ) );
 
-		String aqi = StringUtils.defaultIfEmpty( info.get( "AQI" ), NA ), status = info.get( "Status" );
+		String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA ), status = Cast.string( info, "Status" );
 
 		Color color = "良好".equals( status ) ? Color.G : "普通".equals( status ) ? Color.Y : "設備維護".equals( status ) ? Color.B : Color.R;
 
@@ -74,7 +77,7 @@ public class AQIController extends DialogController {
 
 		attach.addFields( field( "AQI指標", aqi ) ).addFields( field( "狀態", status ) );
 
-		TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( info.get( i ), UNITS.get( i ) ) ) ) );
+		TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
 
 		message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text, url );
 	}
