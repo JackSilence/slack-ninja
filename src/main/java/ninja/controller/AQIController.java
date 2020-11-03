@@ -25,7 +25,7 @@ import ninja.util.Utils;
 
 @RestController
 public class AQIController extends DialogController {
-	private static final String API_URL = "https://data.epa.gov.tw/api/v1/aqx_p_432?format=json&api_key=%s&filters=SiteName,EQ,%s";
+	private static final String API_URL = "https://data.epa.gov.tw/api/v1/aqx_p_432?format=json&limit=100&filters=SiteName,EQ,%s&api_key=%s";
 
 	private static final String DEFAULT = "松山", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
 
@@ -67,7 +67,7 @@ public class AQIController extends DialogController {
 
 		county = Check.first( aqi.data().entrySet().stream().filter( i -> i.getValue().contains( site ) ), "查無測站: " + site ).getKey();
 
-		Map<?, ?> info = Cast.map( Cast.list( Gson.from( Utils.call( String.format( API_URL, key, site ) ), Map.class ), "records" ).get( 0 ) );
+		Map<?, ?> info = Cast.map( Cast.list( Gson.from( Utils.call( String.format( API_URL, site, key ) ), Map.class ), "records" ).get( 0 ) );
 
 		String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA ), status = Cast.string( info, "Status" );
 
