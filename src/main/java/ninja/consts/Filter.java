@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.base.CaseFormat;
 
 public enum Filter {
-	ROUTE( true ), STOP( true ), STATION( true ), DIRECTION( false ), COUNTY( false ), SITE_NAME( false );
+	ROUTE( true ), STOP( true ), STATION( true ), DIRECTION( false );
 
 	private static final String AND = " and ", OR = " or ";
 
