@@ -1,0 +1,13 @@
+{
+    "callback_id": "VAS",
+    "title": "三總看診進度查詢",
+    "elements": [
+        {
+            "label": "科別名稱",
+            "type": "select",
+            "name": "division",
+            "placeholder": "請選擇科別",
+            "options": %s
+        }
+    ]
+}
