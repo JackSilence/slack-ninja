@@ -7,8 +7,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.common.collect.Iterables;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -54,7 +52,7 @@ public class VASController extends GroupController<Set<String>> {
 
         Check.list( data, "查無看診資料: " + text );
 
-        SlackAttachment attach = Slack.attachment( "三總看診進度查詢", "https://www2.ndmctsgh.edu.tw/PatientNum/" ).setText( tag( text ) );
+        SlackAttachment attach = Slack.attachment( "三總看診進度查詢", "https://www2.ndmctsgh.edu.tw/PatientNum/" ).setText( tag( branch, division ) );
 
         data.forEach( i -> attach.addFields( field( i.get( "Room" ), i.get( "Doctor" ) ) ).addFields( field( "目前 / 下個", i.get( "Current" ) + " / " + i.get( "Next" ) ) ) );
 
