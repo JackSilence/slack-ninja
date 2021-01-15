@@ -2,7 +2,10 @@ package ninja.controller;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.ImmutableMap;
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Color;
 import ninja.service.AQI;
@@ -24,7 +26,7 @@ import ninja.util.Slack;
 import ninja.util.Utils;
 
 @RestController
-public class AQIController extends DialogController {
+public class AQIController extends GroupController<List<String>> {
 	private static final String API_URL = "https://data.epa.gov.tw/api/v1/aqx_p_432?format=json&limit=100&filters=SiteName,EQ,%s&api_key=%s";
 
 	private static final String DEFAULT = "松山", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
@@ -55,9 +57,12 @@ public class AQIController extends DialogController {
 
 	@Override
 	protected Object[] args() {
-		return ArrayUtils.toArray( DEFAULT, json( aqi.data().entrySet().stream().map( i -> {
-			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, list( i.getValue().stream().map( super::option ) ) );
-		} ) ) );
+		return ArrayUtils.toArray( DEFAULT, groups( aqi ) );
+	}
+
+	@Override
+	protected Stream<Map<String, String>> group( Entry<String, List<String>> entry ) {
+		return entry.getValue().stream().map( super::option );
 	}
 
 	@PostMapping( "/aqi" )

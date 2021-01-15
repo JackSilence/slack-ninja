@@ -7,7 +7,7 @@
             "type": "select",
             "name": "division",
             "placeholder": "請選擇科別",
-            "options": %s
+            "option_groups": %s
         }
     ]
 }

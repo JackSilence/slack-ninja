@@ -3,9 +3,11 @@ package ninja.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,8 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.ImmutableMap;
-
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Act;
 import ninja.consts.Color;
@@ -31,7 +31,7 @@ import ninja.util.Slack;
 import ninja.util.Utils;
 
 @RestController
-public class MovieController extends DialogController {
+public class MovieController extends GroupController<Map<String, String>> {
 	private static final String MOVIE_PATH = "/movie", IMG = "img", RATING_REGEX = "/images/cer_(.+?).gif";
 
 	private static final Map<String, String> RATINGS = new HashMap<>();
@@ -58,9 +58,12 @@ public class MovieController extends DialogController {
 
 	@Override
 	protected Object[] args() {
-		return ArrayUtils.toArray( json( movie.data().entrySet().stream().map( i -> {
-			return ImmutableMap.of( LABEL, i.getKey(), OPTIONS, list( i.getValue().keySet().stream().map( super::option ) ) );
-		} ) ) );
+		return ArrayUtils.toArray( groups( movie ) );
+	}
+
+	@Override
+	protected Stream<Map<String, String>> group( Entry<String, Map<String, String>> entry ) {
+		return entry.getValue().keySet().stream().map( super::option );
 	}
 
 	@PostMapping( "/theater" )

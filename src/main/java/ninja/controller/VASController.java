@@ -2,7 +2,10 @@ package ninja.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Iterables;
 
@@ -17,23 +20,39 @@ import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.service.VAS;
 import ninja.util.Check;
 import ninja.util.Slack;
+import ninja.util.Utils;
 
 @RestController
-public class VASController extends DialogController {
+public class VASController extends GroupController<Set<String>> {
     @Autowired
     private VAS vas;
 
     @Override
     protected Object[] args() {
-        return ArrayUtils.toArray( options( Iterables.getOnlyElement( vas.data().values() ) ) );
+        return ArrayUtils.toArray( groups( vas ) );
+    }
+
+    @Override
+    protected Stream<Map<String, String>> group( Entry<String, Set<String>> entry ) {
+        return entry.getValue().stream().map( i -> option( i, Utils.spacer( entry.getKey(), i ) ) );
     }
 
     @PostMapping( "/vas" )
     @Async
     public void vas( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-        List<Map<String, String>> data = vas.call().filter( i -> text.equals( i.get( "Division" ) ) ).collect( Collectors.toList() );
+        String[] params = Check.station( Check.params( text ) );
 
-        Check.list( data, "查無科別: " + text );
+        String branch = params[ 0 ], division = params[ 1 ];
+
+        Set<String> divisions = vas.data().get( branch );
+
+        Check.nil( divisions, "查無院區: " + branch );
+
+        Check.expr( divisions.contains( division ), "查無科別: " + division );
+
+        List<Map<String, String>> data = vas.call().stream().filter( i -> branch.equals( i.get( "Branch" ) ) && division.equals( i.get( "Division" ) ) ).collect( Collectors.toList() );
+
+        Check.list( data, "查無看診資料: " + text );
 
         SlackAttachment attach = Slack.attachment( "三總看診進度查詢", "https://www2.ndmctsgh.edu.tw/PatientNum/" ).setText( tag( text ) );
 
