@@ -23,7 +23,7 @@ import ninja.util.Gson;
 
 @RestController
 public class DelController extends BaseController {
-	private static final String HISTORY_METHOD = "channels.history", DEL_METHOD = "chat.delete";
+	private static final String HISTORY_METHOD = "conversations.history", DEL_METHOD = "chat.delete";
 
 	private static final String QUERY = "&oldest=%d&latest=%d", TEXT = "總共有 %d 則訊息\n已刪除 %d 則訊息";
 
