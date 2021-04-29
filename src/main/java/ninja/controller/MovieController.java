@@ -1,5 +1,6 @@
 package ninja.controller;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Act;
 import ninja.consts.Color;
 import ninja.service.Movie;
@@ -33,6 +35,8 @@ import ninja.util.Utils;
 @RestController
 public class MovieController extends GroupController<Map<String, String>> {
 	private static final String MOVIE_PATH = "/movie", IMG = "img", RATING_REGEX = "/images/cer_(.+?).gif";
+
+	private static final String RECENT_PATH = MOVIE_PATH + "/recent", RECENT_URL = Movie.URL + "/movie/new/", TITLE = "本周新片上映%d部";
 
 	private static final Map<String, String> RATINGS = new HashMap<>();
 
@@ -117,6 +121,28 @@ public class MovieController extends GroupController<Map<String, String>> {
 		message( attach, command, text, url );
 	}
 
+	@PostMapping( RECENT_PATH )
+	@Async
+	public void recent( @RequestParam String command, @RequestParam( RESPONSE_URL ) String url ) {
+		List<Element> films = Jsoup.select( RECENT_URL, "article.filmList" );
+
+		SlackMessage message = Slack.message( Slack.attachment( String.format( TITLE, films.size() ), RECENT_URL ), command, StringUtils.EMPTY );
+
+		films.forEach( i -> {
+			Element image = i.selectFirst( "a.image.filmListPoster" ), runtime = i.selectFirst( "div.runtime" );
+
+			SlackAttachment attach = Slack.attachment( title( i ).text(), Jsoup.href( this.movie.link( image ) ) );
+
+			String rating = RATINGS.get( Utils.find( RATING_REGEX, src( runtime ) ) );
+
+			String[] info = Arrays.stream( runtime.text().split( StringUtils.SPACE ) ).map( j -> StringUtils.substringAfter( j, "：" ) ).toArray( String[]::new );
+
+			message.addAttachments( attach.setText( tag( rating, info[ 0 ], StringUtils.substringBeforeLast( info[ 1 ], "/" ) ) ).setImageUrl( src( image ) ) );
+		} );
+
+		message( message, url );
+	}
+
 	private Elements films( String theater, SlackAttachment attach ) {
 		String url = Check.first( movie.data().values().stream().map( i -> i.get( theater ) ).filter( Objects::nonNull ), "查無影院: " + theater );
 
@@ -140,6 +166,6 @@ public class MovieController extends GroupController<Map<String, String>> {
 	}
 
 	private Element title( Element element ) {
-		return element.selectFirst( "li.filmTitle" );
+		return element.selectFirst( ".filmTitle" );
 	}
 }
