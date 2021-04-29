@@ -1,5 +1,7 @@
 package ninja.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +38,9 @@ import ninja.util.Utils;
 public class MovieController extends GroupController<Map<String, String>> {
 	private static final String MOVIE_PATH = "/movie", IMG = "img", RATING_REGEX = "/images/cer_(.+?).gif";
 
-	private static final String RECENT_PATH = MOVIE_PATH + "/recent", RECENT_URL = Movie.URL + "/movie/new/", TITLE = "本周新片上映%d部";
+	private static final String NEW_PATH = MOVIE_PATH + "/new", NEW_URL = Movie.URL + "/movie/new/", TITLE = "本周新片上映%d部";
+
+	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "M/d/yyyy" );
 
 	private static final Map<String, String> RATINGS = new HashMap<>();
 
@@ -57,7 +61,7 @@ public class MovieController extends GroupController<Map<String, String>> {
 
 	@Override
 	protected String[] skip() {
-		return ArrayUtils.toArray( MOVIE_PATH );
+		return ArrayUtils.toArray( MOVIE_PATH, NEW_PATH );
 	}
 
 	@Override
@@ -121,21 +125,29 @@ public class MovieController extends GroupController<Map<String, String>> {
 		message( attach, command, text, url );
 	}
 
-	@PostMapping( RECENT_PATH )
+	@PostMapping( NEW_PATH )
 	@Async
-	public void recent( @RequestParam String command, @RequestParam( RESPONSE_URL ) String url ) {
-		List<Element> films = Jsoup.select( RECENT_URL, "article.filmList" );
+	public void mnew( @RequestParam String command, @RequestParam( RESPONSE_URL ) String url ) {
+		List<Element> films = Jsoup.select( NEW_URL, "article.filmList" );
 
-		SlackMessage message = Slack.message( Slack.attachment( String.format( TITLE, films.size() ), RECENT_URL ), command, StringUtils.EMPTY );
+		String title = String.format( TITLE, films.size() );
+
+		SlackMessage message = Slack.message( Slack.author( new SlackAttachment( title ), title, NEW_URL, this.url ), command, StringUtils.EMPTY );
+
+		LocalDate now = LocalDate.now( ZONE_ID );
 
 		films.forEach( i -> {
 			Element image = i.selectFirst( "a.image.filmListPoster" ), runtime = i.selectFirst( "div.runtime" );
 
-			SlackAttachment attach = Slack.attachment( title( i ).text(), Jsoup.href( this.movie.link( image ) ) );
-
 			String rating = RATINGS.get( Utils.find( RATING_REGEX, src( runtime ) ) );
 
 			String[] info = Arrays.stream( runtime.text().split( StringUtils.SPACE ) ).map( j -> StringUtils.substringAfter( j, "：" ) ).toArray( String[]::new );
+
+			LocalDate date = LocalDate.parse( info[ 1 ], DATE_TIME_FORMATTER );
+
+			Color color = date.isEqual( now ) ? Color.G : date.isBefore( now ) ? Color.Y : Color.R;
+
+			SlackAttachment attach = Slack.attachment( title( i ).text(), image.attr( "abs:href" ) ).setColor( color.value() );
 
 			message.addAttachments( attach.setText( tag( rating, info[ 0 ], StringUtils.substringBeforeLast( info[ 1 ], "/" ) ) ).setImageUrl( src( image ) ) );
 		} );
