@@ -2,6 +2,7 @@ package ninja.controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -143,13 +144,20 @@ public class MovieController extends GroupController<Map<String, String>> {
 
 			String[] info = Arrays.stream( runtime.text().split( StringUtils.SPACE ) ).map( j -> StringUtils.substringAfter( j, "：" ) ).toArray( String[]::new );
 
-			LocalDate date = LocalDate.parse( info[ 1 ], DATE_TIME_FORMATTER );
+			SlackAttachment attach = Slack.attachment( title( i ).text(), image.attr( "abs:href" ) );
 
-			Color color = date.isEqual( now ) ? Color.G : date.isBefore( now ) ? Color.Y : Color.R;
+			try {
+				LocalDate date = LocalDate.parse( info[ 1 ], DATE_TIME_FORMATTER );
 
-			SlackAttachment attach = Slack.attachment( title( i ).text(), image.attr( "abs:href" ) ).setColor( color.value() );
+				attach.setColor( ( date.isEqual( now ) ? Color.G : date.isBefore( now ) ? Color.Y : Color.R ).value() );
 
-			message.addAttachments( attach.setText( tag( rating, info[ 0 ], StringUtils.substringBeforeLast( info[ 1 ], "/" ) ) ).setImageUrl( src( image ) ) );
+				attach.setText( tag( rating, info[ 0 ], StringUtils.substringBeforeLast( info[ 1 ], "/" ) ) );
+
+			} catch ( DateTimeParseException e ) {
+				attach.setText( tag( rating, info[ 0 ] ) );
+			}
+
+			message.addAttachments( attach.setImageUrl( src( image ) ) );
 		} );
 
 		message( message, url );
