@@ -29,9 +29,8 @@ public class Movie extends Data<Map<String, String>> {
 			} else {
 				Element link = link( i );
 
-				data.get( Iterables.getLast( data.keySet() ) ).put( link.text(), Jsoup.href( link ) );
+				data.get( Iterables.getLast( data.keySet() ) ).put( StringUtils.remove( link.text(), "★ " ), Jsoup.href( link ) );
 			}
 		} );
 	}
-
 }
