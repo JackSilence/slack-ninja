@@ -1,0 +1,1130 @@
+[
+    {
+        "LineID": "1",
+        "LineField": "BR",
+        "LineName": "BR 文湖線",
+        "LineStations": [
+            {
+                "SID": "019",
+                "LineID": "1",
+                "StationLabel": "BR01",
+                "StationLabelForRoadmap": "BR01",
+                "StationName": "動物園",
+                "Lang": null
+            },
+            {
+                "SID": "018",
+                "LineID": "1",
+                "StationLabel": "BR02",
+                "StationLabelForRoadmap": "BR02",
+                "StationName": "木柵",
+                "Lang": null
+            },
+            {
+                "SID": "017",
+                "LineID": "1",
+                "StationLabel": "BR03",
+                "StationLabelForRoadmap": "BR03",
+                "StationName": "萬芳社區",
+                "Lang": null
+            },
+            {
+                "SID": "016",
+                "LineID": "1",
+                "StationLabel": "BR04",
+                "StationLabelForRoadmap": "BR04",
+                "StationName": "萬芳醫院",
+                "Lang": null
+            },
+            {
+                "SID": "015",
+                "LineID": "1",
+                "StationLabel": "BR05",
+                "StationLabelForRoadmap": "BR05",
+                "StationName": "辛亥",
+                "Lang": null
+            },
+            {
+                "SID": "014",
+                "LineID": "1",
+                "StationLabel": "BR06",
+                "StationLabelForRoadmap": "BR06",
+                "StationName": "麟光",
+                "Lang": null
+            },
+            {
+                "SID": "013",
+                "LineID": "1",
+                "StationLabel": "BR07",
+                "StationLabelForRoadmap": "BR07",
+                "StationName": "六張犁",
+                "Lang": null
+            },
+            {
+                "SID": "012",
+                "LineID": "1",
+                "StationLabel": "BR08",
+                "StationLabelForRoadmap": "BR08",
+                "StationName": "科技大樓",
+                "Lang": null
+            },
+            {
+                "SID": "011",
+                "LineID": "1",
+                "StationLabel": "BR09",
+                "StationLabelForRoadmap": "R05 BR09",
+                "StationName": "大安",
+                "Lang": null
+            },
+            {
+                "SID": "010",
+                "LineID": "1",
+                "StationLabel": "BR10",
+                "StationLabelForRoadmap": "BL15 BR10",
+                "StationName": "忠孝復興",
+                "Lang": null
+            },
+            {
+                "SID": "009",
+                "LineID": "1",
+                "StationLabel": "BR11",
+                "StationLabelForRoadmap": "G16 BR11",
+                "StationName": "南京復興",
+                "Lang": null
+            },
+            {
+                "SID": "008",
+                "LineID": "1",
+                "StationLabel": "BR12",
+                "StationLabelForRoadmap": "BR12",
+                "StationName": "中山國中",
+                "Lang": null
+            },
+            {
+                "SID": "007",
+                "LineID": "1",
+                "StationLabel": "BR13",
+                "StationLabelForRoadmap": "BR13",
+                "StationName": "松山機場",
+                "Lang": null
+            },
+            {
+                "SID": "021",
+                "LineID": "1",
+                "StationLabel": "BR14",
+                "StationLabelForRoadmap": "BR14",
+                "StationName": "大直",
+                "Lang": null
+            },
+            {
+                "SID": "022",
+                "LineID": "1",
+                "StationLabel": "BR15",
+                "StationLabelForRoadmap": "BR15",
+                "StationName": "劍南路",
+                "Lang": null
+            },
+            {
+                "SID": "023",
+                "LineID": "1",
+                "StationLabel": "BR16",
+                "StationLabelForRoadmap": "BR16",
+                "StationName": "西湖",
+                "Lang": null
+            },
+            {
+                "SID": "024",
+                "LineID": "1",
+                "StationLabel": "BR17",
+                "StationLabelForRoadmap": "BR17",
+                "StationName": "港墘",
+                "Lang": null
+            },
+            {
+                "SID": "025",
+                "LineID": "1",
+                "StationLabel": "BR18",
+                "StationLabelForRoadmap": "BR18",
+                "StationName": "文德",
+                "Lang": null
+            },
+            {
+                "SID": "026",
+                "LineID": "1",
+                "StationLabel": "BR19",
+                "StationLabelForRoadmap": "BR19",
+                "StationName": "內湖",
+                "Lang": null
+            },
+            {
+                "SID": "027",
+                "LineID": "1",
+                "StationLabel": "BR20",
+                "StationLabelForRoadmap": "BR20",
+                "StationName": "大湖公園",
+                "Lang": null
+            },
+            {
+                "SID": "028",
+                "LineID": "1",
+                "StationLabel": "BR21",
+                "StationLabelForRoadmap": "BR21",
+                "StationName": "葫洲",
+                "Lang": null
+            },
+            {
+                "SID": "029",
+                "LineID": "1",
+                "StationLabel": "BR22",
+                "StationLabelForRoadmap": "BR22",
+                "StationName": "東湖",
+                "Lang": null
+            },
+            {
+                "SID": "030",
+                "LineID": "1",
+                "StationLabel": "BR23",
+                "StationLabelForRoadmap": "BR23",
+                "StationName": "南港軟體園區",
+                "Lang": null
+            },
+            {
+                "SID": "031",
+                "LineID": "1",
+                "StationLabel": "BR24",
+                "StationLabelForRoadmap": "BL23 BR24",
+                "StationName": "南港展覽館",
+                "Lang": null
+            }
+        ],
+        "Lang": "tw"
+    },
+    {
+        "LineID": "2",
+        "LineField": "R",
+        "LineName": "R 淡水信義線",
+        "LineStations": [
+            {
+                "SID": "099",
+                "LineID": "2",
+                "StationLabel": "R02",
+                "StationLabelForRoadmap": "R02",
+                "StationName": "象山",
+                "Lang": null
+            },
+            {
+                "SID": "100",
+                "LineID": "2",
+                "StationLabel": "R03",
+                "StationLabelForRoadmap": "R03",
+                "StationName": "台北101/世貿",
+                "Lang": null
+            },
+            {
+                "SID": "101",
+                "LineID": "2",
+                "StationLabel": "R04",
+                "StationLabelForRoadmap": "R04",
+                "StationName": "信義安和",
+                "Lang": null
+            },
+            {
+                "SID": "011",
+                "LineID": "2",
+                "StationLabel": "R05",
+                "StationLabelForRoadmap": "R05 BR09",
+                "StationName": "大安",
+                "Lang": null
+            },
+            {
+                "SID": "103",
+                "LineID": "2",
+                "StationLabel": "R06",
+                "StationLabelForRoadmap": "R06",
+                "StationName": "大安森林公園",
+                "Lang": null
+            },
+            {
+                "SID": "134",
+                "LineID": "2",
+                "StationLabel": "R07",
+                "StationLabelForRoadmap": "R07 O06",
+                "StationName": "東門",
+                "Lang": null
+            },
+            {
+                "SID": "042",
+                "LineID": "2",
+                "StationLabel": "R08",
+                "StationLabelForRoadmap": "G10 R08",
+                "StationName": "中正紀念堂",
+                "Lang": null
+            },
+            {
+                "SID": "050",
+                "LineID": "2",
+                "StationLabel": "R09",
+                "StationLabelForRoadmap": "R09",
+                "StationName": "台大醫院",
+                "Lang": null
+            },
+            {
+                "SID": "051",
+                "LineID": "2",
+                "StationLabel": "R10",
+                "StationLabelForRoadmap": "BL12 R10",
+                "StationName": "台北車站",
+                "Lang": null
+            },
+            {
+                "SID": "053",
+                "LineID": "2",
+                "StationLabel": "R11",
+                "StationLabelForRoadmap": "G14 R11",
+                "StationName": "中山",
+                "Lang": null
+            },
+            {
+                "SID": "054",
+                "LineID": "2",
+                "StationLabel": "R12",
+                "StationLabelForRoadmap": "R12",
+                "StationName": "雙連",
+                "Lang": null
+            },
+            {
+                "SID": "055",
+                "LineID": "2",
+                "StationLabel": "R13",
+                "StationLabelForRoadmap": "O11 R13",
+                "StationName": "民權西路",
+                "Lang": null
+            },
+            {
+                "SID": "056",
+                "LineID": "2",
+                "StationLabel": "R14",
+                "StationLabelForRoadmap": "R14",
+                "StationName": "圓山",
+                "Lang": null
+            },
+            {
+                "SID": "057",
+                "LineID": "2",
+                "StationLabel": "R15",
+                "StationLabelForRoadmap": "R15",
+                "StationName": "劍潭",
+                "Lang": null
+            },
+            {
+                "SID": "058",
+                "LineID": "2",
+                "StationLabel": "R16",
+                "StationLabelForRoadmap": "R16",
+                "StationName": "士林",
+                "Lang": null
+            },
+            {
+                "SID": "059",
+                "LineID": "2",
+                "StationLabel": "R17",
+                "StationLabelForRoadmap": "R17",
+                "StationName": "芝山",
+                "Lang": null
+            },
+            {
+                "SID": "060",
+                "LineID": "2",
+                "StationLabel": "R18",
+                "StationLabelForRoadmap": "R18",
+                "StationName": "明德",
+                "Lang": null
+            },
+            {
+                "SID": "061",
+                "LineID": "2",
+                "StationLabel": "R19",
+                "StationLabelForRoadmap": "R19",
+                "StationName": "石牌",
+                "Lang": null
+            },
+            {
+                "SID": "062",
+                "LineID": "2",
+                "StationLabel": "R20",
+                "StationLabelForRoadmap": "R20",
+                "StationName": "唭哩岸",
+                "Lang": null
+            },
+            {
+                "SID": "063",
+                "LineID": "2",
+                "StationLabel": "R21",
+                "StationLabelForRoadmap": "R21",
+                "StationName": "奇岩",
+                "Lang": null
+            },
+            {
+                "SID": "064",
+                "LineID": "2",
+                "StationLabel": "R22",
+                "StationLabelForRoadmap": "R22",
+                "StationName": "北投",
+                "Lang": null
+            },
+            {
+                "SID": "065",
+                "LineID": "2",
+                "StationLabel": "R22A",
+                "StationLabelForRoadmap": "R22A",
+                "StationName": "新北投",
+                "Lang": null
+            },
+            {
+                "SID": "066",
+                "LineID": "2",
+                "StationLabel": "R23",
+                "StationLabelForRoadmap": "R23",
+                "StationName": "復興崗",
+                "Lang": null
+            },
+            {
+                "SID": "067",
+                "LineID": "2",
+                "StationLabel": "R24",
+                "StationLabelForRoadmap": "R24",
+                "StationName": "忠義",
+                "Lang": null
+            },
+            {
+                "SID": "068",
+                "LineID": "2",
+                "StationLabel": "R25",
+                "StationLabelForRoadmap": "R25",
+                "StationName": "關渡",
+                "Lang": null
+            },
+            {
+                "SID": "069",
+                "LineID": "2",
+                "StationLabel": "R26",
+                "StationLabelForRoadmap": "R26",
+                "StationName": "竹圍",
+                "Lang": null
+            },
+            {
+                "SID": "070",
+                "LineID": "2",
+                "StationLabel": "R27",
+                "StationLabelForRoadmap": "R27",
+                "StationName": "紅樹林",
+                "Lang": null
+            },
+            {
+                "SID": "071",
+                "LineID": "2",
+                "StationLabel": "R28",
+                "StationLabelForRoadmap": "R28",
+                "StationName": "淡水",
+                "Lang": null
+            }
+        ],
+        "Lang": "tw"
+    },
+    {
+        "LineID": "3",
+        "LineField": "G",
+        "LineName": "G 松山新店線",
+        "LineStations": [
+            {
+                "SID": "033",
+                "LineID": "3",
+                "StationLabel": "G01",
+                "StationLabelForRoadmap": "G01",
+                "StationName": "新店",
+                "Lang": null
+            },
+            {
+                "SID": "034",
+                "LineID": "3",
+                "StationLabel": "G02",
+                "StationLabelForRoadmap": "G02",
+                "StationName": "新店區公所",
+                "Lang": null
+            },
+            {
+                "SID": "035",
+                "LineID": "3",
+                "StationLabel": "G03",
+                "StationLabelForRoadmap": "G03",
+                "StationName": "七張",
+                "Lang": null
+            },
+            {
+                "SID": "032",
+                "LineID": "3",
+                "StationLabel": "G03A",
+                "StationLabelForRoadmap": "G03A",
+                "StationName": "小碧潭",
+                "Lang": null
+            },
+            {
+                "SID": "036",
+                "LineID": "3",
+                "StationLabel": "G04",
+                "StationLabelForRoadmap": "G04 Y07",
+                "StationName": "大坪林",
+                "Lang": null
+            },
+            {
+                "SID": "037",
+                "LineID": "3",
+                "StationLabel": "G05",
+                "StationLabelForRoadmap": "G05",
+                "StationName": "景美",
+                "Lang": null
+            },
+            {
+                "SID": "038",
+                "LineID": "3",
+                "StationLabel": "G06",
+                "StationLabelForRoadmap": "G06",
+                "StationName": "萬隆",
+                "Lang": null
+            },
+            {
+                "SID": "039",
+                "LineID": "3",
+                "StationLabel": "G07",
+                "StationLabelForRoadmap": "G07",
+                "StationName": "公館",
+                "Lang": null
+            },
+            {
+                "SID": "040",
+                "LineID": "3",
+                "StationLabel": "G08",
+                "StationLabelForRoadmap": "G08",
+                "StationName": "台電大樓",
+                "Lang": null
+            },
+            {
+                "SID": "041",
+                "LineID": "3",
+                "StationLabel": "G09",
+                "StationLabelForRoadmap": "G09 O05",
+                "StationName": "古亭",
+                "Lang": null
+            },
+            {
+                "SID": "042",
+                "LineID": "3",
+                "StationLabel": "G10",
+                "StationLabelForRoadmap": "G10 R08",
+                "StationName": "中正紀念堂",
+                "Lang": null
+            },
+            {
+                "SID": "043",
+                "LineID": "3",
+                "StationLabel": "G11",
+                "StationLabelForRoadmap": "G11",
+                "StationName": "小南門",
+                "Lang": null
+            },
+            {
+                "SID": "086",
+                "LineID": "3",
+                "StationLabel": "G12",
+                "StationLabelForRoadmap": "BL11 G12",
+                "StationName": "西門",
+                "Lang": null
+            },
+            {
+                "SID": "105",
+                "LineID": "3",
+                "StationLabel": "G13",
+                "StationLabelForRoadmap": "G13",
+                "StationName": "北門",
+                "Lang": null
+            },
+            {
+                "SID": "053",
+                "LineID": "3",
+                "StationLabel": "G14",
+                "StationLabelForRoadmap": "G14 R11",
+                "StationName": "中山",
+                "Lang": null
+            },
+            {
+                "SID": "132",
+                "LineID": "3",
+                "StationLabel": "G15",
+                "StationLabelForRoadmap": "G15 O08",
+                "StationName": "松江南京",
+                "Lang": null
+            },
+            {
+                "SID": "009",
+                "LineID": "3",
+                "StationLabel": "G16",
+                "StationLabelForRoadmap": "G16 BR11",
+                "StationName": "南京復興",
+                "Lang": null
+            },
+            {
+                "SID": "109",
+                "LineID": "3",
+                "StationLabel": "G17",
+                "StationLabelForRoadmap": "G17",
+                "StationName": "台北小巨蛋",
+                "Lang": null
+            },
+            {
+                "SID": "110",
+                "LineID": "3",
+                "StationLabel": "G18",
+                "StationLabelForRoadmap": "G18",
+                "StationName": "南京三民",
+                "Lang": null
+            },
+            {
+                "SID": "111",
+                "LineID": "3",
+                "StationLabel": "G19",
+                "StationLabelForRoadmap": "G19",
+                "StationName": "松山",
+                "Lang": null
+            }
+        ],
+        "Lang": "tw"
+    },
+    {
+        "LineID": "4",
+        "LineField": "O",
+        "LineName": "O 中和新蘆線",
+        "LineStations": [
+            {
+                "SID": "048",
+                "LineID": "4",
+                "StationLabel": "O01",
+                "StationLabelForRoadmap": "O01",
+                "StationName": "南勢角",
+                "Lang": null
+            },
+            {
+                "SID": "047",
+                "LineID": "4",
+                "StationLabel": "O02",
+                "StationLabelForRoadmap": "Y11 O02",
+                "StationName": "景安",
+                "Lang": null
+            },
+            {
+                "SID": "046",
+                "LineID": "4",
+                "StationLabel": "O03",
+                "StationLabelForRoadmap": "O03",
+                "StationName": "永安市場",
+                "Lang": null
+            },
+            {
+                "SID": "045",
+                "LineID": "4",
+                "StationLabel": "O04",
+                "StationLabelForRoadmap": "O04",
+                "StationName": "頂溪",
+                "Lang": null
+            },
+            {
+                "SID": "041",
+                "LineID": "4",
+                "StationLabel": "O05",
+                "StationLabelForRoadmap": "G09 O05",
+                "StationName": "古亭",
+                "Lang": null
+            },
+            {
+                "SID": "134",
+                "LineID": "4",
+                "StationLabel": "O06",
+                "StationLabelForRoadmap": "R07 O06",
+                "StationName": "東門",
+                "Lang": null
+            },
+            {
+                "SID": "089",
+                "LineID": "4",
+                "StationLabel": "O07",
+                "StationLabelForRoadmap": "BL14 O07",
+                "StationName": "忠孝新生",
+                "Lang": null
+            },
+            {
+                "SID": "132",
+                "LineID": "4",
+                "StationLabel": "O08",
+                "StationLabelForRoadmap": "G15 O08",
+                "StationName": "松江南京",
+                "Lang": null
+            },
+            {
+                "SID": "131",
+                "LineID": "4",
+                "StationLabel": "O09",
+                "StationLabelForRoadmap": "O09",
+                "StationName": "行天宮",
+                "Lang": null
+            },
+            {
+                "SID": "130",
+                "LineID": "4",
+                "StationLabel": "O10",
+                "StationLabelForRoadmap": "O10",
+                "StationName": "中山國小",
+                "Lang": null
+            },
+            {
+                "SID": "055",
+                "LineID": "4",
+                "StationLabel": "O11",
+                "StationLabelForRoadmap": "O11 R13",
+                "StationName": "民權西路",
+                "Lang": null
+            },
+            {
+                "SID": "128",
+                "LineID": "4",
+                "StationLabel": "O12",
+                "StationLabelForRoadmap": "O12",
+                "StationName": "大橋頭",
+                "Lang": null
+            },
+            {
+                "SID": "127",
+                "LineID": "4",
+                "StationLabel": "O13",
+                "StationLabelForRoadmap": "O13",
+                "StationName": "台北橋",
+                "Lang": null
+            },
+            {
+                "SID": "126",
+                "LineID": "4",
+                "StationLabel": "O14",
+                "StationLabelForRoadmap": "O14",
+                "StationName": "菜寮",
+                "Lang": null
+            },
+            {
+                "SID": "125",
+                "LineID": "4",
+                "StationLabel": "O15",
+                "StationLabelForRoadmap": "O15",
+                "StationName": "三重",
+                "Lang": null
+            },
+            {
+                "SID": "124",
+                "LineID": "4",
+                "StationLabel": "O16",
+                "StationLabelForRoadmap": "O16",
+                "StationName": "先嗇宮",
+                "Lang": null
+            },
+            {
+                "SID": "123",
+                "LineID": "4",
+                "StationLabel": "O17",
+                "StationLabelForRoadmap": "Y18 O17",
+                "StationName": "頭前庄",
+                "Lang": null
+            },
+            {
+                "SID": "122",
+                "LineID": "4",
+                "StationLabel": "O18",
+                "StationLabelForRoadmap": "O18",
+                "StationName": "新莊",
+                "Lang": null
+            },
+            {
+                "SID": "121",
+                "LineID": "4",
+                "StationLabel": "O19",
+                "StationLabelForRoadmap": "O19",
+                "StationName": "輔大",
+                "Lang": null
+            },
+            {
+                "SID": "180",
+                "LineID": "4",
+                "StationLabel": "O20",
+                "StationLabelForRoadmap": "O20",
+                "StationName": "丹鳳",
+                "Lang": null
+            },
+            {
+                "SID": "179",
+                "LineID": "4",
+                "StationLabel": "O21",
+                "StationLabelForRoadmap": "O21",
+                "StationName": "迴龍",
+                "Lang": null
+            },
+            {
+                "SID": "178",
+                "LineID": "4",
+                "StationLabel": "O50",
+                "StationLabelForRoadmap": "O50",
+                "StationName": "三重國小",
+                "Lang": null
+            },
+            {
+                "SID": "177",
+                "LineID": "4",
+                "StationLabel": "O51",
+                "StationLabelForRoadmap": "O51",
+                "StationName": "三和國中",
+                "Lang": null
+            },
+            {
+                "SID": "176",
+                "LineID": "4",
+                "StationLabel": "O52",
+                "StationLabelForRoadmap": "O52",
+                "StationName": "徐匯中學",
+                "Lang": null
+            },
+            {
+                "SID": "175",
+                "LineID": "4",
+                "StationLabel": "O53",
+                "StationLabelForRoadmap": "O53",
+                "StationName": "三民高中",
+                "Lang": null
+            },
+            {
+                "SID": "174",
+                "LineID": "4",
+                "StationLabel": "O54",
+                "StationLabelForRoadmap": "O54",
+                "StationName": "蘆洲",
+                "Lang": null
+            }
+        ],
+        "Lang": "tw"
+    },
+    {
+        "LineID": "5",
+        "LineField": "BL",
+        "LineName": "BL 板南線",
+        "LineStations": [
+            {
+                "SID": "076",
+                "LineID": "5",
+                "StationLabel": "BL01",
+                "StationLabelForRoadmap": "BL01",
+                "StationName": "頂埔",
+                "Lang": null
+            },
+            {
+                "SID": "077",
+                "LineID": "5",
+                "StationLabel": "BL02",
+                "StationLabelForRoadmap": "BL02",
+                "StationName": "永寧",
+                "Lang": null
+            },
+            {
+                "SID": "078",
+                "LineID": "5",
+                "StationLabel": "BL03",
+                "StationLabelForRoadmap": "BL03",
+                "StationName": "土城",
+                "Lang": null
+            },
+            {
+                "SID": "079",
+                "LineID": "5",
+                "StationLabel": "BL04",
+                "StationLabelForRoadmap": "BL04",
+                "StationName": "海山",
+                "Lang": null
+            },
+            {
+                "SID": "080",
+                "LineID": "5",
+                "StationLabel": "BL05",
+                "StationLabelForRoadmap": "BL05",
+                "StationName": "亞東醫院",
+                "Lang": null
+            },
+            {
+                "SID": "081",
+                "LineID": "5",
+                "StationLabel": "BL06",
+                "StationLabelForRoadmap": "BL06",
+                "StationName": "府中",
+                "Lang": null
+            },
+            {
+                "SID": "082",
+                "LineID": "5",
+                "StationLabel": "BL07",
+                "StationLabelForRoadmap": "BL07",
+                "StationName": "板橋",
+                "Lang": null
+            },
+            {
+                "SID": "083",
+                "LineID": "5",
+                "StationLabel": "BL08",
+                "StationLabelForRoadmap": "BL08",
+                "StationName": "新埔",
+                "Lang": null
+            },
+            {
+                "SID": "084",
+                "LineID": "5",
+                "StationLabel": "BL09",
+                "StationLabelForRoadmap": "BL09",
+                "StationName": "江子翠",
+                "Lang": null
+            },
+            {
+                "SID": "085",
+                "LineID": "5",
+                "StationLabel": "BL10",
+                "StationLabelForRoadmap": "BL10",
+                "StationName": "龍山寺",
+                "Lang": null
+            },
+            {
+                "SID": "086",
+                "LineID": "5",
+                "StationLabel": "BL11",
+                "StationLabelForRoadmap": "BL11 G12",
+                "StationName": "西門",
+                "Lang": null
+            },
+            {
+                "SID": "051",
+                "LineID": "5",
+                "StationLabel": "BL12",
+                "StationLabelForRoadmap": "BL12 R10",
+                "StationName": "台北車站",
+                "Lang": null
+            },
+            {
+                "SID": "088",
+                "LineID": "5",
+                "StationLabel": "BL13",
+                "StationLabelForRoadmap": "BL13",
+                "StationName": "善導寺",
+                "Lang": null
+            },
+            {
+                "SID": "089",
+                "LineID": "5",
+                "StationLabel": "BL14",
+                "StationLabelForRoadmap": "BL14 O07",
+                "StationName": "忠孝新生",
+                "Lang": null
+            },
+            {
+                "SID": "010",
+                "LineID": "5",
+                "StationLabel": "BL15",
+                "StationLabelForRoadmap": "BL15 BR10",
+                "StationName": "忠孝復興",
+                "Lang": null
+            },
+            {
+                "SID": "091",
+                "LineID": "5",
+                "StationLabel": "BL16",
+                "StationLabelForRoadmap": "BL16",
+                "StationName": "忠孝敦化",
+                "Lang": null
+            },
+            {
+                "SID": "092",
+                "LineID": "5",
+                "StationLabel": "BL17",
+                "StationLabelForRoadmap": "BL17",
+                "StationName": "國父紀念館",
+                "Lang": null
+            },
+            {
+                "SID": "093",
+                "LineID": "5",
+                "StationLabel": "BL18",
+                "StationLabelForRoadmap": "BL18",
+                "StationName": "市政府",
+                "Lang": null
+            },
+            {
+                "SID": "094",
+                "LineID": "5",
+                "StationLabel": "BL19",
+                "StationLabelForRoadmap": "BL19",
+                "StationName": "永春",
+                "Lang": null
+            },
+            {
+                "SID": "095",
+                "LineID": "5",
+                "StationLabel": "BL20",
+                "StationLabelForRoadmap": "BL20",
+                "StationName": "後山埤",
+                "Lang": null
+            },
+            {
+                "SID": "096",
+                "LineID": "5",
+                "StationLabel": "BL21",
+                "StationLabelForRoadmap": "BL21",
+                "StationName": "昆陽",
+                "Lang": null
+            },
+            {
+                "SID": "097",
+                "LineID": "5",
+                "StationLabel": "BL22",
+                "StationLabelForRoadmap": "BL22",
+                "StationName": "南港",
+                "Lang": null
+            },
+            {
+                "SID": "031",
+                "LineID": "5",
+                "StationLabel": "BL23",
+                "StationLabelForRoadmap": "BL23 BR24",
+                "StationName": "南港展覽館",
+                "Lang": null
+            }
+        ],
+        "Lang": "tw"
+    },
+    {
+        "LineID": "6",
+        "LineField": "Y",
+        "LineName": "Y 環狀線",
+        "LineStations": [
+            {
+                "SID": "036",
+                "LineID": "6",
+                "StationLabel": "Y07",
+                "StationLabelForRoadmap": "G04 Y07",
+                "StationName": "大坪林",
+                "Lang": null
+            },
+            {
+                "SID": "201",
+                "LineID": "6",
+                "StationLabel": "Y08",
+                "StationLabelForRoadmap": "Y08",
+                "StationName": "十四張",
+                "Lang": null
+            },
+            {
+                "SID": "202",
+                "LineID": "6",
+                "StationLabel": "Y09",
+                "StationLabelForRoadmap": "Y09",
+                "StationName": "秀朗橋",
+                "Lang": null
+            },
+            {
+                "SID": "203",
+                "LineID": "6",
+                "StationLabel": "Y10",
+                "StationLabelForRoadmap": "Y10",
+                "StationName": "景平",
+                "Lang": null
+            },
+            {
+                "SID": "047",
+                "LineID": "6",
+                "StationLabel": "Y11",
+                "StationLabelForRoadmap": "Y11 O02",
+                "StationName": "景安",
+                "Lang": null
+            },
+            {
+                "SID": "205",
+                "LineID": "6",
+                "StationLabel": "Y12",
+                "StationLabelForRoadmap": "Y12",
+                "StationName": "中和",
+                "Lang": null
+            },
+            {
+                "SID": "206",
+                "LineID": "6",
+                "StationLabel": "Y13",
+                "StationLabelForRoadmap": "Y13",
+                "StationName": "橋和",
+                "Lang": null
+            },
+            {
+                "SID": "207",
+                "LineID": "6",
+                "StationLabel": "Y14",
+                "StationLabelForRoadmap": "Y14",
+                "StationName": "中原",
+                "Lang": null
+            },
+            {
+                "SID": "208",
+                "LineID": "6",
+                "StationLabel": "Y15",
+                "StationLabelForRoadmap": "Y15",
+                "StationName": "板新",
+                "Lang": null
+            },
+            {
+                "SID": "209",
+                "LineID": "6",
+                "StationLabel": "Y16",
+                "StationLabelForRoadmap": "Y16",
+                "StationName": "板橋",
+                "Lang": null
+            },
+            {
+                "SID": "210",
+                "LineID": "6",
+                "StationLabel": "Y17",
+                "StationLabelForRoadmap": "Y17",
+                "StationName": "新埔民生",
+                "Lang": null
+            },
+            {
+                "SID": "123",
+                "LineID": "6",
+                "StationLabel": "Y18",
+                "StationLabelForRoadmap": "Y18 O17",
+                "StationName": "頭前庄",
+                "Lang": null
+            },
+            {
+                "SID": "212",
+                "LineID": "6",
+                "StationLabel": "Y19",
+                "StationLabelForRoadmap": "Y19",
+                "StationName": "幸福",
+                "Lang": null
+            },
+            {
+                "SID": "213",
+                "LineID": "6",
+                "StationLabel": "Y20",
+                "StationLabelForRoadmap": "Y20",
+                "StationName": "新北產業園區",
+                "Lang": null
+            }
+        ],
+        "Lang": "tw"
+    }
+]

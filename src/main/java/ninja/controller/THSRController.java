@@ -70,10 +70,10 @@ public class THSRController extends DialogController {
 
 		SlackAttachment attach1 = Slack.attachment( TITLE, LINK ), attach2 = Slack.attachment( Color.G );
 
-		List<?> fares = Cast.list( thsr.call( String.format( FARE, start, end ) ).get( 0 ), "Fares" );
-
-		fares.stream().map( Cast::map ).sorted( ( i, j ) -> price( i ).compareTo( price( j ) ) ).limit( 2 ).forEach( i -> {
-			attach1.addFields( field( Cast.string( i, "TicketType" ), "$" + price( i ).intValue() ) );
+		Cast.list( thsr.call( String.format( FARE, start, end ) ).get( 0 ), "Fares" ).stream().map( Cast::map ).filter( i -> {
+			return Cast.dble( i, "TicketType" ).equals( 1d ) && Cast.dble( i, "FareClass" ).equals( 1d ); // 一般票, 成人
+		} ).sorted( ( i, j ) -> price( i ).compareTo( price( j ) ) ).limit( 2 ).forEach( i -> {
+			attach1.addFields( field( cabin( i ), "$" + price( i ).intValue() ) );
 		} );
 
 		String filter = Utils.spacer( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + Utils.spacer( way.field, way.order );
@@ -99,6 +99,12 @@ public class THSRController extends DialogController {
 		String[] fields = way.field.split( "/" );
 
 		return Cast.string( Cast.map( map, fields[ 0 ] ), fields[ 1 ] );
+	}
+
+	private String cabin( Map<?, ?> map ) {
+		Double cabin = Cast.dble( map, "CabinClass" );
+
+		return cabin.equals( 1d ) ? "標準" : cabin.equals( 3d ) ? "自由" : "商務";
 	}
 
 	private Double price( Map<?, ?> map ) {
