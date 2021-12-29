@@ -140,7 +140,7 @@ public class MovieController extends GroupController<Map<String, String>> {
 		films.forEach( i -> {
 			Element image = i.selectFirst( "a.image.filmListPoster" ), runtime = i.selectFirst( "div.runtime" );
 
-			String rating = RATINGS.get( Utils.find( RATING_REGEX, src( runtime ) ) );
+			String rating = RATINGS.getOrDefault( Utils.find( RATING_REGEX, src( runtime ) ), "無分級" );
 
 			String[] info = Arrays.stream( runtime.text().split( StringUtils.SPACE ) ).map( j -> StringUtils.substringAfter( j, "：" ) ).toArray( String[]::new );
 
@@ -182,7 +182,9 @@ public class MovieController extends GroupController<Map<String, String>> {
 	}
 
 	private String src( Element element ) {
-		return element.selectFirst( IMG ).attr( "src" );
+		Element img = element.selectFirst( IMG );
+
+		return img == null ? StringUtils.EMPTY : img.attr( "src" );
 	}
 
 	private Element title( Element element ) {
