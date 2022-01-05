@@ -11,7 +11,7 @@ import ninja.util.Utils;
 
 @Service
 public class VAS extends Data<Set<String>> {
-    private static final String VAS_URL = "https://patno.ndmctsgh.edu.tw/wcm/vas";
+    private static final String VAS_URL = "https://patnonew.ndmctsgh.edu.tw/api/history/visit_record";
 
     public List<Map<String, String>> call() {
         return Gson.list( Utils.call( VAS_URL ) );
