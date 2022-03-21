@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Lists;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
@@ -133,34 +135,38 @@ public class MovieController extends GroupController<Map<String, String>> {
 
 		String title = String.format( TITLE, films.size() );
 
-		SlackMessage message = Slack.message( Slack.author( new SlackAttachment( title ), title, NEW_URL, this.url ), command, StringUtils.EMPTY );
-
 		LocalDate now = LocalDate.now( ZONE_ID );
 
-		films.forEach( i -> {
-			Element image = i.selectFirst( "a.image.filmListPoster" ), runtime = i.selectFirst( "div.runtime" );
+		List<List<Element>> partition = Lists.partition( films, 5 );
 
-			String rating = RATINGS.getOrDefault( Utils.find( RATING_REGEX, src( runtime ) ), "無分級" );
+		for ( int i = 0; i < partition.size(); i++ ) {
+			SlackMessage message = i == 0 ? Slack.message( Slack.author( new SlackAttachment( title ), title, NEW_URL, this.url ), command, StringUtils.EMPTY ) : Slack.message();
 
-			String[] info = Arrays.stream( runtime.text().split( StringUtils.SPACE ) ).map( j -> StringUtils.substringAfter( j, "：" ) ).toArray( String[]::new );
+			partition.get( i ).forEach( j -> {
+				Element image = j.selectFirst( "a.image.filmListPoster" ), runtime = j.selectFirst( "div.runtime" );
 
-			SlackAttachment attach = Slack.attachment( title( i ).text(), image.attr( "abs:href" ) );
+				String rating = RATINGS.getOrDefault( Utils.find( RATING_REGEX, src( runtime ) ), "無分級" );
 
-			try {
-				LocalDate date = LocalDate.parse( info[ 1 ], DATE_TIME_FORMATTER );
+				String[] info = Arrays.stream( runtime.text().split( StringUtils.SPACE ) ).map( k -> StringUtils.substringAfter( k, "：" ) ).toArray( String[]::new );
 
-				attach.setColor( ( date.isEqual( now ) ? Color.G : date.isBefore( now ) ? Color.Y : Color.R ).value() );
+				SlackAttachment attach = Slack.attachment( title( j ).text(), image.attr( "abs:href" ) );
 
-				attach.setText( tag( rating, info[ 0 ], StringUtils.substringBeforeLast( info[ 1 ], "/" ) ) );
+				try {
+					LocalDate date = LocalDate.parse( info[ 1 ], DATE_TIME_FORMATTER );
 
-			} catch ( DateTimeParseException e ) {
-				attach.setText( tag( rating, info[ 0 ] ) );
-			}
+					attach.setColor( ( date.isEqual( now ) ? Color.G : date.isBefore( now ) ? Color.Y : Color.R ).value() );
 
-			message.addAttachments( attach.setImageUrl( src( image ) ) );
-		} );
+					attach.setText( tag( rating, info[ 0 ], StringUtils.substringBeforeLast( info[ 1 ], "/" ) ) );
 
-		message( message, url );
+				} catch ( DateTimeParseException e ) {
+					attach.setText( tag( rating, info[ 0 ] ) );
+				}
+
+				message.addAttachments( attach.setImageUrl( src( image ) ) );
+			} );
+
+			message( message, url );
+		}
 	}
 
 	private Elements films( String theater, SlackAttachment attach ) {
