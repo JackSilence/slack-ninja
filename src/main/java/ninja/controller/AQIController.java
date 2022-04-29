@@ -27,7 +27,7 @@ import ninja.util.Utils;
 
 @RestController
 public class AQIController extends GroupController<List<String>> {
-	private static final String API_URL = "https://data.epa.gov.tw/api/v1/aqx_p_432?format=json&limit=100&filters=SiteName,EQ,%s&api_key=%s";
+	private static final String API_URL = "https://data.epa.gov.tw/api/v2/aqx_p_432?format=json&limit=100&filters=sitename,EQ,%s&api_key=%s";
 
 	private static final String DEFAULT = "松山", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
 
@@ -76,7 +76,7 @@ public class AQIController extends GroupController<List<String>> {
 
 		Map<?, ?> info = Cast.map( Check.first( Cast.list( result, "records" ).stream(), "查無資料: " + site ) );
 
-		String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "AQI" ), NA ), status = Cast.string( info, "Status" );
+		String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "aqi" ), NA ), status = Cast.string( info, "status" );
 
 		Color color = "良好".equals( status ) ? Color.G : "普通".equals( status ) ? Color.Y : "設備維護".equals( status ) ? Color.B : Color.R;
 
@@ -84,7 +84,7 @@ public class AQIController extends GroupController<List<String>> {
 
 		attach.addFields( field( "AQI指標", aqi ) ).addFields( field( "狀態", status ) );
 
-		TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i ), UNITS.get( i ) ) ) ) );
+		TITLES.keySet().forEach( i -> attach.addFields( field( TITLES.get( i ), value( Cast.string( info, i.toLowerCase() ), UNITS.get( i ) ) ) ) );
 
 		message( attach.setFallback( String.format( "%s%sAQI: %s", county, site, aqi ) ), command, text, url );
 	}
