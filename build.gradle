@@ -27,4 +27,6 @@ dependencies {
 	
 	compile('org.springframework.retry:spring-retry:1.2.2.RELEASE')
 	compile('org.aspectj:aspectjweaver:1.8.9')
+	compile('com.sendgrid:sendgrid-java:4.0.1')
+	compile('org.apache.commons:commons-text:1.6')
 }
