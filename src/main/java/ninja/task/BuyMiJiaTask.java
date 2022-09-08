@@ -1,5 +1,8 @@
 package ninja.task;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -89,7 +92,9 @@ public class BuyMiJiaTask implements IService {
             }
         } );
 
-        mail.send( subject = Utils.subject( "百米家新商品通知" ), String.format( Utils.getResourceAsString( TEMPLATE ), sb.toString() ) );
+        subject = String.format( "%s_%s", "百米家新商品通知", LocalDateTime.now( ZoneId.of( Zone.TAIPEI ) ).format( DateTimeFormatter.ofPattern( "yyyyMMddHH" ) ) );
+
+        mail.send( subject, String.format( Utils.getResourceAsString( TEMPLATE ), sb.toString() ) );
 
         slack.call( new SlackMessage( subject ).setAttachments( attachments ) );
     }
