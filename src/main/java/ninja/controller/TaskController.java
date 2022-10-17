@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +35,7 @@ public class TaskController extends BaseController {
 	}
 
 	@Autowired
-	private RequestMappingHandlerMapping mapping;
+	private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
 	@Autowired
 	private ApplicationContext context;
@@ -91,8 +91,8 @@ public class TaskController extends BaseController {
 
 		Object[] args = { path = "/" + command.toLowerCase(), text, url };
 
-		mapping.getHandlerMethods().entrySet().stream().filter( i -> {
-			return String.format( "[%s]", path ).equals( i.getKey().getPatternsCondition().toString() ); // methodsCondition就不比較了, 都是POST
+		requestMappingHandlerMapping.getHandlerMethods().entrySet().stream().filter( i -> {
+			return String.format( "[%s]", path ).equals( i.getKey().getActivePatternsCondition().toString() ); // methodsCondition就不比較了, 都是POST
 
 		} ).findFirst().map( Entry::getValue ).ifPresent( i -> { // 不用ParameterNameDiscoverer
 			try {
@@ -105,7 +105,7 @@ public class TaskController extends BaseController {
 	}
 
 	private <T> T check( List<T> list, String payload ) {
-		Check.expr( CollectionUtils.isNotEmpty( list ) && list.size() == 1, payload );
+		Check.expr( !CollectionUtils.isEmpty( list ) && list.size() == 1, payload );
 
 		return list.get( 0 );
 	}

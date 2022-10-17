@@ -1,32 +1,27 @@
-buildscript {
-	repositories {
-		maven {
-			url 'https://repo1.maven.org/maven2'
-		}
-	}
-	dependencies.classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.5.18.RELEASE'
+plugins {
+	id 'org.springframework.boot' version '2.7.4'
+	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+	id 'java'
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'org.springframework.boot'
-
-sourceCompatibility = 1.8
+sourceCompatibility = '1.8'
 
 repositories {
-	maven {
-		url 'https://repo1.maven.org/maven2'
-	}
+	mavenCentral()
 	maven {
 		url 'https://jitpack.io'
 	}
 }
 
+jar {
+    enabled = false
+}
+
 dependencies {
-	compile('com.github.JackSilence:magic:6854f731a6')
+	implementation('com.github.JackSilence:magic:6854f731a6')
 	
-	compile('org.springframework.retry:spring-retry:1.2.2.RELEASE')
-	compile('org.aspectj:aspectjweaver:1.8.9')
-	compile('com.sendgrid:sendgrid-java:4.0.1')
-	compile('org.apache.commons:commons-text:1.6')
+	implementation('org.springframework.retry:spring-retry:1.2.2.RELEASE')
+	implementation('org.aspectj:aspectjweaver:1.8.9')
+	implementation('com.sendgrid:sendgrid-java:4.0.1')
+	implementation('org.apache.commons:commons-text:1.6')
 }
