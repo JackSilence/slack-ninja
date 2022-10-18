@@ -13,6 +13,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import magic.controller.ExecuteController;
@@ -23,6 +24,7 @@ import ninja.ex.EXHandler;
 
 @SpringBootApplication
 @EnableRetry
+@EnableScheduling
 @Import( { ExecuteController.class, AsyncExecutor.class, Slack.class } )
 public class App implements AsyncConfigurer {
 	@Value( "${email.username:}" )
