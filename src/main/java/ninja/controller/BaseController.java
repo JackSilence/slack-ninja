@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HttpHeaders;
 
 import net.gpedro.integrations.slack.SlackAttachment;
@@ -55,11 +54,11 @@ public abstract class BaseController {
 
 	@ModelAttribute
 	public void verify( @RequestHeader( HEADER_TIMESTAMP ) String timestamp, @RequestHeader( HEADER_SIGNATURE ) String signature, @RequestBody String body, HttpServletRequest request ) {
-		Instant instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
+		var instant = Instant.ofEpochSecond( Long.valueOf( timestamp ) );
 
 		Check.expr( instant.plus( 5, ChronoUnit.MINUTES ).compareTo( Instant.now() ) >= 0, "Instant: " + instant );
 
-		String digest = digest( String.join( ":", VERSION, timestamp, getClass().equals( EventController.class ) ? body : body.replace( "*", "%2A" ) ) );
+		var digest = digest( String.join( ":", VERSION, timestamp, getClass().equals( EventController.class ) ? body : body.replace( "*", "%2A" ) ) );
 
 		Check.equals( signature, digest, String.format( "%s, body: %s", String.join( "!=", signature, digest ), body ) );
 
@@ -73,11 +72,11 @@ public abstract class BaseController {
 	}
 
 	protected Map<String, String> option( String label, Object value ) {
-		return ImmutableMap.of( LABEL, label, VALUE, value.toString() );
+		return Map.of( LABEL, label, VALUE, value.toString() );
 	}
 
 	protected Map<String, String> option2( String text, String value ) {
-		return ImmutableMap.of( TEXT, text, VALUE, value );
+		return Map.of( TEXT, text, VALUE, value );
 	}
 
 	protected String get( String method, String channel, String query ) {

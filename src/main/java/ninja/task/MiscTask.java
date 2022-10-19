@@ -1,7 +1,5 @@
 package ninja.task;
 
-import java.util.Map;
-
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +17,7 @@ public class MiscTask extends Task {
 	@Override
 	public void exec() {
 		try {
-			Map<?, ?> credits = Cast.map( new Cloudinary().api().usage( ObjectUtils.emptyMap() ), "credits" );
+			var credits = Cast.map( new Cloudinary().api().usage( ObjectUtils.emptyMap() ), "credits" );
 
 			call( String.format( TEMPLATE, Cast.dble( credits, "limit" ), Cast.dble( credits, "usage" ) ) );
 

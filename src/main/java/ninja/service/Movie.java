@@ -27,7 +27,7 @@ public class Movie extends Data<Map<String, String>> {
 			if ( i.hasClass( "type0" ) ) {
 				data.put( StringUtils.remove( i.text(), "▼" ), new LinkedHashMap<>() );
 			} else {
-				Element link = link( i );
+				var link = link( i );
 
 				data.get( Iterables.getLast( data.keySet() ) ).put( StringUtils.remove( link.text(), "★ " ), Jsoup.href( link ) );
 			}

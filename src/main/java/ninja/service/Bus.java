@@ -50,7 +50,7 @@ public class Bus extends PTX {
 	@Override
 	void init( Map<String, String> data ) {
 		Jsoup.select( ROUTES_URL, "section.busline li > a", i -> {
-			String id = Utils.find( ROUTE_ID_REGEX, Jsoup.href( i ) );
+			var id = Utils.find( ROUTE_ID_REGEX, Jsoup.href( i ) );
 
 			if ( id != null ) {
 				data.put( i.text(), id );

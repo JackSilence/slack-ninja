@@ -1,6 +1,5 @@
 package ninja;
 
-import java.util.Properties;
 import java.util.concurrent.Executor;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -39,7 +38,7 @@ public class App implements AsyncConfigurer {
 
 	@Bean
 	public JavaMailSender sender() {
-		JavaMailSenderImpl sender = new JavaMailSenderImpl();
+		var sender = new JavaMailSenderImpl();
 
 		sender.setHost( "smtp.gmail.com" );
 		sender.setPort( 465 );
@@ -47,7 +46,7 @@ public class App implements AsyncConfigurer {
 		sender.setUsername( Utils.decode( username ) );
 		sender.setPassword( Utils.decode( password ) );
 
-		Properties props = sender.getJavaMailProperties();
+		var props = sender.getJavaMailProperties();
 
 		props.put( "mail.transport.protocol", "smtp" );
 		props.put( "mail.smtp.auth", "true" );
@@ -61,7 +60,7 @@ public class App implements AsyncConfigurer {
 	@Bean
 	@Override
 	public Executor getAsyncExecutor() {
-		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		var executor = new ThreadPoolTaskExecutor();
 
 		executor.setCorePoolSize( 10 );
 

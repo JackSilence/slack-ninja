@@ -30,17 +30,17 @@ public class MusicController extends BaseController {
     @PostMapping( "/music" )
     @Async
     public void music( @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-        List<List<String>> songs = Iterables.getOnlyElement( music.data().values() );
+        var songs = Iterables.getOnlyElement( music.data().values() );
 
         if ( StringUtils.isEmpty( text ) ) {
-            String duplicate = text( songs.stream().filter( i -> Collections.frequency( songs, i ) > 1 ).distinct() );
+            var duplicate = text( songs.stream().filter( i -> Collections.frequency( songs, i ) > 1 ).distinct() );
 
             duplicate = duplicate.isEmpty() ? StringUtils.EMPTY : ", duplicate:\n" + duplicate;
 
             message( String.format( "Number of songs: *%d*%s", songs.size(), duplicate ), url );
 
         } else {
-            String query = HtmlUtils.htmlUnescape( text );
+            var query = HtmlUtils.htmlUnescape( text );
 
             message( String.format( "*%s*\n%s", tag( query ), Check.empty( text( songs.stream().filter( i -> {
                 String artist = i.get( 0 ), name = i.get( 2 ), feat = Utils.find( FEAT_REGEX, name ), remix = Utils.find( REMIX_REGEX, name );

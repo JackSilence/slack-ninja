@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,9 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 
-import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackField;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Color;
 import ninja.util.Cast;
 import ninja.util.Check;
@@ -71,7 +68,7 @@ public class WeatherController extends DialogController {
 
 	@Override
 	protected Object[] args() {
-		String hours = json( iterate( 0, i -> i + 6, 9 ).map( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
+		var hours = json( iterate( 0, i -> i + 6, 9 ).map( i -> option( i == 0 ? "現在" : i + "小時後", i ) ) );
 
 		return ArrayUtils.toArray( DEFAULT_DIST, options( DISTRICTS.keySet() ), DEFAULT_HOURS, hours );
 	}
@@ -79,13 +76,13 @@ public class WeatherController extends DialogController {
 	@PostMapping( "/weather" )
 	@Async
 	public void weather( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		String[] params = Check.params( StringUtils.defaultIfEmpty( text, Utils.spacer( DEFAULT_DIST, DEFAULT_HOURS ) ) );
+		var params = Check.params( StringUtils.defaultIfEmpty( text, Utils.spacer( DEFAULT_DIST, DEFAULT_HOURS ) ) );
 
-		String district = StringUtils.appendIfMissing( params[ 0 ], "區" );
+		var district = StringUtils.appendIfMissing( params[ 0 ], "區" );
 
-		ZonedDateTime time = ZonedDateTime.now( ZONE_ID );
+		var time = ZonedDateTime.now( ZONE_ID );
 
-		Integer hour = time.getHour(), plus = Arrays.asList( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6, town, hours;
+		Integer hour = time.getHour(), plus = List.of( 5, 11, 17, 23 ).contains( hour ) ? 9 : 6, town, hours;
 
 		Check.expr( ObjectUtils.allNotNull( town = DISTRICTS.get( district ), hours = Ints.tryParse( params[ 1 ] ) ) && hours >= -12 && hours <= 48, "參數有誤: " + text );
 
@@ -94,11 +91,11 @@ public class WeatherController extends DialogController {
 
 		log.info( "From: {}, to: {}", from, to );
 
-		Map<?, ?> result = Gson.from( Utils.call( API_URL + String.format( QUERY, key, district, from, to ) ), Map.class );
+		var result = Gson.from( Utils.call( API_URL + String.format( QUERY, key, district, from, to ) ), Map.class );
 
-		SlackMessage message = Slack.message( Slack.attachment( String.format( TITLE, district ), WEB_URL + town ), command, text );
+		var message = Slack.message( Slack.attachment( String.format( TITLE, district ), WEB_URL + town ), command, text );
 
-		List<?> elements = Cast.list( first( first( Cast.map( result, "records" ), "locations" ), "location" ), "weatherElement" );
+		var elements = Cast.list( first( first( Cast.map( result, "records" ), "locations" ), "location" ), "weatherElement" );
 
 		Map<String, String> image = new HashMap<>(), at = new HashMap<>();
 
@@ -111,19 +108,19 @@ public class WeatherController extends DialogController {
 		each( elements, "AT", j -> at.put( Cast.string( j, "dataTime" ), Cast.string( first( j, ELEMENT_VALUE ), VALUE ) ) );
 
 		each( elements, "WeatherDescription", j -> {
-			String[] data = Cast.string( first( j, ELEMENT_VALUE ), VALUE ).split( DELIMITER );
+			var data = Cast.string( first( j, ELEMENT_VALUE ), VALUE ).split( DELIMITER );
 
 			String ci = data[ 3 ], wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
 
-			Color color = "舒適".equals( ci ) ? Color.G : "悶熱".equals( ci ) ? Color.Y : "易中暑".equals( ci ) ? Color.R : Color.B;
+			var color = "舒適".equals( ci ) ? Color.G : "悶熱".equals( ci ) ? Color.Y : "易中暑".equals( ci ) ? Color.R : Color.B;
 
-			int hr = hour( start = Cast.string( j, START_TIME ) );
+			var hr = hour( start = Cast.string( j, START_TIME ) );
 
-			String period = hr == 12 ? "中午" : hr >= 0 && hr < 6 ? "凌晨" : hr >= 6 && hr < 12 ? "早上" : hr >= 13 && hr < 18 ? "下午" : "晚上";
+			var period = hr == 12 ? "中午" : hr >= 0 && hr < 6 ? "凌晨" : hr >= 6 && hr < 12 ? "早上" : hr >= 13 && hr < 18 ? "下午" : "晚上";
 
-			String title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點";
+			var title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點";
 
-			SlackAttachment attach = Slack.author( Slack.attachment( color ), title, null, image.get( start ) );
+			var attach = Slack.author( Slack.attachment( color ), title, null, image.get( start ) );
 
 			attach.addFields( super.field( "溫度 / 體感", data[ 2 ].substring( 4, 6 ) + " / " + at.get( start ) + "˚C" ) );
 

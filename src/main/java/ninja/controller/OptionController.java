@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.ImmutableMap;
-
 import ninja.consts.Dialog;
 import ninja.consts.Filter;
 import ninja.service.Bus;
@@ -29,7 +27,7 @@ public class OptionController extends BaseController {
 
 	@PostMapping( "/options" )
 	public Map<String, List<?>> options( String payload ) {
-		Payload message = Gson.from( payload, Payload.class );
+		var message = Gson.from( payload, Payload.class );
 
 		String id = message.getId(), value = message.getValue();
 
@@ -45,7 +43,7 @@ public class OptionController extends BaseController {
 					return options( Stream.empty() );
 				}
 
-				List<Map<String, ?>> info = bus.call( "DisplayStopOfRoute", Filter.and( Filter.ROUTE.eq( value ), Filter.DIRECTION.eq( "0" ) ) );
+				var info = bus.call( "DisplayStopOfRoute", Filter.and( Filter.ROUTE.eq( value ), Filter.DIRECTION.eq( "0" ) ) );
 
 				return options( info.isEmpty() ? Stream.empty() : bus.stops( info.get( 0 ), bus::stop ).map( i -> option( i, bus.text( value, i ) ) ) );
 
@@ -61,6 +59,6 @@ public class OptionController extends BaseController {
 	}
 
 	private Map<String, List<?>> options( Stream<?> options ) {
-		return ImmutableMap.of( OPTIONS, list( options ) );
+		return Map.of( OPTIONS, list( options ) );
 	}
 }

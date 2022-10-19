@@ -1,10 +1,8 @@
 package ninja.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ninja.slack.Callback;
-import ninja.slack.Event;
 import ninja.util.Cast;
 import ninja.util.Check;
 import ninja.util.Gson;
@@ -34,7 +31,7 @@ public class EventController extends BaseController {
 
 	private static final String QUERY_TITLE = "您查詢的單字是", CHECK_TITLE = "您是不是要查", ENG_REGEX = "[a-zA-Z]+";
 
-	private static final List<String> REJECT_SUB_TYPES = Arrays.asList( "bot_message", "message_deleted" );
+	private static final List<String> REJECT_SUB_TYPES = List.of( "bot_message", "message_deleted" );
 
 	private enum Type {
 		APP_MENTION, MESSAGE, APP_HOME_OPENED;
@@ -48,9 +45,9 @@ public class EventController extends BaseController {
 
 	@PostMapping( "/event" )
 	public void event( @RequestAttribute( REQ_BODY ) String body, Model model ) {
-		Callback callback = Gson.from( body, Callback.class );
+		var callback = Gson.from( body, Callback.class );
 
-		Event event = callback.getEvent();
+		var event = callback.getEvent();
 
 		String challenge = callback.getChallenge(), text = event.getText(), channel = event.getChannel();
 
@@ -66,7 +63,7 @@ public class EventController extends BaseController {
 
 		log.info( "Body: {}", body );
 
-		Type type = EnumUtils.getEnumIgnoreCase( Type.class, event.getType() );
+		var type = EnumUtils.getEnumIgnoreCase( Type.class, event.getType() );
 
 		if ( Type.APP_MENTION.equals( type ) && StringUtils.contains( text, MENTION_KEYWORD ) ) {
 			post( Heroku.task( "您可選擇任務並於確認後執行", channel ) );
@@ -75,9 +72,9 @@ public class EventController extends BaseController {
 			post( Slack.message( translate( text ), channel ) ); // text可能為null, 例如subtype: message_changed
 
 		} else if ( Type.APP_HOME_OPENED.equals( type ) ) {
-			String view = magic.util.Utils.getResourceAsString( "/template/home.json" );
+			var view = magic.util.Utils.getResourceAsString( "/template/home.json" );
 
-			log.info( post( "views.publish", token, ImmutableMap.of( "user_id", event.getUser(), "view", view ) ) );
+			log.info( post( "views.publish", token, Map.of( "user_id", event.getUser(), "view", view ) ) );
 		}
 	}
 

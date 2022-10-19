@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.Iterables;
 
-import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Color;
 import ninja.util.Cast;
 import ninja.util.Check;
@@ -78,13 +77,13 @@ public class TyphoonController extends DialogController {
 			return;
 		}
 
-		String area = StringUtils.defaultIfEmpty( text, DEFAULT );
+		var area = StringUtils.defaultIfEmpty( text, DEFAULT );
 
 		String data = Utils.call( DATA_URL ), time = Utils.find( TIME_REGEX, data ), count = Utils.find( COUNT_REGEX, data );
 
-		SlackAttachment attach = Slack.attachment( TITLE, WEB_URL ).setImageUrl( url( Iterables.getLast( Cast.list( map( IMG_JSON, time ), "WHOLE" ) ) ) );
+		var attach = Slack.attachment( TITLE, WEB_URL ).setImageUrl( url( Iterables.getLast( Cast.list( map( IMG_JSON, time ), "WHOLE" ) ) ) );
 
-		int pr = Cast.dble( Cast.map( map( AREA_JSON, time ), "AREA" ), Check.nil( AREAS.get( area ), "查無區域: " + area ) ).intValue();
+		var pr = Cast.dble( Cast.map( map( AREA_JSON, time ), "AREA" ), Check.nil( AREAS.get( area ), "查無區域: " + area ) ).intValue();
 
 		attach.addFields( field( "熱帶低壓 / 颱風", count.replace( ",", " / " ) + "個" ) ).addFields( field( "侵襲" + area + "機率", pr + "%" ) );
 

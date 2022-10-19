@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.gson.JsonObject;
 
 import net.gpedro.integrations.slack.SlackActionType;
-import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Act;
 import ninja.consts.Task;
 import ninja.slack.Action;
@@ -19,7 +18,7 @@ public class Heroku {
 	}
 
 	public static JsonObject task( String text, String channel ) {
-		SlackAttachment attach = Slack.attachment( Act.HEROKU_TASK );
+		var attach = Slack.attachment( Act.HEROKU_TASK );
 
 		Stream.of( Task.values() ).map( Heroku::action ).forEach( i -> attach.addAction( i ) );
 

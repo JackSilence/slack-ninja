@@ -39,7 +39,7 @@ public class NASAController extends BaseController {
 
 		Check.expr( !date.isBefore( START_DATE ) && !date.isAfter( now ), "Date must be between Jun 16, 1995 and today." );
 
-		Map<?, ?> result = Gson.from( Utils.call( String.format( API_URL, key, date ) ), Map.class );
+		var result = Gson.from( Utils.call( String.format( API_URL, key, date ) ), Map.class );
 
 		String link = Check.nil( Cast.string( result, "url" ), Cast.string( result, "msg" ) ), id = Utils.find( YOUTUBE_REGEX, link );
 

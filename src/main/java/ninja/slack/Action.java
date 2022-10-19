@@ -49,7 +49,7 @@ public class Action extends SlackAction {
 
 	@Override
 	public JsonObject toJson() {
-		JsonObject data = Gson.object( this );
+		var data = Gson.object( this );
 
 		super.toJson().entrySet().forEach( i -> data.add( i.getKey(), i.getValue() ) );
 

@@ -11,7 +11,6 @@ import java.util.Map;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.net.HttpHeaders;
-import com.google.gson.Gson;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -28,6 +27,8 @@ import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Zone;
+import ninja.util.Cast;
+import ninja.util.Gson;
 
 @Service
 public class BuyMiJiaTask implements IService {
@@ -54,28 +55,26 @@ public class BuyMiJiaTask implements IService {
 
         String items = Utils.getResourceAsString( ITEMS ), subject;
 
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
 
         List<SlackAttachment> attachments = new ArrayList<>();
 
-        Gson gson = new Gson();
+        var now = new Date();
 
-        Date now = new Date();
-
-        Map<?, ?> result = gson.fromJson( Utils.getEntityAsString( get( SEARCH_URL + QUERY ) ), Map.class );
+        var result = Gson.from( Utils.getEntityAsString( get( SEARCH_URL + QUERY ) ), Map.class );
 
         ( ( List<Map<String, Object>> ) MoreObjects.firstNonNull( result.get( "items" ), Collections.EMPTY_LIST ) ).stream().map( i -> ( Map<String, Object> ) i.get( "item_basic" ) ).forEach( i -> {
-            Double shopId = ( Double ) i.get( "shopid" ), itemId = ( Double ) i.get( "itemid" );
+            Double shopId = Cast.dble( i, "shopid" ), itemId = Cast.dble( i, "itemid" );
 
             int min = price( i.get( "price_min" ) ), max = price( i.get( "price_max" ) );
 
-            String name = ( String ) i.get( "name" ), price, link, title;
+            String name = Cast.string( i, "name" ), price, link, title;
 
             i.put( "price", price = min == max ? String.valueOf( min ) : min + "<br>" + max );
 
             i.put( "link", link = String.format( LINK, name.replaceAll( "\\s", "-" ), shopId, itemId ) );
 
-            Date c = new Date( ( long ) ( ( Double ) i.get( "ctime" ) * 1000 ) ), ytd = DateUtils.addDays( now, -1 );
+            Date c = new Date( ( long ) ( Cast.dble( i, "ctime" ) * 1000 ) ), ytd = DateUtils.addDays( now, -1 );
 
             boolean isNow = DateUtils.isSameDay( c, now ), isYtd = DateUtils.isSameDay( c, ytd );
 

@@ -26,7 +26,7 @@ public class ClearController extends DialogController {
 	@PostMapping( "/clear" )
 	@Async
 	public void clear( @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		Data<?> data = Check.first( datas.stream().filter( i -> ClassUtils.getSimpleName( i ).equals( text ) ), "查無此類: " + text );
+		var data = Check.first( datas.stream().filter( i -> ClassUtils.getSimpleName( i ).equals( text ) ), "查無此類: " + text );
 
 		data.data().clear();
 		data.data();

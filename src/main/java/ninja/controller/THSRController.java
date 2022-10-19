@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Color;
 import ninja.service.THSR;
 import ninja.util.Cast;
@@ -50,7 +49,7 @@ public class THSRController extends DialogController {
 
 	@Override
 	protected Object[] args() {
-		String way = options( EnumUtils.getEnumMap( Way.class ).keySet() );
+		var way = options( EnumUtils.getEnumMap( Way.class ).keySet() );
 
 		LocalDateTime time = ( time = LocalDateTime.now( ZONE_ID ) ).truncatedTo( ChronoUnit.HOURS ).plusMinutes( 30 * ( int ) Math.ceil( time.getMinute() / 30d ) );
 
@@ -60,13 +59,13 @@ public class THSRController extends DialogController {
 	@PostMapping( "/thsr" )
 	@Async
 	public void thsr( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		String[] params = Check.station( Check.params( text, 5 ) );
+		var params = Check.station( Check.params( text, 5 ) );
 
 		String start = id( params[ 0 ] ), end = id( params[ 1 ] ), date = params[ 2 ], time = params[ 3 ];
 
 		Check.expr( dates().contains( date ) && times().contains( time ), "時間有誤: " + text );
 
-		Way way = Check.name( Way.class, params[ 4 ], "行程有誤: " + text );
+		var way = Check.name( Way.class, params[ 4 ], "行程有誤: " + text );
 
 		SlackAttachment attach1 = Slack.attachment( TITLE, LINK ), attach2 = Slack.attachment( Color.G );
 
@@ -78,7 +77,7 @@ public class THSRController extends DialogController {
 
 		String filter = Utils.spacer( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + Utils.spacer( way.field, way.order );
 
-		List<Map<String, ?>> info = thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" );
+		var info = thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" );
 
 		info.forEach( i -> {
 			attach2.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
@@ -86,7 +85,7 @@ public class THSRController extends DialogController {
 			attach2.addFields( field( "出發 - 抵達", String.join( " - ", time( i, Way.出發 ), time( i, Way.抵達 ) ) ) );
 		} );
 
-		SlackMessage message = Slack.message( attach1, command, text );
+		var message = Slack.message( attach1, command, text );
 
 		message( info.size() > 0 ? message.addAttachments( attach2 ) : message, url );
 	}
@@ -96,13 +95,13 @@ public class THSRController extends DialogController {
 	}
 
 	private String time( Map<String, ?> map, Way way ) {
-		String[] fields = way.field.split( "/" );
+		var fields = way.field.split( "/" );
 
 		return Cast.string( Cast.map( map, fields[ 0 ] ), fields[ 1 ] );
 	}
 
 	private String cabin( Map<?, ?> map ) {
-		Double cabin = Cast.dble( map, "CabinClass" );
+		var cabin = Cast.dble( map, "CabinClass" );
 
 		return cabin.equals( 1d ) ? "標準" : cabin.equals( 3d ) ? "自由" : "商務";
 	}

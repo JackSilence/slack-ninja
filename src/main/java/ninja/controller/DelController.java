@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.ImmutableMap;
-
 import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.slack.Event;
@@ -27,25 +25,25 @@ public class DelController extends BaseController {
 
 	private static final String QUERY = "&oldest=%d&latest=%d", TEXT = "總共有 %d 則訊息\n已刪除 %d 則訊息";
 
-	private static final Map<String, Long> DAYS_AGO = ImmutableMap.of( StringUtils.EMPTY, 0L, "今天", 0L, "昨天", 1L, "前天", 2L );
+	private static final Map<String, Long> DAYS_AGO = Map.of( StringUtils.EMPTY, 0L, "今天", 0L, "昨天", 1L, "前天", 2L );
 
 	@PostMapping( "/delete" )
 	@Async
 	public void delete( @RequestParam( CHANNEL_ID ) String channel, @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
 		Long days = DAYS_AGO.get( text ), success = 0L;
 
-		LocalDate date = days == null ? LocalDate.parse( text ) : LocalDate.now( ZONE_ID ).minusDays( days );
+		var date = days == null ? LocalDate.parse( text ) : LocalDate.now( ZONE_ID ).minusDays( days );
 
 		String title = date.toString(), query = String.format( QUERY, epochSecond( date ), epochSecond( date.plusDays( 1 ) ) ), response;
 
 		log.info( "Date: {}, query: {}", date, query );
 
-		History history = Gson.from( get( HISTORY_METHOD, channel, query ), History.class );
+		var history = Gson.from( get( HISTORY_METHOD, channel, query ), History.class );
 
 		List<Event> message = ObjectUtils.defaultIfNull( history.getMessages(), new ArrayList<>() );
 
 		for ( int i = 0, size = message.size(); i < size; i++ ) {
-			Event event = message.get( i );
+			var event = message.get( i );
 
 			event.setChannel( channel );
 
@@ -65,7 +63,7 @@ public class DelController extends BaseController {
 			}
 		}
 
-		String txt = String.format( TEXT, message.size(), success );
+		var txt = String.format( TEXT, message.size(), success );
 
 		message( new SlackAttachment( title + "\n" + txt ).setTitle( title ).setText( txt ), command, text, url );
 	}

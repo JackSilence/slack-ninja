@@ -55,7 +55,7 @@ public class Check {
 	}
 
 	public static String[] station( String[] params ) {
-		String start = params[ 0 ];
+		var start = params[ 0 ];
 
 		expr( !start.equals( params[ 1 ] ), "起訖站不得相同: " + start );
 
@@ -67,7 +67,7 @@ public class Check {
 	}
 
 	public static String[] params( String text, int number ) {
-		String[] params = StringUtils.split( text );
+		var params = StringUtils.split( text );
 
 		expr( params.length == number, "參數個數有誤: " + text );
 

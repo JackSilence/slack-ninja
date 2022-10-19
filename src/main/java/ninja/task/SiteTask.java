@@ -20,7 +20,7 @@ public class SiteTask extends Task {
 	@Scheduled( cron = "0 0 23 * * *", zone = Zone.TAIPEI )
 	@Override
 	public void exec() {
-		List<String> sites = Utils.list( aqi.data().values().stream().flatMap( List::stream ) );
+		var sites = Utils.list( aqi.data().values().stream().flatMap( List::stream ) );
 
 		call( String.format( TEMPLATE, sites.size(), sites.stream().distinct().count() ) );
 	}

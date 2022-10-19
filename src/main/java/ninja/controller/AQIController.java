@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.consts.Color;
 import ninja.service.AQI;
 import ninja.util.Cast;
@@ -72,15 +71,15 @@ public class AQIController extends GroupController<List<String>> {
 
 		county = Check.first( aqi.data().entrySet().stream().filter( i -> i.getValue().contains( site ) ), "查無測站: " + site ).getKey();
 
-		Map<?, ?> result = Gson.from( Utils.call( String.format( API_URL, site, key ) ), Map.class );
+		var result = Gson.from( Utils.call( String.format( API_URL, site, key ) ), Map.class );
 
-		Map<?, ?> info = Cast.map( Check.first( Cast.list( result, "records" ).stream(), "查無資料: " + site ) );
+		var info = Cast.map( Check.first( Cast.list( result, "records" ).stream(), "查無資料: " + site ) );
 
 		String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "aqi" ), NA ), status = Cast.string( info, "status" );
 
-		Color color = "良好".equals( status ) ? Color.G : "普通".equals( status ) ? Color.Y : "設備維護".equals( status ) ? Color.B : Color.R;
+		var color = "良好".equals( status ) ? Color.G : "普通".equals( status ) ? Color.Y : "設備維護".equals( status ) ? Color.B : Color.R;
 
-		SlackAttachment attach = Slack.attachment( color ).setTitle( TITLE ).setTitleLink( LINK ).setText( tag( county, site ) );
+		var attach = Slack.attachment( color ).setTitle( TITLE ).setTitleLink( LINK ).setText( tag( county, site ) );
 
 		attach.addFields( field( "AQI指標", aqi ) ).addFields( field( "狀態", status ) );
 

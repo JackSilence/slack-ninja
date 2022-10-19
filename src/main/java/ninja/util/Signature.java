@@ -12,9 +12,9 @@ import org.apache.commons.codec.digest.HmacAlgorithms;
 public class Signature {
 	public static byte[] hmac( String data, String secret, HmacAlgorithms algorithms ) {
 		try {
-			String algorithm = algorithms.toString();
+			var algorithm = algorithms.toString();
 
-			Mac mac = Mac.getInstance( algorithm );
+			var mac = Mac.getInstance( algorithm );
 
 			mac.init( new SecretKeySpec( secret.getBytes( StandardCharsets.UTF_8 ), algorithm ) );
 

@@ -1,12 +1,9 @@
 package ninja.util;
 
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Request;
@@ -28,7 +25,7 @@ public class Utils {
 	}
 
 	public static String call( String uri, SlackMessage message ) {
-		JsonObject data = message.prepare();
+		var data = message.prepare();
 
 		data.addProperty( "replace_original", false );
 
@@ -40,7 +37,7 @@ public class Utils {
 	}
 
 	public static String find( String regex, String input ) {
-		Matcher matcher = Pattern.compile( regex ).matcher( input );
+		var matcher = Pattern.compile( regex ).matcher( input );
 
 		return matcher.find() ? matcher.group( 1 ) : null;
 	}

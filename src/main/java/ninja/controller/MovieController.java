@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -27,11 +26,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.gpedro.integrations.slack.SlackAttachment;
-import net.gpedro.integrations.slack.SlackMessage;
 import ninja.consts.Act;
 import ninja.consts.Color;
 import ninja.service.Movie;
-import ninja.slack.Action;
 import ninja.util.Check;
 import ninja.util.Jsoup;
 import ninja.util.Slack;
@@ -80,9 +77,9 @@ public class MovieController extends GroupController<Map<String, String>> {
 	@PostMapping( "/theater" )
 	@Async
 	public void theater( @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		Action action = Slack.action( Act.MOVIE, "請選擇要觀看的電影" );
+		var action = Slack.action( Act.MOVIE, "請選擇要觀看的電影" );
 
-		SlackAttachment attach = Slack.attachment( Act.MOVIE ).addAction( action );
+		var attach = Slack.attachment( Act.MOVIE ).addAction( action );
 
 		films( text, attach ).forEach( i -> action.addOption( option( title( i ), text ) ) );
 
@@ -92,32 +89,32 @@ public class MovieController extends GroupController<Map<String, String>> {
 	@PostMapping( MOVIE_PATH )
 	@Async
 	public void movie( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		String[] params = StringUtils.split( text, null, 2 ); // 考慮電影名稱可能會有空白
+		var params = StringUtils.split( text, null, 2 ); // 考慮電影名稱可能會有空白
 
 		Check.expr( params.length > 0 && params.length <= 2, "參數個數有誤: " + text );
 
 		String theater = params[ 0 ], film;
 
-		SlackAttachment attach = new SlackAttachment();
+		var attach = new SlackAttachment();
 
-		Elements elements = films( theater, attach );
+		var elements = films( theater, attach );
 
 		attach.setTitle( film = params.length == 1 ? title( elements.first() ).text() : params[ 1 ] ).setFallback( String.format( "%s %s時刻表", theater, film ) );
 
-		List<Element> films = Check.list( list( elements.stream().filter( i -> film.equals( title( i ).text() ) ) ), "查無影片: " + film );
+		var films = Check.list( list( elements.stream().filter( i -> film.equals( title( i ).text() ) ) ), "查無影片: " + film );
 
 		Element movie = films.get( 0 ), info = movie.child( 1 ).child( 0 ).child( 0 );
 
 		attach.setTitleLink( Jsoup.href( this.movie.link( info ) ) ).setImageUrl( src( info ) ).setColor( star( title( movie ) ) ? Color.G.value() : null );
 
-		String rating = RATINGS.get( Utils.find( RATING_REGEX, src( info = info.nextElementSibling() ) ) );
+		var rating = RATINGS.get( Utils.find( RATING_REGEX, src( info = info.nextElementSibling() ) ) );
 
 		attach.setText( tag( rating, StringUtils.remove( info.text(), "片長：" ) ) );
 
-		int number = films.size() == 1 ? 6 : 3;
+		var number = films.size() == 1 ? 6 : 3;
 
 		films.forEach( i -> {
-			String[] times = StringUtils.split( i.child( 1 ).child( 1 ).select( "li:not(.filmVersion,.theaterElse)" ).text().replace( "：", ":" ) );
+			var times = StringUtils.split( i.child( 1 ).child( 1 ).select( "li:not(.filmVersion,.theaterElse)" ).text().replace( "：", ":" ) );
 
 			attach.addFields( field( i.select( "li.filmVersion" ).text(), IntStream.range( 0, times.length ).boxed().map( j -> {
 				return String.format( j % number == 0 ? "%s" : j % number == number - 1 ? " %s\n" : " %s", times[ j ] );
@@ -131,28 +128,28 @@ public class MovieController extends GroupController<Map<String, String>> {
 	@PostMapping( NEW_PATH )
 	@Async
 	public void mnew( @RequestParam String command, @RequestParam( RESPONSE_URL ) String url ) {
-		List<Element> films = Jsoup.select( NEW_URL, "article.filmList" );
+		var films = Jsoup.select( NEW_URL, "article.filmList" );
 
-		String title = String.format( TITLE, films.size() );
+		var title = String.format( TITLE, films.size() );
 
-		LocalDate now = LocalDate.now( ZONE_ID );
+		var now = LocalDate.now( ZONE_ID );
 
-		List<List<Element>> partition = Lists.partition( films, 5 );
+		var partition = Lists.partition( films, 5 );
 
 		for ( int i = 0; i < partition.size(); i++ ) {
-			SlackMessage message = i == 0 ? Slack.message( Slack.author( new SlackAttachment( title ), title, NEW_URL, this.url ), command, StringUtils.EMPTY ) : Slack.message();
+			var message = i == 0 ? Slack.message( Slack.author( new SlackAttachment( title ), title, NEW_URL, this.url ), command, StringUtils.EMPTY ) : Slack.message();
 
 			partition.get( i ).forEach( j -> {
 				Element image = j.selectFirst( "a.image.filmListPoster" ), runtime = j.selectFirst( "div.runtime" );
 
-				String rating = RATINGS.getOrDefault( Utils.find( RATING_REGEX, src( runtime ) ), "無分級" );
+				var rating = RATINGS.getOrDefault( Utils.find( RATING_REGEX, src( runtime ) ), "無分級" );
 
-				String[] info = Arrays.stream( runtime.text().split( StringUtils.SPACE ) ).map( k -> StringUtils.substringAfter( k, "：" ) ).toArray( String[]::new );
+				var info = Arrays.stream( runtime.text().split( StringUtils.SPACE ) ).map( k -> StringUtils.substringAfter( k, "：" ) ).toArray( String[]::new );
 
-				SlackAttachment attach = Slack.attachment( title( j ).text(), image.attr( "abs:href" ) );
+				var attach = Slack.attachment( title( j ).text(), image.attr( "abs:href" ) );
 
 				try {
-					LocalDate date = LocalDate.parse( info[ 1 ], DATE_TIME_FORMATTER );
+					var date = LocalDate.parse( info[ 1 ], DATE_TIME_FORMATTER );
 
 					attach.setColor( ( date.isEqual( now ) ? Color.G : date.isBefore( now ) ? Color.Y : Color.R ).value() );
 
@@ -170,7 +167,7 @@ public class MovieController extends GroupController<Map<String, String>> {
 	}
 
 	private Elements films( String theater, SlackAttachment attach ) {
-		String url = Check.first( movie.data().values().stream().map( i -> i.get( theater ) ).filter( Objects::nonNull ), "查無影院: " + theater );
+		var url = Check.first( movie.data().values().stream().map( i -> i.get( theater ) ).filter( Objects::nonNull ), "查無影院: " + theater );
 
 		Slack.author( attach, theater, url = Movie.URL + url, this.url );
 
@@ -188,7 +185,7 @@ public class MovieController extends GroupController<Map<String, String>> {
 	}
 
 	private String src( Element element ) {
-		Element img = element.selectFirst( IMG );
+		var img = element.selectFirst( IMG );
 
 		return img == null ? StringUtils.EMPTY : img.attr( "src" );
 	}

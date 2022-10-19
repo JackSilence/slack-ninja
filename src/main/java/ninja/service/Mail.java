@@ -3,8 +3,6 @@ package ninja.service;
 import java.nio.charset.StandardCharsets;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -26,9 +24,9 @@ public class Mail extends SendGrid {
 		super.send( subject, content );
 
 		try {
-			MimeMessage message = sender.createMimeMessage();
+			var message = sender.createMimeMessage();
 
-			MimeMessageHelper helper = new MimeMessageHelper( message, true, StandardCharsets.UTF_8.name() );
+			var helper = new MimeMessageHelper( message, true, StandardCharsets.UTF_8.name() );
 
 			helper.setSubject( subject );
 			helper.setText( content, true );

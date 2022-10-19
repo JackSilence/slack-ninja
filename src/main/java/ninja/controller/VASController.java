@@ -1,6 +1,5 @@
 package ninja.controller;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.service.VAS;
 import ninja.util.Check;
 import ninja.util.Slack;
@@ -38,21 +36,21 @@ public class VASController extends GroupController<Set<String>> {
     @PostMapping( "/vas" )
     @Async
     public void vas( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-        String[] params = Check.station( Check.params( text ) );
+        var params = Check.station( Check.params( text ) );
 
         String branch = params[ 0 ], division = params[ 1 ];
 
-        Set<String> divisions = vas.data().get( branch );
+        var divisions = vas.data().get( branch );
 
         Check.nil( divisions, "查無院區: " + branch );
 
         Check.expr( divisions.contains( division ), "查無科別: " + division );
 
-        List<Map<String, String>> data = vas.call().stream().filter( i -> branch.equals( i.get( "Branch" ) ) && division.equals( i.get( "Division" ) ) ).collect( Collectors.toList() );
+        var data = vas.call().stream().filter( i -> branch.equals( i.get( "Branch" ) ) && division.equals( i.get( "Division" ) ) ).collect( Collectors.toList() );
 
         Check.list( data, "查無看診資料: " + text );
 
-        SlackAttachment attach = Slack.attachment( "三總看診進度查詢", "https://www2.ndmctsgh.edu.tw/PatientNum/" ).setText( tag( branch, division ) );
+        var attach = Slack.attachment( "三總看診進度查詢", "https://www2.ndmctsgh.edu.tw/PatientNum/" ).setText( tag( branch, division ) );
 
         data.forEach( i -> attach.addFields( field( i.get( "Room" ), i.get( "Doctor" ) ) ).addFields( field( "目前 / 下個", i.get( "Current" ) + " / " + i.get( "Next" ) ) ) );
 

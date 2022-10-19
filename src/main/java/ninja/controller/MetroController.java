@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.gpedro.integrations.slack.SlackAttachment;
 import ninja.service.Metro;
 import ninja.util.Cast;
 import ninja.util.Check;
@@ -30,13 +29,13 @@ public class MetroController extends DialogController {
 	@PostMapping( "/mrt" )
 	@Async
 	public void mrt( @RequestParam String command, @RequestParam String text, @RequestParam( RESPONSE_URL ) String url ) {
-		String[] params = Check.station( Check.params( text ) );
+		var params = Check.station( Check.params( text ) );
 
 		String start = id( params[ 0 ] ), end = id( params[ 1 ] );
 
 		log.info( "Start: {}, end: {}", start, end );
 
-		SlackAttachment attach = Slack.attachment( TITLE, String.format( WEB_URL, start, end ) );
+		var attach = Slack.attachment( TITLE, String.format( WEB_URL, start, end ) );
 
 		try {
 			Map<?, ?> path = call( PATH_INFO, start, end ), ticket = call( TICKET_INFO, start, end );
@@ -45,7 +44,7 @@ public class MetroController extends DialogController {
 
 			attach.setText( String.format( "%s=>%s（約 %s 分鐘）", path.get( "Path" ), end, path.get( "TravelTime" ) ) );
 
-			String discount40 = Cast.string( ticket, "Discount40" );
+			var discount40 = Cast.string( ticket, "Discount40" );
 
 			attach.addFields( field( "全票", Cast.string( ticket, "DeductedFare" ) ) ).addFields( field( "敬老、愛心", discount40 ) );
 

@@ -3,7 +3,6 @@ package ninja.controller;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.EnumUtils;
@@ -19,7 +18,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import ninja.consts.Act;
 import ninja.consts.Dialog;
 import ninja.consts.Task;
-import ninja.slack.Action;
 import ninja.slack.Payload;
 import ninja.util.Check;
 import ninja.util.Gson;
@@ -47,18 +45,18 @@ public class TaskController extends BaseController {
 
 	@PostMapping( "/execute" )
 	public void execute( String payload ) {
-		Payload message = Gson.from( payload, Payload.class );
+		var message = Gson.from( payload, Payload.class );
 
-		Type type = Check.nil( EnumUtils.getEnumIgnoreCase( Type.class, message.getType() ), payload );
+		var type = Check.nil( EnumUtils.getEnumIgnoreCase( Type.class, message.getType() ), payload );
 
 		log.info( "State: " + message.getState() ); // 目前是dialog有設state就會收到
 
 		String command = message.getId(), url = message.getUrl(), text = StringUtils.EMPTY, path;
 
 		if ( Type.INTERACTIVE_MESSAGE.equals( type ) ) {
-			Act act = Check.name( Act.class, command, payload );
+			var act = Check.name( Act.class, command, payload );
 
-			Action action = check( message.getActions(), payload );
+			var action = check( message.getActions(), payload );
 
 			Check.equals( command, action.getName(), payload );
 
@@ -84,7 +82,7 @@ public class TaskController extends BaseController {
 			}
 
 		} else {
-			Map<String, String> submission = Check.map( message.getSubmission(), payload );
+			var submission = Check.map( message.getSubmission(), payload );
 
 			text = Check.name( Dialog.class, command, payload ).text( submission );
 		}

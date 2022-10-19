@@ -25,7 +25,7 @@ public class EXHandler implements AsyncUncaughtExceptionHandler {
 			return;
 		}
 
-		String uri = params[ params.length - 1 ].toString();
+		var uri = params[ params.length - 1 ].toString();
 
 		if ( uri.matches( RESPONSE_URL_REGEX ) ) {
 			log.info( Utils.call( uri, new SlackMessage( message( ex ) ) ) );

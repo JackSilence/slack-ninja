@@ -12,8 +12,6 @@ import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.google.common.collect.ImmutableMap;
-
 import magic.util.Utils;
 import net.gpedro.integrations.slack.SlackException;
 import ninja.consts.Dialog;
@@ -36,9 +34,9 @@ public abstract class DialogController extends BaseController {
 	}
 
 	protected void dialog( String id, Dialog dialog, Object... args ) {
-		String template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
+		var template = Utils.getResourceAsString( String.format( DIALOG_TEMPLATE, dialog.name().toLowerCase() ) );
 
-		log.info( post( DIALOG_METHOD, ImmutableMap.of( TRIGGER_ID, id, "dialog", String.format( template, args ) ) ) );
+		log.info( post( DIALOG_METHOD, Map.of( TRIGGER_ID, id, "dialog", String.format( template, args ) ) ) );
 	}
 
 	protected String options( Collection<String> collection ) {

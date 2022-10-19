@@ -32,11 +32,11 @@ public abstract class PTX extends Data<String> {
 	private String secret;
 
 	public List<Map<String, ?>> call( String path, String filter, String... query ) {
-		String uri = UrlEscapers.urlFragmentEscaper().escape( String.format( API_URL, path, filter, String.join( "&", query ) ) );
+		var uri = UrlEscapers.urlFragmentEscaper().escape( String.format( API_URL, path, filter, String.join( "&", query ) ) );
 
 		log.info( "Uri: {}", uri );
 
-		Request request = Request.Get( uri ).setHeader( HttpHeaders.AUTHORIZATION, token() );
+		var request = Request.Get( uri ).setHeader( HttpHeaders.AUTHORIZATION, token() );
 
 		return Gson.list( Utils.call( request.addHeader( HttpHeaders.ACCEPT_ENCODING, "gzip" ) ) );
 	}
@@ -50,7 +50,7 @@ public abstract class PTX extends Data<String> {
 	}
 
 	private String token() {
-		String token = Utils.call( Request.Post( TOKEN_URL ).bodyString( String.format( TOKEN_DATA, id, secret ), ContentType.APPLICATION_FORM_URLENCODED ) );
+		var token = Utils.call( Request.Post( TOKEN_URL ).bodyString( String.format( TOKEN_DATA, id, secret ), ContentType.APPLICATION_FORM_URLENCODED ) );
 
 		return String.format( "Bearer %s", Cast.string( Gson.from( token, Map.class ), "access_token" ) );
 	}
