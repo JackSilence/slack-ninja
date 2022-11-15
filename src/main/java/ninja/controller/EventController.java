@@ -57,7 +57,7 @@ public class EventController extends BaseController {
 			return;
 		}
 
-		if ( REJECT_SUB_TYPES.contains( event.getSubtype() ) ) {
+		if ( REJECT_SUB_TYPES.contains( StringUtils.defaultString( event.getSubtype() ) ) ) {
 			return; // 不處理小心會變成無窮迴圈
 		}
 
