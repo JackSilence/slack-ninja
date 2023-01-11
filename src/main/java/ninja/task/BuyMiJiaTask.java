@@ -49,7 +49,7 @@ public class BuyMiJiaTask implements IService {
     private Slack slack;
 
     @SuppressWarnings( "unchecked" )
-    @Scheduled( cron = "0 0 12,19 * * *", zone = Zone.TAIPEI )
+    // @Scheduled( cron = "0 0 12,19 * * *", zone = Zone.TAIPEI )
     public void exec() {
         Utils.sleep( RandomUtils.nextInt( 1000, 10000 ) );
 
