@@ -30,7 +30,7 @@ import ninja.util.Utils;
 public class THSRController extends DialogController {
 	private static final String TIME = "DailyTimetable/OD/%s/to/%s/%s", FARE = "ODFare/%s/to/%s";
 
-	private static final String TITLE = "高鐵時刻表與票價查詢", LINK = "https://m.thsrc.com.tw/tw/TimeTable/SearchResult";
+	private static final String TITLE = "高鐵時刻表與票價查詢", LINK = "https://www.thsrc.com.tw/";
 
 	private enum Way {
 		出發( "OriginStopTime/DepartureTime", "ge", "asc" ), 抵達( "DestinationStopTime/ArrivalTime", "le", "desc" );
