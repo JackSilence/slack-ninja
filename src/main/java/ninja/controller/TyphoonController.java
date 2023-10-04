@@ -21,17 +21,17 @@ import ninja.util.Utils;
 
 @RestController
 public class TyphoonController extends DialogController {
-	private static final String WARN_URL = "https://www.cwb.gov.tw/Data/js/warn/Warning_Content.js", TY_NEWS = "'TY_NEWS'";
+	private static final String WARN_URL = "https://www.cwa.gov.tw/Data/js/warn/Warning_Content.js", TY_NEWS = "'TY_NEWS'";
 
-	private static final String DATA_URL = "https://www.cwb.gov.tw/Data/js/typhoon/TY_NEWS-Data.js";
+	private static final String DATA_URL = "https://www.cwa.gov.tw/Data/js/typhoon/TY_NEWS-Data.js";
 
 	private static final String TIME_REGEX = "var TY_DataTime = '(.+?)';", COUNT_REGEX = "var TY_COUNT = \\[(.+?)];";
 
-	private static final String WEB_URL = "https://www.cwb.gov.tw/V8/C/P/Typhoon/TY_NEWS.html", TITLE = "氣象局颱風消息";
+	private static final String WEB_URL = "https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_NEWS.html", TITLE = "氣象局颱風消息";
 
 	private static final String IMG_JSON = "PTA_IMGS_%s_zhtw.json", AREA_JSON = "WSP-AREA_%s_WHOLE-DURATION.json";
 
-	private static final String NEWS_URL = "https://www.cwb.gov.tw/Data/typhoon/TY_NEWS/", DEFAULT = "臺北市";
+	private static final String NEWS_URL = "https://www.cwa.gov.tw/Data/typhoon/TY_NEWS/", DEFAULT = "臺北市";
 
 	private static final Map<String, String> AREAS = new LinkedHashMap<>();
 

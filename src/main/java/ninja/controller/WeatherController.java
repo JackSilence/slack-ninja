@@ -33,9 +33,9 @@ import ninja.util.Utils;
 
 @RestController
 public class WeatherController extends DialogController {
-	private static final String API_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-061";
+	private static final String API_URL = "https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-D0047-061";
 
-	private static final String WEB_URL = "https://www.cwb.gov.tw/V8/C/W/Town/Town.html?TID=", TITLE = "台北市%s天氣預報", DELIMITER = "。";
+	private static final String WEB_URL = "https://www.cwa.gov.tw/V8/C/W/Town/Town.html?TID=", TITLE = "台北市%s天氣預報", DELIMITER = "。";
 
 	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s&elementName=Wx,AT,WeatherDescription";
 
