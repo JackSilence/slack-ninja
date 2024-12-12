@@ -37,9 +37,9 @@ public class WeatherController extends DialogController {
 
 	private static final String WEB_URL = "https://www.cwa.gov.tw/V8/C/W/Town/Town.html?TID=", TITLE = "台北市%s天氣預報", DELIMITER = "。";
 
-	private static final String QUERY = "?Authorization=%s&locationName=%s&timeFrom=%s&timeTo=%s&elementName=Wx,AT,WeatherDescription";
+	private static final String QUERY = "?Authorization=%s&LocationName=%s&timeFrom=%s&timeTo=%s&elementName=天氣現象,體感溫度,天氣預報綜合描述";
 
-	private static final String START_TIME = "startTime", ELEMENT_VALUE = "elementValue", DEFAULT_DIST = "內湖區", DEFAULT_HOURS = "0";
+	private static final String START_TIME = "StartTime", ELEMENT_VALUE = "ElementValue", DEFAULT_DIST = "內湖區", DEFAULT_HOURS = "0";
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( "yyyy-MM-dd HH:mm:ss" );
 
@@ -95,20 +95,20 @@ public class WeatherController extends DialogController {
 
 		var message = Slack.message( Slack.attachment( String.format( TITLE, district ), WEB_URL + town ), command, text );
 
-		var elements = Cast.list( first( first( Cast.map( result, "records" ), "locations" ), "location" ), "weatherElement" );
+		var elements = Cast.list( first( first( Cast.map( result, "records" ), "Locations" ), "Location" ), "WeatherElement" );
 
 		Map<String, String> image = new HashMap<>(), at = new HashMap<>();
 
-		each( elements, "Wx", j -> {
+		each( elements, "天氣現象", j -> {
 			String start = Cast.string( j, START_TIME ), when = Range.closedOpen( 6, 18 ).contains( hour( start ) ) ? "day" : "night";
 
-			image.put( start, String.format( this.url, when, Cast.string( Cast.map( Cast.list( j, ELEMENT_VALUE ).get( 1 ) ), VALUE ) ) );
+			image.put( start, String.format( this.url, when, Cast.string( first( j, ELEMENT_VALUE ), "WeatherCode" ) ) );
 		} );
 
-		each( elements, "AT", j -> at.put( Cast.string( j, "dataTime" ), Cast.string( first( j, ELEMENT_VALUE ), VALUE ) ) );
+		each( elements, "體感溫度", j -> at.put( Cast.string( j, "DataTime" ), Cast.string( first( j, ELEMENT_VALUE ), "ApparentTemperature" ) ) );
 
-		each( elements, "WeatherDescription", j -> {
-			var data = Cast.string( first( j, ELEMENT_VALUE ), VALUE ).split( DELIMITER );
+		each( elements, "天氣預報綜合描述", j -> {
+			var data = Cast.string( first( j, ELEMENT_VALUE ), "WeatherDescription" ).split( DELIMITER );
 
 			String ci = data[ 3 ], wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
 
@@ -133,8 +133,8 @@ public class WeatherController extends DialogController {
 	}
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {
-		elements.stream().map( Cast::map ).filter( i -> name.equals( i.get( "elementName" ) ) ).forEach( i -> {
-			Cast.list( i, "time" ).stream().limit( 2 ).map( Cast::map ).forEach( action );
+		elements.stream().map( Cast::map ).filter( i -> name.equals( i.get( "ElementName" ) ) ).forEach( i -> {
+			Cast.list( i, "Time" ).stream().limit( 2 ).map( Cast::map ).forEach( action );
 		} );
 	}
 
