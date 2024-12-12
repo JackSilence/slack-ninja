@@ -37,7 +37,7 @@ public class WeatherController extends DialogController {
 
 	private static final String WEB_URL = "https://www.cwa.gov.tw/V8/C/W/Town/Town.html?TID=", TITLE = "台北市%s天氣預報", DELIMITER = "。";
 
-	private static final String QUERY = "?Authorization=%s&LocationName=%s&timeFrom=%s&timeTo=%s&elementName=天氣現象,體感溫度,天氣預報綜合描述";
+	private static final String QUERY = "?Authorization=%s&LocationName=%s&timeFrom=%s&timeTo=%s&ElementName=天氣現象,體感溫度,天氣預報綜合描述";
 
 	private static final String START_TIME = "StartTime", ELEMENT_VALUE = "ElementValue", DEFAULT_DIST = "內湖區", DEFAULT_HOURS = "0";
 
@@ -105,7 +105,7 @@ public class WeatherController extends DialogController {
 			image.put( start, String.format( this.url, when, Cast.string( first( j, ELEMENT_VALUE ), "WeatherCode" ) ) );
 		} );
 
-		each( elements, "體感溫度", j -> at.put( Cast.string( j, "DataTime" ), Cast.string( first( j, ELEMENT_VALUE ), "ApparentTemperature" ) ) );
+		each( elements, "體感溫度", j -> at.put( Cast.string( j, "DataTime" ), Cast.string( first( j, ELEMENT_VALUE ), "ApparentTemperature" ) ), 4 );
 
 		each( elements, "天氣預報綜合描述", j -> {
 			var data = Cast.string( first( j, ELEMENT_VALUE ), "WeatherDescription" ).split( DELIMITER );
@@ -133,8 +133,12 @@ public class WeatherController extends DialogController {
 	}
 
 	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action ) {
+		each( elements, name, action, 2 );
+	}
+
+	private void each( List<?> elements, String name, Consumer<? super Map<?, ?>> action, long limit ) {
 		elements.stream().map( Cast::map ).filter( i -> name.equals( i.get( "ElementName" ) ) ).forEach( i -> {
-			Cast.list( i, "Time" ).stream().limit( 2 ).map( Cast::map ).forEach( action );
+			Cast.list( i, "Time" ).stream().limit( limit ).map( Cast::map ).forEach( action );
 		} );
 	}
 
