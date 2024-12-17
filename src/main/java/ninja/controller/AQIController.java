@@ -28,7 +28,7 @@ import ninja.util.Utils;
 public class AQIController extends GroupController<List<String>> {
 	private static final String API_URL = "https://data.moenv.gov.tw/api/v2/aqx_p_432?format=json&limit=100&filters=sitename,EQ,%s&api_key=%s";
 
-	private static final String DEFAULT = "松山", TITLE = "空氣品質監測網", LINK = "https://airtw.epa.gov.tw", NA = "N/A";
+	private static final String DEFAULT = "松山", TITLE = "空氣品質監測網", LINK = "https://airtw.moenv.gov.tw", NA = "N/A";
 
 	private static final Map<String, String> TITLES = new LinkedHashMap<>(), UNITS = new HashMap<>();
 
