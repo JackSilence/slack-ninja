@@ -4,7 +4,10 @@ plugins {
 	id 'java'
 }
 
-sourceCompatibility = '17'
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
 	mavenCentral()
@@ -18,15 +21,14 @@ jar {
 }
 
 dependencies {
-	implementation('com.github.JackSilence:magic:6854f731a6')
-	
-	implementation('org.springframework.retry:spring-retry:2.0.10')
-	implementation('org.aspectj:aspectjweaver:1.8.9')
-	implementation('com.sendgrid:sendgrid-java:4.0.1')
-	implementation('org.apache.commons:commons-text:1.6')
-	implementation('com.sun.mail:jakarta.mail:2.0.1')
+	implementation 'com.github.JackSilence:magic:6854f731a6'
+	implementation 'org.springframework.retry:spring-retry:2.0.10'
+	implementation 'org.aspectj:aspectjweaver:1.8.9'
+	implementation 'com.sendgrid:sendgrid-java:4.0.1'
+	implementation 'org.apache.commons:commons-text:1.6'
+	implementation 'com.sun.mail:jakarta.mail:2.0.1'
 }
 
 tasks.withType(JavaCompile) {
-    options.compilerArgs << "-parameters"
+	options.compilerArgs += "-parameters"
 }
