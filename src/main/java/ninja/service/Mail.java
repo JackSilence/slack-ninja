@@ -2,7 +2,7 @@ package ninja.service;
 
 import java.nio.charset.StandardCharsets;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
