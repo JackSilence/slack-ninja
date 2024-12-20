@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.client.fluent.Request;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+// import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import magic.service.IMailService;
@@ -48,7 +49,7 @@ public class BuyMiJiaTask implements IService {
     @Autowired
     private Slack slack;
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings( { "unchecked", "deprecation" } )
     // @Scheduled( cron = "0 0 12,19 * * *", zone = Zone.TAIPEI )
     public void exec() {
         Utils.sleep( RandomUtils.nextInt( 1000, 10000 ) );
@@ -61,7 +62,13 @@ public class BuyMiJiaTask implements IService {
 
         var now = new Date();
 
-        var result = Gson.from( Utils.getEntityAsString( get( SEARCH_URL + QUERY ) ), Map.class );
+        Map<String, Object> result;
+
+        try {
+            result = Gson.from( Utils.getEntityAsString( get( SEARCH_URL + QUERY ) ), Map.class );
+        } catch ( RuntimeException e ) {
+            result = new HashMap<>();
+        }
 
         ( ( List<Map<String, Object>> ) MoreObjects.firstNonNull( result.get( "items" ), Collections.EMPTY_LIST ) ).stream().map( i -> ( Map<String, Object> ) i.get( "item_basic" ) ).forEach( i -> {
             Double shopId = Cast.dble( i, "shopid" ), itemId = Cast.dble( i, "itemid" );

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
