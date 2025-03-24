@@ -77,7 +77,7 @@ public class THSRController extends DialogController {
 
 		String filter = Utils.spacer( way.field, way.operator, StringUtils.wrap( time, "'" ) ), order = "$orderby=" + Utils.spacer( way.field, way.order );
 
-		var info = thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=4" );
+		var info = thsr.call( String.format( TIME, start, end, date ), filter, order, "$top=10" );
 
 		info.forEach( i -> {
 			attach2.addFields( field( "車次", Cast.string( Cast.map( i, "DailyTrainInfo" ), "TrainNo" ) ) );
