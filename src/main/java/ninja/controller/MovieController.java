@@ -187,10 +187,19 @@ public class MovieController extends GroupController<Map<String, String>> {
 	private String src( Element element ) {
 		var img = element.selectFirst( IMG );
 
-		return img == null ? StringUtils.EMPTY : img.attr( "src" );
+		if ( img == null ) {
+			return StringUtils.EMPTY;
+		}
+
+		var src = img.attr( "src" );
+
+		return StringUtils.isNotEmpty( src ) && !src.startsWith( "http" ) 
+			? Movie.URL + ( src.startsWith( "/" ) ? src : "/" + src )
+			: src;
 	}
 
 	private Element title( Element element ) {
 		return element.selectFirst( ".filmTitle" );
 	}
 }
+
