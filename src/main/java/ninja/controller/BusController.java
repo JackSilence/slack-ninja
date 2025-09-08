@@ -58,7 +58,7 @@ public class BusController extends DialogController {
 			return;
 		}
 
-		filter = Filter.and( filter, stop.equals( unwrap ) ? Filter.STOP.contains( stop ) : Filter.STOP.eq( unwrap ), Filter.DIRECTION.le( "1" ) );
+		filter = Filter.and( filter, stop.equals( unwrap ) ? Filter.STOP.contains( stop ) : Filter.STOP.eq( unwrap ) );
 
 		var info2 = Check.list( bus.call( "EstimatedTimeOfArrival", filter, "$orderby=Direction" ), "查無站牌: " + stop );
 
