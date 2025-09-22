@@ -1,5 +1,9 @@
 app:
   name: NINJA
+
+server:
+  port: ${PORT:8080}
+
 logging:
   pattern:
     console: "[%d][%t] %p %C{0}.%M:%L - %m%n"

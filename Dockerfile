@@ -43,12 +43,12 @@ RUN chown -R ninja:ninja /app
 # Switch to non-root user
 USER ninja
 
-# Expose port (Spring Boot default is 8080)
-EXPOSE 8080
+# Expose port (will use PORT environment variable from Render)
+EXPOSE ${PORT:-8080}
 
-# Health check
+# Health check (use PORT environment variable and correct endpoint)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-8080}/ || exit 1
 
 # JVM optimization for container
 ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
