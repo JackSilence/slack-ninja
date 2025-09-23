@@ -38,7 +38,7 @@ public abstract class PTX extends Data<String> {
 
 		var request = Request.Get( uri ).setHeader( HttpHeaders.AUTHORIZATION, token() );
 
-		return Gson.list( Utils.call( request.addHeader( HttpHeaders.ACCEPT_ENCODING, "gzip" ) ) );
+		return Gson.listOfMaps( Utils.call( request.addHeader( HttpHeaders.ACCEPT_ENCODING, "gzip" ) ) );
 	}
 
 	public String station( Map<?, ?> map ) {

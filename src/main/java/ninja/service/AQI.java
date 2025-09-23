@@ -26,7 +26,7 @@ public class AQI extends Data<List<String>> {
 	}
 
 	private List<Map<String, String>> call( Request request ) {
-		return Gson.list( Utils.call( request ) );
+		return Gson.listOfMaps( Utils.call( request ) );
 	}
 
 	private Request request( String target, String query ) {

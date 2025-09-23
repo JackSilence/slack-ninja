@@ -37,7 +37,7 @@ public class Metro extends Data<String> {
 	}
 
 	private void init( Map<String, String> data, String json ) {
-		List<Map<String, ?>> list = Gson.list( json );
+		List<Map<String, ?>> list = Gson.listOfMaps( json );
 
 		list.stream().flatMap( i -> Cast.list( i, "LineStations" ).stream() ).map( Cast::map ).forEach( i -> {
 			data.put( Cast.string( i, "StationName" ), Cast.string( i, "SID" ) );

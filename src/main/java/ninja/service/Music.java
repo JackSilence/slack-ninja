@@ -19,7 +19,7 @@ public class Music extends Data<List<List<String>>> {
 
             var url = Cast.map( Cast.list( response, "resources" ).get( 0 ) ).get( "secure_url" ).toString();
 
-            data.put( url, Gson.list( Utils.call( url ) ) );
+            data.put( url, Gson.listOfLists( Utils.call( url ) ) );
 
         } catch ( Exception e ) {
             throw new RuntimeException( e );

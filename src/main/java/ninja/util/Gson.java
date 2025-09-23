@@ -2,6 +2,7 @@ package ninja.util;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -17,8 +18,14 @@ public class Gson {
 		return GSON.fromJson( json, type );
 	}
 
-	public static <T> List<T> list( String json ) {
-		return Gson.from( json, new TypeToken<List<T>>() {
+	@SuppressWarnings( "unchecked" )
+	public static <T> List<T> listOfMaps( String json ) {
+		return ( List<T> ) Gson.from( json, new TypeToken<List<Map<String, Object>>>() {
+		}.getType() );
+	}
+
+	public static List<List<String>> listOfLists( String json ) {
+		return Gson.from( json, new TypeToken<List<List<String>>>() {
 		}.getType() );
 	}
 
