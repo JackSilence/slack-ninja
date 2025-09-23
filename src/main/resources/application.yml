@@ -4,6 +4,11 @@ app:
 server:
   port: ${PORT:8080}
 
+spring:
+  threads:
+    virtual:
+      enabled: true
+
 logging:
   pattern:
     console: "[%d][%t] %p %C{0}.%M:%L - %m%n"

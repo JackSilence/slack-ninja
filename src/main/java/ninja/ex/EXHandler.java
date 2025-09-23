@@ -33,11 +33,11 @@ public class EXHandler implements AsyncUncaughtExceptionHandler {
 	}
 
 	private String message( Throwable ex ) {
-		if ( ex instanceof IllegalArgumentException ) {
-			return ex.getMessage();
+		if ( ex instanceof IllegalArgumentException iae ) {
+			return iae.getMessage();
 
-		} else if ( ex instanceof DateTimeParseException ) {
-			return "時間格式有誤: " + ( ( DateTimeParseException ) ex ).getParsedString();
+		} else if ( ex instanceof DateTimeParseException dtpe ) {
+			return "時間格式有誤: " + dtpe.getParsedString();
 		}
 
 		return "系統忙碌中";

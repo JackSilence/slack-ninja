@@ -112,11 +112,22 @@ public class WeatherController extends DialogController {
 
 			String ci = data[ 3 ], wind = StringUtils.remove( RegExUtils.replaceFirst( data[ 4 ], StringUtils.SPACE, "，" ), StringUtils.SPACE ), start;
 
-			var color = "舒適".equals( ci ) ? Color.G : "悶熱".equals( ci ) ? Color.Y : "易中暑".equals( ci ) ? Color.R : Color.B;
+			var color = switch ( StringUtils.defaultString( ci ) ) {
+				case "舒適" -> Color.G;
+				case "悶熱" -> Color.Y;
+				case "易中暑" -> Color.R;
+				default -> Color.B;
+			};
 
 			var hr = hour( start = Cast.string( j, START_TIME ) );
 
-			var period = hr == 12 ? "中午" : hr >= 0 && hr < 6 ? "凌晨" : hr >= 6 && hr < 12 ? "早上" : hr >= 13 && hr < 18 ? "下午" : "晚上";
+			var period = switch ( hr ) {
+				case 12 -> "中午";
+				case 0, 1, 2, 3, 4, 5 -> "凌晨";
+				case 6, 7, 8, 9, 10, 11 -> "早上";
+				case 13, 14, 15, 16, 17 -> "下午";
+				default -> "晚上";
+			};
 
 			var title = start.substring( 0, 11 ) + period + ( hr > 12 ? hr - 12 : hr ) + "點";
 

@@ -77,7 +77,12 @@ public class AQIController extends GroupController<List<String>> {
 
 		String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "aqi" ), NA ), status = Cast.string( info, "status" );
 
-		var color = "良好".equals( status ) ? Color.G : "普通".equals( status ) ? Color.Y : "設備維護".equals( status ) ? Color.B : Color.R;
+		var color = switch ( StringUtils.defaultString( status ) ) {
+			case "良好" -> Color.G;
+			case "普通" -> Color.Y;
+			case "設備維護" -> Color.B;
+			default -> Color.R;
+		};
 
 		var attach = Slack.attachment( color ).setTitle( TITLE ).setTitleLink( LINK ).setText( tag( county, site ) );
 

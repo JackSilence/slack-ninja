@@ -103,7 +103,11 @@ public class THSRController extends DialogController {
 	private String cabin( Map<?, ?> map ) {
 		var cabin = Cast.dble( map, "CabinClass" );
 
-		return cabin.equals( 1d ) ? "標準" : cabin.equals( 3d ) ? "自由" : "商務";
+		return switch ( cabin.intValue() ) {
+			case 1 -> "標準";
+			case 3 -> "自由";
+			default -> "商務";
+		};
 	}
 
 	private Double price( Map<?, ?> map ) {

@@ -1,5 +1,5 @@
 # Multi-stage build for Spring Boot Slack Ninja application
-FROM gradle:8.5-jdk17-alpine AS builder
+FROM gradle:8.5-jdk21-alpine AS builder
 
 # Set working directory
 WORKDIR /app
@@ -19,7 +19,7 @@ COPY system.properties ./
 RUN ./gradlew bootJar --no-daemon
 
 # Runtime stage
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 # Install tzdata for timezone support
 RUN apk add --no-cache tzdata
