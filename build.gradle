@@ -16,18 +16,20 @@ repositories {
 	}
 }
 
+configurations {
+	all {
+		exclude group: 'commons-logging', module: 'commons-logging'
+	}
+}
+
 jar {
 	enabled = false
 }
 
 dependencies {
-	implementation 'com.github.JackSilence:magic:dfa7f77cc7'
+	implementation 'com.github.JackSilence:magic:b0e1536a9a'
 	implementation 'org.springframework.retry:spring-retry:2.0.12'
 	implementation 'org.aspectj:aspectjweaver:1.9.22'
-	implementation('com.sendgrid:sendgrid-java:4.0.1') {
-		exclude group: 'commons-logging', module: 'commons-logging'
-	}
-	implementation 'org.apache.commons:commons-text:1.14.0'
 	implementation 'com.google.guava:guava:33.5.0-jre'
 	implementation 'org.jsoup:jsoup:1.21.2'
 }

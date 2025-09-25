@@ -48,7 +48,7 @@ public class EventController extends BaseController {
 
 			if ( challenge != null ) {
 				Map<String, String> response = new HashMap<>();
-				response.put( "challenge", challenge );
+				response.put( CHALLENGE, challenge );
 				return ResponseEntity.ok().contentType( MediaType.APPLICATION_JSON ).body( response );
 			}
 		}

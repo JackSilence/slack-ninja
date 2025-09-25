@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.time.format.DateTimeParseException;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.lang.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ public class EXHandler implements AsyncUncaughtExceptionHandler {
 	private static final String RESPONSE_URL_REGEX = "https://hooks.slack.com/(commands|actions|app).+"; // 排除services (incoming-webhook)
 
 	@Override
-	public void handleUncaughtException( Throwable ex, Method method, Object... params ) {
+	public void handleUncaughtException( @NonNull Throwable ex, @NonNull Method method, @NonNull Object... params ) {
 		log.error( StringUtils.EMPTY, ex );
 
 		if ( ArrayUtils.isEmpty( params ) ) {
