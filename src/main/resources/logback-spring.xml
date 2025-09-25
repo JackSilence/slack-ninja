@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<configuration debug="true">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+    <springProperty scope="context" name="appName" source="app.name" defaultValue="NINJA" />
+    <appender name="SLACK" class="ninja.logging.SlackAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <token>${slack.bot.token:-}</token>
+        <channel>${slack.channel:-}</channel>
+        <user>${slack.user.id:-}</user>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="SLACK" />
+    </root>
+</configuration>
