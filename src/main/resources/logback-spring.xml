@@ -3,7 +3,6 @@
 <configuration debug="true">
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
-    <springProperty scope="context" name="appName" source="app.name" defaultValue="NINJA" />
     <appender name="SLACK" class="ninja.logging.SlackAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>ERROR</level>
@@ -11,6 +10,7 @@
         <token>${slack.bot.token:-}</token>
         <channel>${slack.channel:-}</channel>
         <user>${slack.user.id:-}</user>
+        <app>${app.name:-}</app>
     </appender>
     <root level="INFO">
         <appender-ref ref="CONSOLE" />

@@ -21,7 +21,7 @@ import ninja.consts.Task;
 import ninja.slack.Payload;
 import ninja.util.Check;
 import ninja.util.Gson;
-import ninja.util.Heroku;
+import ninja.util.Ninja;
 
 @RestController
 @RequestMapping( "/task" )
@@ -40,7 +40,7 @@ public class TaskController extends BaseController {
 
 	@PostMapping
 	public String task() {
-		return Heroku.task().toString();
+		return Ninja.task().toString();
 	}
 
 	@PostMapping( "/execute" )
@@ -60,7 +60,7 @@ public class TaskController extends BaseController {
 
 			Check.equals( command, action.getName(), payload );
 
-			if ( Act.HEROKU_TASK.equals( act ) ) {
+			if ( Act.NINJA_TASK.equals( act ) ) {
 				Check.name( Task.class, command = action.getValue(), payload );
 
 				String user = message.getUser().getName(), token = System.getenv( "slack.legacy.token." + user );

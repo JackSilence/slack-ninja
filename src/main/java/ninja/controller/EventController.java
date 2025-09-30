@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ninja.slack.Callback;
 import ninja.util.Check;
 import ninja.util.Gson;
-import ninja.util.Heroku;
+import ninja.util.Ninja;
 import ninja.util.Slack;
 
 @RestController
@@ -66,7 +66,7 @@ public class EventController extends BaseController {
 		String text = event.getText(), channel = event.getChannel();
 
 		if ( Type.APP_MENTION.equals( type ) && StringUtils.contains( text, MENTION_KEYWORD ) ) {
-			post( Heroku.task( "您可選擇任務並於確認後執行", channel ) );
+			post( Ninja.task( "您可選擇任務並於確認後執行", channel ) );
 
 		} else if ( Type.MESSAGE.equals( type ) && ( text = StringUtils.defaultString( text ).trim() ).matches( ENG_REGEX ) ) {
 			post( Slack.message( translate( text ), channel ) ); // text可能為null, 例如subtype: message_changed

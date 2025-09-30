@@ -16,7 +16,7 @@ import ninja.util.Utils;
 public class SlackAppender extends AppenderBase<ILoggingEvent> {
     private static final String API_URL = "https://slack.com/api/chat.postEphemeral";
 
-    private String token, channel, user;
+    private String token, channel, user, app;
 
     @Override
     public void start() {
@@ -51,8 +51,9 @@ public class SlackAppender extends AppenderBase<ILoggingEvent> {
     private String message( ILoggingEvent event ) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append( "🚨 *Slack Ninja Error Alert*\n" );
-        sb.append( "```\n" );
+        String prefix = StringUtils.isNotBlank( app ) ? app + StringUtils.SPACE : StringUtils.EMPTY;
+
+        sb.append( "🚨 *" ).append( prefix ).append( "Error Alert*\n" ).append( "```\n" );
         sb.append( "Time: " ).append( new java.util.Date( event.getTimeStamp() ) ).append( "\n" );
         sb.append( "Level: " ).append( event.getLevel() ).append( "\n" );
         sb.append( "Logger: " ).append( event.getLoggerName() ).append( "\n" );
@@ -88,5 +89,9 @@ public class SlackAppender extends AppenderBase<ILoggingEvent> {
 
     public void setUser( String user ) {
         this.user = user;
+    }
+
+    public void setApp( String app ) {
+        this.app = app;
     }
 }
