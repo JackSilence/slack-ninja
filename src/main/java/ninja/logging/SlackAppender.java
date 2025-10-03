@@ -1,31 +1,20 @@
 package ninja.logging;
 
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.fluent.Request;
-
-import com.google.common.net.HttpHeaders;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.status.ErrorStatus;
-import ninja.util.Gson;
+import net.gpedro.integrations.slack.SlackMessage;
 import ninja.util.Utils;
 
 public class SlackAppender extends AppenderBase<ILoggingEvent> {
-    private static final String API_URL = "https://slack.com/api/chat.postMessage";
-
-    private String token, channel, app;
+    private String webhook, app;
 
     @Override
     public void start() {
-        if ( StringUtils.isBlank( token ) ) {
-            addStatus( new ErrorStatus( "Slack token is not configured", this ) );
-            return;
-        }
-        if ( StringUtils.isBlank( channel ) ) {
-            addStatus( new ErrorStatus( "Slack channel is not configured", this ) );
+        if ( StringUtils.isBlank( webhook ) ) {
+            addStatus( new ErrorStatus( "Slack webhook is not configured", this ) );
             return;
         }
         super.start();
@@ -40,7 +29,7 @@ public class SlackAppender extends AppenderBase<ILoggingEvent> {
         try {
             send( message( event ) );
         } catch ( Exception e ) {
-            addError( "Failed to send ephemeral message to Slack", e );
+            addError( "Failed to send message to Slack webhook", e );
         }
     }
 
@@ -66,21 +55,15 @@ public class SlackAppender extends AppenderBase<ILoggingEvent> {
     }
 
     private void send( String message ) {
-        String body = Gson.json( Map.of( "channel", channel, "text", message ) );
-
-        String response = Utils.call( Request.Post( API_URL ).setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + token ), body );
+        String response = Utils.call( webhook, new SlackMessage( message ) );
 
         if ( response.contains( "\"ok\":false" ) ) {
-            addError( "Slack API error: " + response );
+            addError( "Slack webhook error: " + response );
         }
     }
 
-    public void setToken( String token ) {
-        this.token = token;
-    }
-
-    public void setChannel( String channel ) {
-        this.channel = channel;
+    public void setWebhook( String webhook ) {
+        this.webhook = webhook;
     }
 
     public void setApp( String app ) {

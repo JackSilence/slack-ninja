@@ -8,8 +8,7 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>ERROR</level>
         </filter>
-        <token>${slack.bot.token:-}</token>
-        <channel>${slack.dm.channel:-}</channel>
+        <webhook>${slack.webhook.url.dm:-}</webhook>
         <app>${app}</app>
     </appender>
     <root level="INFO">
