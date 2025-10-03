@@ -14,9 +14,9 @@ import ninja.util.Gson;
 import ninja.util.Utils;
 
 public class SlackAppender extends AppenderBase<ILoggingEvent> {
-    private static final String API_URL = "https://slack.com/api/chat.postEphemeral";
+    private static final String API_URL = "https://slack.com/api/chat.postMessage";
 
-    private String token, channel, user, app;
+    private String token, channel, app;
 
     @Override
     public void start() {
@@ -26,10 +26,6 @@ public class SlackAppender extends AppenderBase<ILoggingEvent> {
         }
         if ( StringUtils.isBlank( channel ) ) {
             addStatus( new ErrorStatus( "Slack channel is not configured", this ) );
-            return;
-        }
-        if ( StringUtils.isBlank( user ) ) {
-            addStatus( new ErrorStatus( "Slack user is not configured", this ) );
             return;
         }
         super.start();
@@ -70,7 +66,7 @@ public class SlackAppender extends AppenderBase<ILoggingEvent> {
     }
 
     private void send( String message ) {
-        String body = Gson.json( Map.of( "channel", channel, "user", user, "text", message ) );
+        String body = Gson.json( Map.of( "channel", channel, "text", message ) );
 
         String response = Utils.call( Request.Post( API_URL ).setHeader( HttpHeaders.AUTHORIZATION, "Bearer " + token ), body );
 
@@ -85,10 +81,6 @@ public class SlackAppender extends AppenderBase<ILoggingEvent> {
 
     public void setChannel( String channel ) {
         this.channel = channel;
-    }
-
-    public void setUser( String user ) {
-        this.user = user;
     }
 
     public void setApp( String app ) {

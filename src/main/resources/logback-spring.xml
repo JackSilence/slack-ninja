@@ -9,8 +9,7 @@
             <level>ERROR</level>
         </filter>
         <token>${slack.bot.token:-}</token>
-        <channel>${slack.channel:-}</channel>
-        <user>${slack.user.id:-}</user>
+        <channel>${slack.dm.channel:-}</channel>
         <app>${app}</app>
     </appender>
     <root level="INFO">
