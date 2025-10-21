@@ -8,7 +8,7 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>ERROR</level>
         </filter>
-        <webhook>${slack.webhook.url.dm:-}</webhook>
+        <webhook>${slack.webhook.url.omg:-}</webhook>
         <app>${app}</app>
     </appender>
     <root level="INFO">
