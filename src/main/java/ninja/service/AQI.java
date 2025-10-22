@@ -1,35 +1,27 @@
 package ninja.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.client.fluent.Request;
-import org.apache.http.entity.ContentType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import ninja.util.Cast;
 import ninja.util.Gson;
 import ninja.util.Utils;
 
 @Service
 public class AQI extends Data<List<String>> {
-	private static final String SITE_URL = "https://airtw.moenv.gov.tw/ajax.aspx";
+	private static final String SITE_URL = "https://data.moenv.gov.tw/api/v2/aqx_p_432?format=json&api_key=%s";
 
-	private static final String SITE_PAYLOAD = "Target=Get%s&%s";
-
-	private static final String COUNTY = "County", NAME = "Name";
+	@Value( "${epa.api.key:}" )
+	private String key;
 
 	@Override
 	void init( Map<String, List<String>> data ) {
-		call( request( COUNTY, "AreaID=&SiteID=" ) ).forEach( i -> {
-			data.put( i.get( NAME ), Utils.list( call( request( "Site", COUNTY + "=" + i.get( "Value" ) ) ).stream().map( j -> j.get( NAME ) ) ) );
-		} );
-	}
+		var records = Cast.list( Gson.from( Utils.call( String.format( SITE_URL, key ) ), Map.class ), "records" ).stream().map( Cast::map );
 
-	private List<Map<String, String>> call( Request request ) {
-		return Gson.listOfMaps( Utils.call( request ) );
-	}
-
-	private Request request( String target, String query ) {
-		return Request.Post( SITE_URL ).bodyString( String.format( SITE_PAYLOAD, target, query ), ContentType.APPLICATION_FORM_URLENCODED );
+		records.forEach( r -> data.computeIfAbsent( Cast.string( r, "county" ), k -> new ArrayList<>() ).add( Cast.string( r, "sitename" ) ) );
 	}
 }
