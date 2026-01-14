@@ -20,8 +20,9 @@ public class AQI extends Data<List<String>> {
 
 	@Override
 	void init( Map<String, List<String>> data ) {
-		var records = Cast.list( Gson.from( Utils.call( String.format( SITE_URL, key ) ), Map.class ), "records" ).stream().map( Cast::map );
+		var records = Gson.listOfMaps( Utils.call( String.format( SITE_URL, key ) ) ).stream().map( Cast::map );
 
 		records.forEach( r -> data.computeIfAbsent( Cast.string( r, "county" ), k -> new ArrayList<>() ).add( Cast.string( r, "sitename" ) ) );
 	}
 }
+

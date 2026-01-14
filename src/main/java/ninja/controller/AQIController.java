@@ -71,9 +71,9 @@ public class AQIController extends GroupController<List<String>> {
 
 		county = Check.first( aqi.data().entrySet().stream().filter( i -> i.getValue().contains( site ) ), "查無測站: " + site ).getKey();
 
-		var result = Gson.from( Utils.call( String.format( API_URL, site, key ) ), Map.class );
+		var result = Gson.listOfMaps( Utils.call( String.format( API_URL, site, key ) ) );
 
-		var info = Cast.map( Check.first( Cast.list( result, "records" ).stream(), "查無資料: " + site ) );
+		var info = Cast.map( Check.first( result.stream(), "查無資料: " + site ) );
 
 		String aqi = StringUtils.defaultIfEmpty( Cast.string( info, "aqi" ), NA ), status = Cast.string( info, "status" );
 
